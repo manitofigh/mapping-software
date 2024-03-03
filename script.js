@@ -1,7 +1,3 @@
-//initialize tooltips
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
 // left collapse button
 $('#left-bar-collapse-btn').click(function() {
     $('.left-bar').toggleClass('bar-collapsed');
@@ -21,6 +17,7 @@ $('#bottom-bar-collapse-btn').click(function() {
 });
 
 $('#reset-layout-btn').click(function() {
+    $(this).addClass('disabled');
     $('.left-bar, .right-bar, .bottom-bar').removeClass('bar-collapsed');
     resetLayout();
 });
