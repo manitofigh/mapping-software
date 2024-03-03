@@ -1,0 +1,7 @@
+node_moudules/
+build
+.npm
+npm-debug.log
+.nyc
+.env
+.DS_Store
