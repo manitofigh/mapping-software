@@ -72,7 +72,7 @@ div {
 
 /* hover increase scale 20% ease in out 300ms*/
 .collapse-btn:hover {
-    transform: scale(1.2);
+    transform: scale(1.15);
 }
 
 /* not hover */
@@ -95,7 +95,8 @@ div {
 
 #left-bar-collapse-btn {
     position: absolute;
-    left: 4px;
+    left: 0px;
+    margin: 0 0 0 2px;
 }
 
 .right-bar {
@@ -112,7 +113,8 @@ div {
 
 #right-bar-collapse-btn {
     position: absolute;
-    right: 4px;
+    right: 0px;
+    margin: 0 2px 0 0;
 }
 
 .bottom-bar {
@@ -129,30 +131,30 @@ div {
 
 #bottom-bar-collapse-btn {
     position: absolute;
-    bottom: -1px;
-    rotate: 90deg;
+    bottom: -6px;
+    rotate: -90deg;
+    margin: 0 0 0 0;
 }
 
+/* remove bars that are assigned this class */
 .bar-collapsed {
     display: none;
 }
 
+/* opacity reduction on the bars that their related collapse button is hovered over */
 .collapse-opacity {
     opacity: 0.85;
     transition: opacity 120ms ease-in-out;
-  }
+}
 
+/* When bottom is closed but left is still open */
 .left-expanded-bottom {
     grid-column: 1 / 2;
     grid-row: 2 / 4;
 }
 
+/* When bottom is closed but right is still open */
 .right-expanded-bottom {
-    grid-row: 2 / 4;
-}
-
-.main-expanded-full {
-    grid-column: 1 / 4;
     grid-row: 2 / 4;
 }
 
@@ -161,22 +163,19 @@ div {
     grid-row: 2 / 3;
 }
 
-.main-expanded-right {
-    grid-column: 2 / 4;
-    grid-row: 2 / 3;
-}
-
+/* Only expand to the bottom when left and right bars are still open*/
 .main-expanded-bottom {
     grid-row: 2 / 4;
 }
 
+/* Expand throughout the entire screen except over the top bar when all the bars are closed */
 .main-expanded-full {
     grid-column: 1 / 4;
     grid-row: 2 / 4;
 }
 
 .main-expanded-left-right {
-    grid-column: 1 / 4;
+    grid-column: 1 / -1; /* Full width when both left and right are closed */
 }
 
 .main-expanded-right {
