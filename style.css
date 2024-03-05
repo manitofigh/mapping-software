@@ -12,6 +12,13 @@
     --bg-color-main: #18181b;
 }
 
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(160deg) brightness(100%) contrast(80%);
+}
+
 div {
     color: #F0F0F0;
 }
@@ -64,7 +71,8 @@ div {
     height: 28px;
     background-color: white;
     border-radius: 500px;
-    border: 2px solid var(--border-color-bars);
+    border: 1px solid rgb(179, 103, 255);
+    box-shadow: 0 0 8px 0 rgb(179, 103, 255);
     z-index: 1;
     transition: transform 120ms ease-in-out;
     cursor: pointer;
