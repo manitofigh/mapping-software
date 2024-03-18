@@ -56,11 +56,39 @@ function Geocoding() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  const dragOverHandler = ev => {
+ 
+    // console.log("dragOvered");
+    ev.target.background = "blue"
+    ev.preventDefault();
+  }
+  const dropHandler = ev => {  
+    // console.log("hello");
+    ev.preventDefault();
+    if(ev.target.classList.contains("dragover"))
+      ev.target.classList.remove("dragover");
+  }
+
+  const dragEnter = ev => {  
+  
+     console.log("dragEnter");
+    if(ev.target.id == "drop_zone")
+      ev.target.classList.add("dragover");
+  }
+  const dragLeave = ev => {  
+  
+    // console.log("dragLeave");
+    if(ev.target.id == "drop_zone")
+      ev.target.classList.remove("dragover");
+  }
+
+
+  
 
   return (
     <div>
       <textarea
-        placeholder="Enter addresses separated by commas"
+        placeholder="Enter addresses separated by newline"
         rows="5"
         cols="50"
         value={addresses.join('\n')}
@@ -80,7 +108,23 @@ function Geocoding() {
           </li>
         ))}
       </ul>
+      <div 
+		id="drop_zone"
+		onDrop={e => dropHandler(e)}
+		onDragOver={e=> dragOverHandler(e)}
+		onDragEnter={e=> dragEnter(e)}
+		onDragLeave={e=> dragLeave(e)}>
+		
+
+		<p> Drag a text file in this area </p>
+		
+		<form>
+			<input type="file" id="actual_button" accept=".csv,.txt" hidden/>
+			<label id="upload_label" for="actual_button"> Upload File </label>
+		</form>
+	</div>
     </div>
+    
   );
 }
 
