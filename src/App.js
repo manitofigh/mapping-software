@@ -4,8 +4,31 @@ import './App.css';
 import React, { useState } from 'react';
 
 function Geocoding() {
-  const [addresses, setAddresses] = useState([]);
+  const [addresses, setAddresses] = useState(['']);
   const [results, setResults] = useState([]);
+
+ // Allows input to appear as it is to make it one string to use the \n to split the code.   
+  const handleAddressChange = (e, index) => {
+    const newAddresses = [...addresses];
+    newAddresses[index] = e.target.value;
+    setAddresses(newAddresses);
+  };
+
+  const addAddressInput = () => {
+    setAddresses([...addresses, '']);
+  };
+
+  const removeAddressInput = (index) => {
+    const newAddresses = [...addresses];
+    newAddresses.splice(index, 1);
+    setAddresses(newAddresses);
+  };
+
+  const concatenateAddresses = () => {
+    const concatenatedAddresses = addresses.join('\n');
+    console.log(concatenatedAddresses);
+    
+  };
 
   const geocodeAddresses = async () => {
     const geocodedResults = [];
@@ -42,6 +65,12 @@ function Geocoding() {
     // Save the results to a JSON file
     console.log(geocodedResults);
     //saveResultsToJsonFile(geocodedResults, 'geocoding_results.json');
+  };
+
+  const doneInputting = () => {
+    const concatenatedAddresses = addresses.join('\n');
+    console.log(concatenatedAddresses);
+    geocodeAddresses(); // Geocode all addresses
   };
 
   const saveResultsToJsonFile = (results, filename) => {
@@ -84,48 +113,38 @@ function Geocoding() {
 
 
   
-
   return (
     <div>
-      <textarea
-        placeholder="Enter addresses separated by newline"
-        rows="5"
-        cols="50"
-        value={addresses.join('\n')}
-        onChange={(e) => setAddresses(e.target.value.split('\n'))}
-      />
-      <button onClick={geocodeAddresses}>Geocode Addresses</button>
-      <ul>
-        {results.map((result, index) => (
-          <li key={index}>
-            <strong>Address:</strong> {result.formatted_address}<br />
-            <strong>Latitude:</strong> {result.latitude}<br />
-            <strong>Longitude:</strong> {result.longitude}<br />
-            <strong>Accuracy:</strong> {result.accuracy}<br />
-            <strong>Google Place ID:</strong> {result.google_place_id}<br />
-            <strong>Type:</strong> {result.type}<br />
-            <strong>Postcode:</strong> {result.postcode}<br />
-          </li>
-        ))}
-      </ul>
+      {addresses.map((address, index) => (
+        <div key={index}>
+          <input
+            type="text"
+            placeholder="Enter address"
+            value={address}
+            onChange={(e) => handleAddressChange(e, index)}
+          />
+          <button onClick={() => removeAddressInput(index)}>Remove</button>
+        </div>
+      ))}
+      <button onClick={addAddressInput}>Add Address</button>
+      <button onClick={doneInputting}>Done Inputting</button>
+      {/* File Upload Section */}
       <div 
-		id="drop_zone"
-		onDrop={e => dropHandler(e)}
-		onDragOver={e=> dragOverHandler(e)}
-		onDragEnter={e=> dragEnter(e)}
-		onDragLeave={e=> dragLeave(e)}>
-		
-
-		<p> Drag a text file in this area </p>
-		
-		<form>
-			<input type="file" id="actual_button" accept=".csv,.txt" hidden/>
-			<label id="upload_label" for="actual_button"> Upload File </label>
-		</form>
-	</div>
+        id="drop_zone"
+        onDrop={e => dropHandler(e)}
+        onDragOver={e => dragOverHandler(e)}
+        onDragEnter={e => dragEnter(e)}
+        onDragLeave={e => dragLeave(e)}
+      >
+        <p>Drag a text file in this area</p>
+        <form>
+          <input type="file" id="actual_button" accept=".csv,.txt" hidden />
+          <label id="upload_label" htmlFor="actual_button">Upload File</label>
+        </form>
+      </div>
     </div>
-    
   );
+  
 }
 
 export default Geocoding;
