@@ -38,26 +38,29 @@
 }
 
 #drop_zone {
-	border: 5px solid black;
-	width: 200px;
-	height: 200px;
-	background-color: white;
-	text-align: center;
+  border: 5px solid black;
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #drop_zone.dragover {
-	border: 5px solid black;
-	width: 200px;
-	height: 200px;
-	background-color: blue;
+  border: 5px solid black;
+  width: 200px;
+  height: 200px;
+  background-color: blue;
 }
 
 #upload_label {
-	background-color: blue;
-	color: white;
-	padding: 0.5rem;
-	border-radius: 0.3rem;
-	cursor: pointer;
-
+  background-color: blue;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
 }
+
 

@@ -1,34 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
 
+import './App.css';
 import React, { useState } from 'react';
 
 function Geocoding() {
-  const [addresses, setAddresses] = useState(['']);
+  const [addresses, setAddresses] = useState([""]);
   const [results, setResults] = useState([]);
 
- // Allows input to appear as it is to make it one string to use the \n to split the code.   
-  const handleAddressChange = (e, index) => {
-    const newAddresses = [...addresses];
-    newAddresses[index] = e.target.value;
-    setAddresses(newAddresses);
+  const handleFileChange = (e) => {
+    e.preventDefault();
+    const file = e.target.files[0];
+    processFile(file);
+  };
+
+  const processFile = (file) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      let resultText = e.target.result;
+      resultText = resultText.replaceAll('\r', '');
+      const texts = resultText.split('\n');
+      texts.pop();
+  
+      setAddresses(texts.slice(0, 100)); 
+    };
+    if (file) {
+      reader.readAsText(file);
+    }
   };
 
   const addAddressInput = () => {
-    setAddresses([...addresses, '']);
+    if (addresses.length < 100) {
+      setAddresses([...addresses, '']);
+    }
   };
 
-  const removeAddressInput = (index) => {
-    const newAddresses = [...addresses];
-    newAddresses.splice(index, 1);
-    setAddresses(newAddresses);
-  };
+  
 
-  const concatenateAddresses = () => {
-    const concatenatedAddresses = addresses.join('\n');
-    console.log(concatenatedAddresses);
-    
-  };
+  
 
   const geocodeAddresses = async () => {
     const geocodedResults = [];
@@ -85,34 +92,29 @@ function Geocoding() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  const dragOverHandler = ev => {
- 
-    // console.log("dragOvered");
-    ev.target.background = "blue"
-    ev.preventDefault();
-  }
-  const dropHandler = ev => {  
-    // console.log("hello");
-    ev.preventDefault();
-    if(ev.target.classList.contains("dragover"))
-      ev.target.classList.remove("dragover");
-  }
 
-  const dragEnter = ev => {  
+  const dragOverHandler = (e) => {
+    e.preventDefault();
+    e.target.classList.add("dragover");
+  };
   
-     console.log("dragEnter");
-    if(ev.target.id == "drop_zone")
-      ev.target.classList.add("dragover");
-  }
-  const dragLeave = ev => {  
+  const dragEnterHandler = (e) => {
+    e.preventDefault();
+    e.target.classList.add("dragover");
+  };
   
-    // console.log("dragLeave");
-    if(ev.target.id == "drop_zone")
-      ev.target.classList.remove("dragover");
-  }
+  const dragLeaveHandler = (e) => {
+    e.preventDefault();
+    e.target.classList.remove("dragover");
+  };
 
+  const dropHandler = (e) => {
+    e.preventDefault();
+    e.target.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    processFile(file);
+  };
 
-  
   return (
     <div>
       {addresses.map((address, index) => (
@@ -121,30 +123,26 @@ function Geocoding() {
             type="text"
             placeholder="Enter address"
             value={address}
-            onChange={(e) => handleAddressChange(e, index)}
+            onChange={(e) => setAddresses([...addresses.slice(0, index), e.target.value, ...addresses.slice(index + 1)])}
           />
-          <button onClick={() => removeAddressInput(index)}>Remove</button>
+          <button onClick={() => setAddresses(addresses.filter((_, i) => i !== index))}>Remove</button>
         </div>
       ))}
       <button onClick={addAddressInput}>Add Address</button>
       <button onClick={doneInputting}>Done Inputting</button>
-      {/* File Upload Section */}
-      <div 
+      
+      <div
         id="drop_zone"
-        onDrop={e => dropHandler(e)}
-        onDragOver={e => dragOverHandler(e)}
-        onDragEnter={e => dragEnter(e)}
-        onDragLeave={e => dragLeave(e)}
+        onDrop={dropHandler}
+        onDragOver={dragOverHandler}
+        onDragEnter={dragEnterHandler}
+        onDragLeave={dragLeaveHandler}
       >
-        <p>Drag a text file in this area</p>
-        <form>
-          <input type="file" id="actual_button" accept=".csv,.txt" hidden />
-          <label id="upload_label" htmlFor="actual_button">Upload File</label>
-        </form>
+        <label htmlFor="actual_button" id="upload_label">Upload File</label>
+        <input type="file" id="actual_button" accept=".csv,.txt" onChange={handleFileChange} hidden />
       </div>
     </div>
   );
-  
 }
 
 export default Geocoding;
