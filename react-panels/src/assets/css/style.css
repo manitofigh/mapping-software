@@ -1,0 +1,195 @@
+body {
+    margin: 0;
+    padding: 0;
+    /* hide scrollbar on all browsers */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* root */
+:root {
+    --border-color-bars: #F0F0F0;
+    --bg-color-main: #18181b;
+}
+
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(160deg) brightness(100%) contrast(80%);
+}
+
+div {
+    color: #F0F0F0;
+}
+
+.bg-body-tertiary {
+    background-color: var(--bg-color-main) !important;
+}
+
+.main-container {
+    display: grid;
+    /* gap: 5px; */
+    width: 100vw;
+    height: 100vh;
+    grid-template-rows: minmax(70px, 80px) 1fr minmax(120px, 140px);
+    grid-template-columns: minmax(80px, 120px) auto minmax(80px, 160px);
+}
+
+.top-bar {
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+
+    position: relative;
+    border-bottom: 2px solid var(--border-color-bars);
+    z-index: 2;
+}
+
+.navbar { /*bootstrap change */
+    width: 100%;
+    height: 100%;
+}
+
+#reset-layout-btn {
+    cursor: pointer;
+}
+
+.left-bar {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+
+    position: relative;
+    background-color: var(--bg-color-main);
+    border-right: 2px solid var(--border-color-bars);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.collapse-btn {
+    width: 13px;
+    height: 28px;
+    background-color: white;
+    border-radius: 500px;
+    border: 1px solid rgb(179, 103, 255);
+    box-shadow: 0 0 8px 0 rgb(179, 103, 255);
+    z-index: 1;
+    transition: transform 120ms ease-in-out;
+    cursor: pointer;
+}
+
+/* hover increase scale 20% ease in out 300ms*/
+.collapse-btn:hover {
+    transform: scale(1.15);
+}
+
+/* not hover */
+.collapse-btn:not(:hover) {
+    transform: scale(1);
+    transition-duration: 120ms;
+    transition-timing-function: ease-in-out;
+}
+
+.main-content {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+
+    position: relative;
+    background-color: var(--bg-color-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#left-bar-collapse-btn {
+    position: absolute;
+    left: 0px;
+    margin: 0 0 0 2px;
+}
+
+.right-bar {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+
+    position: relative;
+    background-color: var(--bg-color-main);
+    border-left: 2px solid var(--border-color-bars);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#right-bar-collapse-btn {
+    position: absolute;
+    right: 0px;
+    margin: 0 2px 0 0;
+}
+
+.bottom-bar {
+    grid-column: 1 / 4;
+    grid-row: 3 / 4;
+
+    position: relative;
+    background-color: var(--bg-color-main);
+    border-top: 2px solid var(--border-color-bars);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#bottom-bar-collapse-btn {
+    position: absolute;
+    bottom: -6px;
+    rotate: -90deg;
+    margin: 0 0 0 0;
+}
+
+/* remove bars that are assigned this class */
+.bar-collapsed {
+    display: none;
+}
+
+/* opacity reduction on the bars that their related collapse button is hovered over */
+.collapse-opacity {
+    opacity: 0.85;
+    transition: opacity 120ms ease-in-out;
+}
+
+/* When bottom is closed but left is still open */
+.left-expanded-bottom {
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+}
+
+/* When bottom is closed but right is still open */
+.right-expanded-bottom {
+    grid-row: 2 / 4;
+}
+
+.main-expanded-left {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+}
+
+/* Only expand to the bottom when left and right bars are still open*/
+.main-expanded-bottom {
+    grid-row: 2 / 4;
+}
+
+/* Expand throughout the entire screen except over the top bar when all the bars are closed */
+.main-expanded-full {
+    grid-column: 1 / 4;
+    grid-row: 2 / 4;
+}
+
+.main-expanded-left-right {
+    grid-column: 1 / -1; /* Full width when both left and right are closed */
+}
+
+.main-expanded-right {
+    grid-column: 2 / 4;
+}
+
+.main-expanded-bottom {
+    grid-row: 2 / 4;
+}

@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import React from 'react';
+import DriverPanel from './components/DriverPanel';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-
   return (
-    <>
-      test
-    </>
-  )
+    <div>
+      <DriverPanel />
+    </div>
+  );
 }
 
-export default App
+export default App;
