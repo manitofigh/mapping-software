@@ -4,6 +4,7 @@
 .LSOverride
 ._*
 __MACOSX
+node_modules/
 
 ~$*
 *~
