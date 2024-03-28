@@ -22,7 +22,7 @@ app.set("view engine", "ejs");
 app.use(
   session({
     // Key we want to keep secret which will encrypt all of our information
-    secret: 'something',
+    secret: 'something', // TO DO
     // Should we resave our session variables if nothing has changes which we dont
     resave: false,
     // Save empty value if there is no vaue which we do not want to do
