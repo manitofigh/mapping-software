@@ -105,15 +105,15 @@ app.post("/users/register", async (req, res) => {
           });
         } else {
           pool.query(
-            `INSERT INTO users (name, email, password)
-                VALUES ($1, $2, $3)
+            `INSERT INTO users (name, email, password, isadmin)
+                VALUES ($1, $2, $3, false)
                 RETURNING id, password`,
-            [name, email, hashedPassword],
+            [name, email, hashedPassword, isadmin],
             (err, results) => {
               if (err) {
                 throw err;
               }
-              console.log(results.rows);
+              console.log(results.rows,);
               req.flash("success_msg", "You are now registered. Please log in");
               res.redirect("/users/login");
             }
@@ -127,10 +127,19 @@ app.post("/users/register", async (req, res) => {
 app.post(
   "/users/login",
   passport.authenticate("local", {
-    successRedirect: "/users/dashboard",
     failureRedirect: "/users/login",
     failureFlash: true
-  })
+  }),
+  (req, res) => {
+    // Check if the authenticated user is an admin
+    if (req.user.isadmin) {
+      // Redirect admin users to the admin dashboard
+      res.redirect("/admin/dashboard");
+    } else {
+      // Redirect non-admin users to the user dashboard
+      res.redirect("/users/dashboard");
+    }
+  }
 );
 
 function checkAuthenticated(req, res, next) {
