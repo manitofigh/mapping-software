@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 function Geocoding() {
   const [addresses, setAddresses] = useState([""]);
-  const [addresses, setAddresses] = useState([""]);
+ 
   const [results, setResults] = useState([]);
 
   const handleFileChange = (e) => {
