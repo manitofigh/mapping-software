@@ -11,6 +11,9 @@ const AdminPanel = () => {
     bottom: false,
   });
 
+  // Additional state to manage whether the reset button is disabled
+  const [isResetDisabled, setIsResetDisabled] = useState(true);
+
   useEffect(() => {
     // Ensure the map container is clean before initializing a new map
     let container = L.DomUtil.get('adminMap');
@@ -25,7 +28,7 @@ const AdminPanel = () => {
 
     const map = new L.map('adminMap', mapOptions);
     const layer = new L.TileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     );
     map.addLayer(layer);
 
@@ -35,9 +38,28 @@ const AdminPanel = () => {
     };
   }, []);
 
-  const toggleBar = (barName) => {
-    setBars((prevBars) => ({ ...prevBars, [barName]: !prevBars[barName] }));
+  // Mimics the resetLayout function from jQuery, using React state
+  const resetLayout = () => {
+    setBars({ left: false, right: false, bottom: false });
   };
+
+  // Mimics the updateLayout function from jQuery, using React state
+  const updateLayout = () => {
+    const anyCollapsed = Object.values(bars).some(value => value);
+    setIsResetDisabled(!anyCollapsed);
+  };
+
+  const toggleBar = (barName) => {
+    setBars(prevBars => {
+      const updatedBars = { ...prevBars, [barName]: !prevBars[barName] };
+      return updatedBars;
+    });
+  };
+
+  // Utilize effect hook to apply layout changes whenever bars' states change
+  useEffect(() => {
+    updateLayout();
+  }, [bars]);
 
   const isAnyBarCollapsed = () => Object.values(bars).some((status) => status);
 
@@ -112,8 +134,9 @@ const AdminPanel = () => {
                 <li className="nav-item">
                   <button
                     type="button"
-                    className="btn btn-danger disabled"
+                    className={`btn btn-danger ${isResetDisabled ? "disabled" : ""}`}
                     id="reset-layout-btn"
+                    onClick={resetLayout}
                   >
                     Reset Layout
                   </button>
@@ -174,7 +197,7 @@ const AdminPanel = () => {
         <button
           className="collapse-btn"
           disabled={!isAnyBarCollapsed()}
-          onClick={() => setBars({ left: false, right: false, bottom: false })}
+          onClick={resetLayout}
           title="Reset Layout"
         >
           Reset Layout
