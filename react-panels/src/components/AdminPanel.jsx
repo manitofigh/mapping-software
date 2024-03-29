@@ -12,17 +12,27 @@ const AdminPanel = () => {
   });
 
   useEffect(() => {
-    // Initialize the map when the component mounts
+    // Ensure the map container is clean before initializing a new map
+    let container = L.DomUtil.get('adminMap');
+    if (container != null) {
+      container._leaflet_id = null;
+    }
+
     const mapOptions = {
       center: [40.7169, -73.599],
       zoom: 15,
     };
 
-    const map = new L.map("adminMap", mapOptions);
+    const map = new L.map('adminMap', mapOptions);
     const layer = new L.TileLayer(
-      "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     );
     map.addLayer(layer);
+
+    // Cleanup function to remove the map when the component unmounts or needs to reinitialize
+    return () => {
+      map.remove();
+    };
   }, []);
 
   const toggleBar = (barName) => {
