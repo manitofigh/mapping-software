@@ -125,14 +125,16 @@ function Geocoding() {
 	str += e['latitude'];
 	str += ";"
       });
-      var res = str.substring(0,str.length-1)
+      var res = str.substring(0,str.length-1);
       console.log(res);
+
 
       try {
 	const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false");
 	const data = await response.json();
 	if(data.code === "Ok"){
 	  console.log("Everything worked")
+    console.log("Duration in mins: " + data.trips[0].duration / 60)
 	  console.log(data)
 	} else 
 	  console.error(data.code + ": " + data.message);
