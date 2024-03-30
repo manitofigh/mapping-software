@@ -116,6 +116,36 @@ function Geocoding() {
     processFile(file);
   };
 
+  const addressSort = async () => {	
+      // console.log("Running Address Sorting");
+      var str = ""
+      results.forEach(e => {
+	str += e['longitude'];
+	str += ","
+	str += e['latitude'];
+	str += ";"
+      });
+      var res = str.substring(0,str.length-1)
+      console.log(res);
+
+      try {
+	const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false");
+	const data = await response.json();
+	if(data.code === "Ok"){
+	  console.log("Everything worked")
+	  console.log(data)
+	} else 
+	  console.error(data.code + ": " + data.message);
+      } catch (error) {
+        console.error(`Error address sorting`);
+      }
+
+      
+
+    // "http://router.project-osrm.org/trip/v1/driving/-73.999786,40.764389;-74.016678,40.703564;-73.985428,40.748817?source=first&roundtrip=false"
+    // console.log(results);
+  }
+
   return (
     <div>
       {addresses.map((address, index) => (
@@ -142,6 +172,8 @@ function Geocoding() {
         <label htmlFor="actual_button" id="upload_label">Upload File</label>
         <input type="file" id="actual_button" accept=".csv,.txt" onChange={handleFileChange} hidden />
       </div>
+
+      <button onClick={addressSort}>Run Geocode</button>
     </div>
   );
 }
