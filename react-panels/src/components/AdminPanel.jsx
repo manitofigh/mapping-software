@@ -175,32 +175,24 @@ const AdminPanel = () => {
       <div className="main-content" id="adminMap">
         <button
           className="collapse-btn"
+          id="left-bar-collapse-btn"
           onClick={() => toggleBar("left")}
           title="Collapse/Show"
         >
-          Toggle Left Bar
         </button>
         <button
           className="collapse-btn"
+          id="right-bar-collapse-btn"
           onClick={() => toggleBar("right")}
           title="Collapse/Show"
         >
-          Toggle Right Bar
         </button>
         <button
           className="collapse-btn"
+          id="bottom-bar-collapse-btn"
           onClick={() => toggleBar("bottom")}
           title="Collapse/Show"
         >
-          Toggle Bottom Bar
-        </button>
-        <button
-          className="collapse-btn"
-          disabled={!isAnyBarCollapsed()}
-          onClick={resetLayout}
-          title="Reset Layout"
-        >
-          Reset Layout
         </button>
       </div>
     </div>

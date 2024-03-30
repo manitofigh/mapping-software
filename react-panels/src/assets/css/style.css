@@ -73,7 +73,7 @@ div {
     border-radius: 500px;
     border: 1px solid rgb(179, 103, 255);
     box-shadow: 0 0 8px 0 rgb(179, 103, 255);
-    z-index: 1;
+    z-index: 401;
     transition: transform 120ms ease-in-out;
     cursor: pointer;
 }
@@ -192,4 +192,13 @@ div {
 
 .main-expanded-bottom {
     grid-row: 2 / 4;
+}
+
+@media (min-width: 880px) {
+    .main-container {
+        /* top to bottom: top-bar main-content(3 cols together) bottom-bar */
+        grid-template-rows: minmax(70px, 80px) 1fr minmax(120px, 140px);
+        /* left to right: left-bar main-content right-bar */
+        grid-template-columns: minmax(80px, 120px) auto minmax(260px, 160px);
+    }
 }
