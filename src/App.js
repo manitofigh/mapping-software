@@ -173,7 +173,7 @@ function Geocoding() {
         <input type="file" id="actual_button" accept=".csv,.txt" onChange={handleFileChange} hidden />
       </div>
 
-      <button onClick={addressSort}>Run Geocode</button>
+      <button onClick={addressSort}>Run Address Sorting</button>
     </div>
   );
 }
