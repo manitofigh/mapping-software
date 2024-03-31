@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
+<body>
+    Enter location to get geocode translation
+    <form action="/translate" method="post">
+        <input type="text" name="text" id="text">
+        <button type="submit">Get geocode translation</button>
+    </form>
+    <% if (locals.location) { %>
+        <h3>Location: <%= location %></h3>
+    <% } %>
+
+     
+</body>
+</html>
