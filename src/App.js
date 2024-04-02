@@ -138,7 +138,7 @@ function Geocoding() {
 	  var waypointIndices = returnWaypointsIndexes(data.waypoints)
 	  for(var i = 1; i < results.length; i++){
 	    console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
-	    console.log(data.trips[0].legs[i-1].duration);
+	    // console.log(data.trips[0].legs[i-1].duration);
 
 	  }
 	  console.log(data)
