@@ -116,32 +116,78 @@ function Geocoding() {
   };
 
   const addressSort = async () => {	
-      // console.log("Running Address Sorting");
-      var str = ""
-      results.forEach(e => {
-	str += e['longitude'];
-	str += ","
-	str += e['latitude'];
-	str += ";"
-      });
-      var res = str.substring(0,str.length-1);
-      console.log(res);
+    // console.log("Running Address Sorting");
+    var str = ""
+    results.forEach(e => {
+      str += e['longitude'];
+      str += ","
+      str += e['latitude'];
+      str += ";"
+    });
+    var res = str.substring(0,str.length-1);
+    console.log(res);
 
 
-      try {
-	const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false");
-	const data = await response.json();
-	if(data.code === "Ok"){
-	  console.log("Everything worked")
-    console.log("Duration in mins: " + data.trips[0].duration / 60)
-	  console.log(data)
-	} else 
-	  console.error(data.code + ": " + data.message);
+    try {
+      const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false&geometries=geojson");
+      const data = await response.json();
+      if(data.code === "Ok"){
+        console.log("Everything worked")
+        console.log("Duration in mins: " + data.trips[0].duration / 60)
+        
+        var waypointIndices = returnWaypointsIndexes(data.waypoints)
+        
+        for(var i = 1; i < results.length; i++){
+          console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
+          // console.log(data.trips[0].legs[i-1].duration);
+        }
+        console.log(data)
+      } else 
+        console.error(data.code + ": " + data.message);
       } catch (error) {
         console.error(`Error address sorting`);
-      }
+    }
 
-      
+    function returnWaypointsIndexes(waypoints){
+      var arr = []
+      var len = waypoints.length
+      for(var i = 0; i < len; i++){
+        for(var a = 0; a < len; a++){
+          if(waypoints[a].waypoint_index == i){
+            arr.push(a);
+          }
+        }
+      }
+      return arr;
+    
+         }
+
+    function convertsSecondsToTime(secs){
+      // seconds
+      var s = Math.floor(secs % 60)
+      var minutes = secs / 60
+      var m = Math.floor(minutes%60)
+      var hours = minutes / 60
+      var h = Math.floor(hours % 60)
+      var days = hours / 60
+      var d = Math.floor(days)
+
+      var arr = [d,h,m,s];
+      var str = ""
+      arr.forEach(e => {
+        if(e === d)
+          str += e.toFixed(0).toString();
+        else
+     str += String(e.toFixed(0)).padStart(2,'0');
+
+        str += ":"
+      });
+            str = str.substring(0,str.length-1);
+
+      // str = d.toFixed(0).toString() + ":" + h.toFixed(0).toString() + ":" + m.toFixed(0).toString() + ":" + s.toFixed(0).toString()
+      return str;
+
+    }       
 
     // "http://router.project-osrm.org/trip/v1/driving/-73.999786,40.764389;-74.016678,40.703564;-73.985428,40.748817?source=first&roundtrip=false"
     // console.log(results);
