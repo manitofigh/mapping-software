@@ -130,11 +130,16 @@ function Geocoding() {
 
 
       try {
-	const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false");
+	const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false&geometries=geojson");
 	const data = await response.json();
 	if(data.code === "Ok"){
 	  console.log("Everything worked")
-    console.log("Duration in mins: " + data.trips[0].duration / 60)
+    	  console.log("Duration in mins: " + data.trips[0].duration / 60)
+	  for(var i = 1; i < results.length; i++){
+	    console.log(results[i-1]['formatted_address'] + "\tto\t" + results[i]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
+	    // console.log(convertsSecondsToTime(data.trips[0].legs[i-1].duration));
+
+	  }
 	  console.log(data)
 	} else 
 	  console.error(data.code + ": " + data.message);
@@ -142,7 +147,32 @@ function Geocoding() {
         console.error(`Error address sorting`);
       }
 
-      
+     function convertsSecondsToTime(secs){
+	     // seconds
+	     var s = Math.floor(secs % 60)
+	     var minutes = secs / 60
+	     var m = Math.floor(minutes%60)
+	     var hours = minutes / 60
+	     var h = Math.floor(hours % 60)
+	     var days = hours / 60
+	     var d = Math.floor(days)
+
+	     var arr = [d,h,m,s];
+	     var str = ""
+	     arr.forEach(e => {
+		     if(e === d)
+		       str += e.toFixed(0).toString();
+		     else
+			str += String(e.toFixed(0)).padStart(2,'0');
+
+		     str += ":"
+	     });
+      	     str = str.substring(0,str.length-1);
+
+	     // str = d.toFixed(0).toString() + ":" + h.toFixed(0).toString() + ":" + m.toFixed(0).toString() + ":" + s.toFixed(0).toString()
+	     return str;
+
+     } 
 
     // "http://router.project-osrm.org/trip/v1/driving/-73.999786,40.764389;-74.016678,40.703564;-73.985428,40.748817?source=first&roundtrip=false"
     // console.log(results);
