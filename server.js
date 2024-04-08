@@ -4,9 +4,18 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
+const multer = require('multer');
+const axios = require('axios');
+const fs = require('fs').promises;
+const path = require('path');
+
+
 require("dotenv").config();
 require('./passportConfig')(passport, pool);
+
 const addressRoutes = require('./addressRoutes');
+const upload = multer({ dest: 'uploads/' });
+
 const app = express();
 
 app.use(express.json());
@@ -132,6 +141,35 @@ function checkNotAuthenticated(req, res, next) {
   }
   next();
 }
+
+//Address input
+app.post('/api/uploadaddresses', upload.single('file'), async(req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  const filePath = path.join(req.file.destination, req.file.filename);
+  console.log('Attempting to read file from:', filePath); // Debug: Log the file path
+
+  try{
+    const data = await fs.readFile(filePath, 'utf8');
+
+    // Split the file content by new lines to get addresses
+    const addresses = data.split('\n').filter(Boolean).map(address => address.trim());
+    console.log('Addresses:', addresses); // Debug: Log addresses
+
+    // using axios here
+    await axios.post('http://localhost:3000/api/addresses', { addresses });
+
+    res.send('Addresses processed successfully.');
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Error processing file.');
+  }
+});
+
+
 
 app.get("/api/itineary", checkNotAuthenticated, async (req, res) => {
   // Example: Return some dashboard data
