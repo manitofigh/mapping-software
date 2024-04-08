@@ -12,6 +12,7 @@ CREATE TABLE addresses (
     address VARCHAR(255) UNIQUE NOT NULL,
     realAddress VARCHAR(255),
     lat_long VARCHAR(255) NOT NULL
+    isvalid BOOLEAN
 );
 
 CREATE TABLE job (
@@ -27,5 +28,4 @@ CREATE TABLE job (
     isCompleted BOOLEAN DEFAULT false,
     isStartOfRoute BOOLEAN DEFAULT false,
     routeStarted BOOLEAN DEFAULT false,
-    invalidAddress BOOLEAN DEFAULT false
 );
