@@ -1,67 +1,45 @@
-const LocalStrategy = require("passport-local").Strategy;
-const { pool } = require("./dbConfig");
-const bcrypt = require("bcrypt");
+const LocalStrategy = require('passport-local').Strategy;
+const bcrypt = require('bcrypt');
 
-function initialize(passport) {
-  console.log("Initialized");
+module.exports = function(passport, pool) {
+    // Local strategy for authentication using email and password
+    passport.use(new LocalStrategy({
+        usernameField: 'email', // Use 'email' instead of default 'username'
+    }, async (email, password, done) => {
+        try {
+            // Query the database for a user with the given email
+            const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+            if (rows.length > 0) {
+                const user = rows[0];
 
-  const authenticateUser = (email, password, done) => {
-    console.log(email, password);
-    pool.query(`SELECT * FROM users WHERE email = $1`, [email], (err, results) => {
-      if (err) {
-          console.error('Error executing query', err.stack);
-          return done(err);
-      }
-        console.log(results.rows);
-
-        if (results.rows.length > 0) {
-          const user = results.rows[0];
-
-          bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err) {
-              console.log(err);
-            }
-            if (isMatch) {
-              return done(null, user);
+                // Compare the provided password with the stored hash
+                if (await bcrypt.compare(password, user.password)) {
+                    return done(null, user); // Success
+                } else {
+                    return done(null, false, { message: 'Password incorrect' }); // Password does not match
+                }
             } else {
-              //password is incorrect
-              return done(null, false, { message: "Password is incorrect" });
+                return done(null, false, { message: 'No user found with that email' }); // No user found
             }
-          });
-        } else {
-          // No user
-          return done(null, false, {
-            message: "No user with that email address"
-          });
+        } catch (error) {
+            return done(error); // An error occurred
         }
-      }
-    );
-  };
+    }));
 
-  passport.use(
-    new LocalStrategy(
-      { usernameField: "email", passwordField: "password" },
-      authenticateUser
-    )
-  );
-  // Stores user details inside session. serializeUser determines which data of the user
-  // object should be stored in the session. The result of the serializeUser method is attached
-  // to the session as req.session.passport.user = {}. Here for instance, it would be (as we provide
-  //   the user id as the key) req.session.passport.user = {id: 'xyz'}
-  passport.serializeUser((user, done) => done(null, user.id));
-
-  // In deserializeUser that key is matched with the in memory array / database or any data resource.
-  // The fetched object is attached to the request object as req.user
-
-  passport.deserializeUser((id, done) => {
-    pool.query(`SELECT * FROM users WHERE id = $1`, [id], (err, results) => {
-      if (err) {
-        return done(err);
-      }
-      console.log(`ID is ${results.rows[0].id}`);
-      return done(null, results.rows[0]);
+    // Serialize user to the session
+    passport.serializeUser((user, done) => {
+        done(null, user.id);
     });
-  });
-}
 
-module.exports = initialize;
+    // Deserialize user from the session
+    passport.deserializeUser(async (id, done) => {
+        try {
+            const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+            if (rows.length > 0) {
+                done(null, rows[0]); // User found
+            }
+        } catch (error) {
+            done(error, null);
+        }
+    });
+};
