@@ -5,9 +5,12 @@ const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
 require("dotenv").config();
+const addressRoutes = require('./addressRoutes'); // Adjust the path if your file structure is different
 const app = express();
 
-const PORT = process.env.PORT || 4000;
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
 
 const initializePassport = require("./passportConfig");
 
@@ -16,8 +19,11 @@ initializePassport(passport);
 // Middleware
 
 // Parses details from a form
+
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
+
+app.use('/', addressRoutes);
 
 app.use(
   session({
@@ -108,7 +114,7 @@ app.post("/users/register", async (req, res) => {
             `INSERT INTO users (name, email, password, isadmin)
                 VALUES ($1, $2, $3, false)
                 RETURNING id, password`,
-            [name, email, hashedPassword, isadmin],
+            [name, email, hashedPassword],
             (err, results) => {
               if (err) {
                 throw err;

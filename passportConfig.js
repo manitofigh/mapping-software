@@ -7,13 +7,11 @@ function initialize(passport) {
 
   const authenticateUser = (email, password, done) => {
     console.log(email, password);
-    pool.query(
-      `SELECT * FROM users WHERE email = $1`,
-      [email],
-      (err, results) => {
-        if (err) {
-          throw err;
-        }
+    pool.query(`SELECT * FROM users WHERE email = $1`, [email], (err, results) => {
+      if (err) {
+          console.error('Error executing query', err.stack);
+          return done(err);
+      }
         console.log(results.rows);
 
         if (results.rows.length > 0) {
