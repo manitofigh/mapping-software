@@ -11,7 +11,6 @@ async function geocodeAddress(addresses) {
   const apiKey = process.env.GEOCODING_API_KEY;
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addresses)}&key=${apiKey}`;
 
-  // Use fetch or another HTTP library to call the geocoding API
   const response = await fetch(url);
   const data = await response.json();
 
@@ -42,18 +41,18 @@ router.post('/api/addresses', async (req, res) => {
       if (queryResult.rows.length > 0) {
         console.log("Address found in database:", address);
         const jobDetails = {
-            driverName: "Driver A", // Example, replace with actual logic to determine
-            routeNumber: 1, // Example
-            waypointIndex: 0, // Example, you might need to determine this based on other data
-            latLong: queryResult.rows[0].lat_long,
-            realAddress: queryResult.rows[0].realaddress,
-            startDate: new Date(), // Example, replace with actual logic
-            formattedDuration: "seconds", // Example
-            durationSeconds: 3600, // example
-            isCompleted: false,
-            isStartOfRoute: false, // default
-            routeStarted: false, // default
-        };
+          driverName: "Driver A", // Placeholder - TO CHANGE
+          routeNumber: 1, // Placeholder - TO CHANGE
+          waypointIndex: 0, // Placeholder - TO CHANGE
+          latLong: latLong,
+          realAddress: realAddress,
+          startDate: new Date(), // Placeholder - TO CHANGE
+          formattedDuration: "seconds", // Placeholder - TO CHANGE
+          durationSeconds: 3600, // Placeholder - TO CHANGE
+          isCompleted: false, // default
+          isStartOfRoute: false, // default
+          routeStarted: false, // default
+      };
         const {driverName, routeNumber, waypointIndex, latLong, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted} = jobDetails;
 
         await pool.query('INSERT INTO job (driverName, routeNumber, waypointIndex, lat_long, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', 
@@ -61,7 +60,7 @@ router.post('/api/addresses', async (req, res) => {
                  latLong, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, 
                  isStartOfRoute, routeStarted]);
       }  else {
-        // The address does not exist, add it to tempAddresses for further processing
+        // The address does not exist, add it to tempAddresses to send to google API
         tempAddresses.push(address);
         }
     } catch (error) {
@@ -80,15 +79,15 @@ router.post('/api/addresses', async (req, res) => {
       await pool.query('INSERT INTO addresses (address, realAddress, lat_long, isvalid) VALUES ($1, $2, $3, $4)', [address, realAddress, latLong, true]);
       
       const jobDetails = {
-        driverName: "Driver A", // Placeholder - adjust as needed
-        routeNumber: 1, // Placeholder - adjust as needed
-        waypointIndex: 0, // Placeholder - adjust as needed
+        driverName: "Driver A", // Placeholder - TO CHANGE
+        routeNumber: 1, // Placeholder - TO CHANGE
+        waypointIndex: 0, // Placeholder - TO CHANGE
         latLong: latLong,
         realAddress: realAddress,
-        startDate: new Date(), // Placeholder - adjust as needed
-        formattedDuration: "seconds", // Placeholder - adjust as needed
-        durationSeconds: 3600, // Placeholder - adjust as needed
-        isCompleted: false,
+        startDate: new Date(), // Placeholder - TO CHANGE
+        formattedDuration: "seconds", // Placeholder - TO CHANGE
+        durationSeconds: 3600, // Placeholder - TO CHANGE
+        isCompleted: false, // default
         isStartOfRoute: false, // default
         routeStarted: false, // default
     };
