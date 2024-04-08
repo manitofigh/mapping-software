@@ -6,11 +6,11 @@ const flash = require("express-flash");
 const session = require("express-session");
 require("dotenv").config();
 require('./passportConfig')(passport, pool);
-const addressRoutes = require('./addressRoutes'); // Adjust the path if your file structure is different
+const addressRoutes = require('./addressRoutes');
 const app = express();
 
 app.use(express.json());
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT; // Set this in your .env file
 
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
@@ -26,16 +26,16 @@ app.use('/', addressRoutes);
 app.use(
   session({
     // Key we want to keep secret which will encrypt all of our information
-    secret: 'something', // TO DO
-    // Should we resave our session variables if nothing has changes which we dont
+    secret: process.env.SESSION_SECRET, // Set this in your .env file
+    // Should we resave our session variables if nothing has changes (we dont)
     resave: false,
-    // Save empty value if there is no vaue which we do not want to do
+    // Save empty value if there is no vaue (we dont)
     saveUninitialized: false
   })
 );
-// Funtion inside passport which initializes passport
+//initializes passport
 app.use(passport.initialize());
-// Store our variables to be persisted across the whole session. Works with app.use(Session) above
+// Store our variables to be persisted across the whole session
 app.use(passport.session());
 app.use(flash());
 
@@ -52,7 +52,7 @@ app.post("/users/register", async (req, res) => {
 
   let errors = [];
 
-  // Basic validation
+  //validation
   if (!name || !email || !password || !password2) {
       errors.push({ message: "Please enter all fields" });
   }
@@ -91,7 +91,7 @@ app.post("/users/register", async (req, res) => {
               );
 
               if (newUser.rows.length > 0) {
-                  // Successfully created user, you can adjust what you return as needed
+                  // Successfully created user
                   res.status(201).json({ user: newUser.rows[0] });
               } else {
                   // Just in case the insertion fails

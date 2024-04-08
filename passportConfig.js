@@ -4,10 +4,10 @@ const bcrypt = require('bcrypt');
 module.exports = function(passport, pool) {
     // Local strategy for authentication using email and password
     passport.use(new LocalStrategy({
-        usernameField: 'email', // Use 'email' instead of default 'username'
+        usernameField: 'email', // Using 'email' instead of default 'username'
     }, async (email, password, done) => {
         try {
-            // Query the database for a user with the given email
+            // Query the database for a user with the inputed email
             const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
             if (rows.length > 0) {
                 const user = rows[0];
