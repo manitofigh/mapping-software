@@ -31,3 +31,9 @@ CREATE TABLE job (
     routeStarted BOOLEAN DEFAULT false,
     issubmitted BOOLEAN DEFAULT false,
 );
+
+CREATE TABLE routes (
+    id SERIAL PRIMARY KEY,
+    routenumber INTEGER
+    route_geometry GEOGRAPHY(LineString, 4326)
+);

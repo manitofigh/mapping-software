@@ -40,7 +40,7 @@ async function getNextRouteNumber() {
       // Query to find the highest routeNumber in the job table
       const result = await pool.query('SELECT MAX(routenumber) as routenumber FROM job');
       const maxRouteNumber = result.rows[0].routenumber;
-      console.log("MAXROUTENUMBER",maxRouteNumber);
+      //console.log("MAXROUTENUMBER",maxRouteNumber);
 
       // If no routeNumbers exist yet, start with 1, otherwise increment by 1
       return maxRouteNumber ? maxRouteNumber + 1 : 1;
@@ -94,6 +94,8 @@ router.post('/api/fetch-and-group-addresses', async (req, res) =>{
       const id = groupedAddresses[routeNumber].map(item => item.id);
       await updateAddressIndexes(waypointIndices, distanceArr, durationArr, routeNumber, id);
 
+      await insertRouteGeometry(routeNumber,routingResult.trips[0]);
+
       // Optionally, mark jobs as completed if necessary
   }
   } catch (error) {
@@ -101,6 +103,26 @@ router.post('/api/fetch-and-group-addresses', async (req, res) =>{
     res.status(500).send('Error fetching or processing jobs');
   }
 });
+
+async function insertRouteGeometry(routenumber, routeGeometry) {
+  try {
+  const geometry = routeGeometry.geometry;
+  //console.log(geometry);
+    
+    await pool.query(`
+      INSERT INTO routes (routenumber, route_geometry)
+      VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4326))
+      ON CONFLICT (routenumber)
+      DO NOTHING
+      RETURNING *;`,[routenumber,geometry]);
+    
+    //console.log('Inserted Route');
+
+  } catch (error) {
+    console.error('Error inserting route:', error);
+  }
+}
+
 
 async function OSRMdataFormat(locations){
 
@@ -111,7 +133,7 @@ async function OSRMdataFormat(locations){
     return `${longitude},${latitude}`;
   }).join(';');
 
-  console.log(singleString);
+  //console.log(singleString);
 
   return singleString
       
@@ -121,11 +143,12 @@ async function OSRMdataFormat(locations){
 async function updateAddressIndexes(waypointIndices, distanceArr, durationArr, routeNumber,id){
   try{
 
-    console.log(id);
+    //console.log(id);
 
     const jobs = await pool.query(
       'SELECT * FROM job WHERE routeNumber = $1',[routeNumber]
     );
+
 
     if (jobs.rows.length !== waypointIndices.length-1 && jobs.rows.length !== distanceArr.length-1 && jobs.rows.length !== durationArr.length-1) {
       throw new Error('Mismatch between job counts and provided indexes');
@@ -140,6 +163,7 @@ async function updateAddressIndexes(waypointIndices, distanceArr, durationArr, r
       const indexId = id[i-1];
       //console.log("indexid: ",indexId);
       pool.query('UPDATE job SET waypointIndex = $1, durationseconds = $2, distance = $3, isSubmitted = true WHERE id = $4',[indexWaypoint, indexDuration, indexDistance, indexId]);
+      
     }
 
     console.log('Jobs updated successfully with new indexes');
@@ -158,7 +182,7 @@ async function returnWaypointsIndexes(waypoints){
 	for(var i = 0; i < len; i++){
 	  arr.push(waypoints[i].waypoint_index);
 	}
-  console.log("waypoints: ",arr);
+  //console.log("waypoints: ",arr);
 	return arr;
 }
 
@@ -172,7 +196,7 @@ async function returnDistanceArr(trip){
   for(var i = 0; i<len; i++){
     arr.push(trip.legs[i].distance);
   }
-  console.log("distance: ",arr);
+  //console.log("distance: ",arr);
   return arr;
 }
 
@@ -185,7 +209,7 @@ async function returnDurationArr(trip){
     arr.push(trip.legs[i].duration);
   }
 
-  console.log("duration: ",arr);
+  //console.log("duration: ",arr);
   return arr;
 }
 
