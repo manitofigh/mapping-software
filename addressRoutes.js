@@ -84,12 +84,15 @@ router.post('/api/fetch-and-group-addresses', async (req, res) =>{
       // Example function call - replace with actual OSRM call
       const routingResult = await callOSRMForRouting(singleString);
       
-      console.log(`Routing result for routeNumber ${routeNumber}:`, routingResult);
+      //console.log(`Routing result for routeNumber ${routeNumber}:`, routingResult);
 
+      var waypointIndices = await returnWaypointsIndexes(routingResult.waypoints);
+      var distanceArr  = await returnDistanceArr(routingResult.trips[0]);
+      var durationArr = await returnDurationArr(routingResult.trips[0]);
 
       //take id only out of groupedAddress object
       const id = groupedAddresses[routeNumber].map(item => item.id);
-      await updateAddressWaypoinyIndexes(routingResult,routeNumber,id);
+      await updateAddressIndexes(waypointIndices, distanceArr, durationArr, routeNumber, id);
 
       // Optionally, mark jobs as completed if necessary
   }
@@ -114,20 +117,8 @@ async function OSRMdataFormat(locations){
       
 }
 
-async function returnWaypointsIndexes(waypoints){
-	var arr = []
-	var len = waypoints.length
-  console.log(waypoints);
 
-	for(var i = 0; i < len; i++){
-	  arr.push(waypoints[i].waypoint_index);
-	}
-
-	return arr;
-}
-
-
-async function updateAddressWaypoinyIndexes(jobIndexes,routeNumber,id){
+async function updateAddressIndexes(waypointIndices, distanceArr, durationArr, routeNumber,id){
   try{
 
     console.log(id);
@@ -136,16 +127,19 @@ async function updateAddressWaypoinyIndexes(jobIndexes,routeNumber,id){
       'SELECT * FROM job WHERE routeNumber = $1',[routeNumber]
     );
 
-    if (jobs.rows.length !== jobIndexes.length-1) {
+    if (jobs.rows.length !== waypointIndices.length-1 && jobs.rows.length !== distanceArr.length-1 && jobs.rows.length !== durationArr.length-1) {
       throw new Error('Mismatch between job counts and provided indexes');
   }
     else{
-    for(var i = 1; i < jobIndexes.length; i++){
-      const indexJob = jobIndexes[i]; //Start with index 1 because index 0 will always be starting location
+    for(var i = 1; i < waypointIndices.length; i++){
+      const indexWaypoint = waypointIndices[i]; //Start with index 1 because index 0 will always be starting location
       //console.log("indexjob: ", indexJob);
+      const indexDuration = durationArr[i-1];
+      //console.log("indexDuration: ", indexDuration);
+      const indexDistance = distanceArr[i-1];
       const indexId = id[i-1];
       //console.log("indexid: ",indexId);
-      pool.query('UPDATE job SET waypointIndex = $1, isSubmitted = true WHERE id = $2',[indexJob,indexId]);
+      pool.query('UPDATE job SET waypointIndex = $1, durationseconds = $2, distance = $3, isSubmitted = true WHERE id = $4',[indexWaypoint, indexDuration, indexDistance, indexId]);
     }
 
     console.log('Jobs updated successfully with new indexes');
@@ -154,6 +148,45 @@ async function updateAddressWaypoinyIndexes(jobIndexes,routeNumber,id){
   catch(error){
     console.error('Error updating job indexes:', error);
   }
+}
+
+async function returnWaypointsIndexes(waypoints){
+	var arr = []
+	var len = waypoints.length
+  //console.log(waypoints);
+
+	for(var i = 0; i < len; i++){
+	  arr.push(waypoints[i].waypoint_index);
+	}
+  console.log("waypoints: ",arr);
+	return arr;
+}
+
+
+async function returnDistanceArr(trip){
+  var arr = []
+  //console.log(trip.legs[0]);
+  var len = trip.legs.length;
+  //console.log(trip.legs);
+
+  for(var i = 0; i<len; i++){
+    arr.push(trip.legs[i].distance);
+  }
+  console.log("distance: ",arr);
+  return arr;
+}
+
+async function returnDurationArr(trip){
+  var arr = []
+  var len = trip.legs.length;
+  //console.log(trip.legs);
+
+  for(var i = 0; i<len; i++){
+    arr.push(trip.legs[i].duration);
+  }
+
+  console.log("duration: ",arr);
+  return arr;
 }
 
 async function callOSRMForRouting(locations) {
@@ -168,13 +201,11 @@ async function callOSRMForRouting(locations) {
       //console.log("OSRM Response Data:", data);
       console.log("Duration in mins: " + data.trips[0].duration /60);
 
-      var waypointIndices = await returnWaypointsIndexes(data.waypoints)
-
-      return waypointIndices; // The OSRM routing result
+      return data; // The OSRM routing result
   } catch (error) {
       console.error('Error calling OSRM:', error);
       throw error; 
-  }
+  } 
 }
 
 

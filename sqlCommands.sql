@@ -24,7 +24,8 @@ CREATE TABLE job (
     realAddress VARCHAR(255),
     startDate TIMESTAMP,
     formattedDuration VARCHAR(100),
-    durationSeconds INTEGER,
+    durationSeconds NUMERIC,
+    distance NUMERIC
     isCompleted BOOLEAN DEFAULT false,
     isStartOfRoute BOOLEAN DEFAULT false,
     routeStarted BOOLEAN DEFAULT false,
