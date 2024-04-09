@@ -4,7 +4,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    isadmin BOOLEAN DEFAULT FALSE
+    role VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE addresses (
@@ -28,4 +28,5 @@ CREATE TABLE job (
     isCompleted BOOLEAN DEFAULT false,
     isStartOfRoute BOOLEAN DEFAULT false,
     routeStarted BOOLEAN DEFAULT false,
+    issubmitted BOOLEAN DEFAULT false,
 );

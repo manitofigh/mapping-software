@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const { Pool } = require('pg');
 const { pool } = require("./dbConfig"); 
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
 
-
+// Function to convert inputted address into geo coordinates using GOOGLE geocoding API
 async function geocodeAddress(addresses) {
 
   const apiKey = process.env.GEOCODING_API_KEY;
@@ -28,7 +29,6 @@ async function geocodeAddress(addresses) {
       return undefined;
     }
   } catch (fetchError) {
-    // This catch block handles exceptions thrown from the fetch operation
     console.error("Error fetching geocoding API:", fetchError);
     return undefined;
   }
@@ -46,9 +46,139 @@ async function getNextRouteNumber() {
       return maxRouteNumber ? maxRouteNumber + 1 : 1;
   } catch (error) {
       console.error("Error fetching max routeNumber:", error);
-      throw error; // Rethrow or handle as appropriate
+      throw error;
   }
 }
+
+router.post('/api/fetch-and-group-addresses', async (req, res) =>{
+  try{
+    //Fetch jobs where isCompleted is false
+    //console.log("Sorting started");
+    const {rows} = await pool.query('SELECT * FROM job WHERE "issubmitted" = false');
+
+    //console.log("Sample row:", rows[0]); // Debugging use
+
+    //Group the addresses by routenumber
+    const groupedAddresses = rows.reduce((acc, curr) => {
+      if (!acc[curr.routenumber]) {
+          acc[curr.routenumber] = [];
+      }
+      acc[curr.routenumber].push({id: curr.id, latLong: curr.lat_long});
+      return acc;
+  }, {});
+
+    res.json(groupedAddresses);
+
+  //console.log("Groupping by addresses with routenunmber done");
+  // Process each routeNumber group sequentially
+  for (const routeNumber of Object.keys(groupedAddresses)) {
+      const addresses = groupedAddresses[routeNumber];
+      console.log(`Processing routeNumber: ${routeNumber} with addresses:`, addresses);
+
+      //take latlong only out of groupedAddress object
+      const latLongs = groupedAddresses[routeNumber].map(item => item.latLong);
+      //console.log(latLongs);
+      // Convert table format to single string format for OSRM (example)
+      const singleString = await OSRMdataFormat(latLongs);
+      
+      // Example function call - replace with actual OSRM call
+      const routingResult = await callOSRMForRouting(singleString);
+      
+      console.log(`Routing result for routeNumber ${routeNumber}:`, routingResult);
+
+
+      //take id only out of groupedAddress object
+      const id = groupedAddresses[routeNumber].map(item => item.id);
+      await updateAddressWaypoinyIndexes(routingResult,routeNumber,id);
+
+      // Optionally, mark jobs as completed if necessary
+  }
+  } catch (error) {
+    console.error('Error processing routes:', error);
+    res.status(500).send('Error fetching or processing jobs');
+  }
+});
+
+async function OSRMdataFormat(locations){
+
+  const singleString = locations.map(coords => {
+    // Split the coords into longitude and latitude
+    const [latitude, longitude] = coords.split(',').map(coord => parseFloat(coord).toFixed(6));
+    // Join them back with a comma and ensure 6 decimal places
+    return `${longitude},${latitude}`;
+  }).join(';');
+
+  console.log(singleString);
+
+  return singleString
+      
+}
+
+async function returnWaypointsIndexes(waypoints){
+	var arr = []
+	var len = waypoints.length
+  console.log(waypoints);
+
+	for(var i = 0; i < len; i++){
+	  arr.push(waypoints[i].waypoint_index);
+	}
+
+	return arr;
+}
+
+
+async function updateAddressWaypoinyIndexes(jobIndexes,routeNumber,id){
+  try{
+
+    console.log(id);
+
+    const jobs = await pool.query(
+      'SELECT * FROM job WHERE routeNumber = $1',[routeNumber]
+    );
+
+    if (jobs.rows.length !== jobIndexes.length-1) {
+      throw new Error('Mismatch between job counts and provided indexes');
+  }
+    else{
+    for(var i = 1; i < jobIndexes.length; i++){
+      const indexJob = jobIndexes[i]; //Start with index 1 because index 0 will always be starting location
+      //console.log("indexjob: ", indexJob);
+      const indexId = id[i-1];
+      //console.log("indexid: ",indexId);
+      pool.query('UPDATE job SET waypointIndex = $1, isSubmitted = true WHERE id = $2',[indexJob,indexId]);
+    }
+
+    console.log('Jobs updated successfully with new indexes');
+   }
+  }
+  catch(error){
+    console.error('Error updating job indexes:', error);
+  }
+}
+
+async function callOSRMForRouting(locations) {
+  const osrmBaseUrl = 'http://router.project-osrm.org/trip/v1/driving/-73.5992,40.7168;';
+  const osrmRequestUrl = '?source=first&roundtrip=false&geometries=geojson';
+
+  try {
+      console.log(osrmBaseUrl + locations + osrmRequestUrl);
+      const response = await fetch(osrmBaseUrl + locations + osrmRequestUrl); 
+      const data = await response.json();
+      console.log("Everything worked");
+      //console.log("OSRM Response Data:", data);
+      console.log("Duration in mins: " + data.trips[0].duration /60);
+
+      var waypointIndices = await returnWaypointsIndexes(data.waypoints)
+
+      return waypointIndices; // The OSRM routing result
+  } catch (error) {
+      console.error('Error calling OSRM:', error);
+      throw error; 
+  }
+}
+
+
+
 
 
   
@@ -69,24 +199,25 @@ router.post('/api/addresses', async (req, res) => {
         if (row.isvalid) {
         console.log("Address found in database:", address);
         const jobDetails = {
-          driverName: "Driver A", // Placeholder - TO CHANGE
+          driverName: "Driver", // TO CHANGE IF REQUIRMENTS CHANGE
           routeNumber: result, //uses function getNextRouteNumber()
-          waypointIndex: 0, // Placeholder - TO CHANGE
+          waypointIndex: 0, // default index
           latLong: row.lat_long,
           realAddress: row.realaddress,
           startDate: new Date(), // Placeholder - TO CHANGE
-          formattedDuration: "seconds", // Placeholder - TO CHANGE
-          durationSeconds: 3600, // Placeholder - TO CHANGE
+          formattedDuration: "seconds",
+          durationSeconds: 0,
           isCompleted: false, // default
           isStartOfRoute: false, // default
           routeStarted: false, // default
+          issubmitted: false,
       };
-        const {driverName, routeNumber, waypointIndex, latLong, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted} = jobDetails;
+        const {driverName, routeNumber, waypointIndex, latLong, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted, issubmitted} = jobDetails;
 
-        await pool.query('INSERT INTO job (driverName, routeNumber, waypointIndex, lat_long, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', 
+        await pool.query('INSERT INTO job (driverName, routeNumber, waypointIndex, lat_long, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted, isSubmitted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', 
             [driverName, routeNumber, waypointIndex,
                  latLong, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, 
-                 isStartOfRoute, routeStarted]);
+                 isStartOfRoute, routeStarted, issubmitted]);
       }}  else {
         // The address does not exist, add it to tempAddresses to send to google API
         tempAddresses.push(address);
@@ -105,7 +236,7 @@ router.post('/api/addresses', async (req, res) => {
       const geocodeResult = await geocodeAddress(address);
       
       console.log(geocodeResult);
-      if(geocodeResult && geocodeResult.latitude !== 'undefined'){
+      if(geocodeResult && geocodeResult.latitude !== 'undefined'){ 
         const { latitude, longitude, realAddress } = geocodeResult;
         const latLong = `${latitude},${longitude}`;
 
@@ -113,22 +244,23 @@ router.post('/api/addresses', async (req, res) => {
       
         const jobDetails = {
           driverName: "Driver", // TO CHANGE IF REQUIRMENTS CHANGE
-          routeNumber: result, // Placeholder - TO CHANGE
-          waypointIndex: 0, // Placeholder - TO CHANGE
+          routeNumber: result, //uses function getNextRouteNumber()
+          waypointIndex: 0, // default
           latLong: latLong,
           realAddress: realAddress,
           startDate: new Date(), // Placeholder - TO CHANGE
-          formattedDuration: "seconds", // Placeholder - TO CHANGE
-          durationSeconds: 3600, // Placeholder - TO CHANGE
+          formattedDuration: "seconds", // default
+          durationSeconds: 0, // default
           isCompleted: false, // default
           isStartOfRoute: false, // default
           routeStarted: false, // default
+          isSubmitted: false,
       };
   
-      await pool.query('INSERT INTO job (driverName, routeNumber, waypointIndex, lat_long, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+      await pool.query('INSERT INTO job (driverName, routeNumber, waypointIndex, lat_long, realAddress, startDate, formattedDuration, durationSeconds, isCompleted, isStartOfRoute, routeStarted, issubmitted) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
           [jobDetails.driverName, jobDetails.routeNumber, jobDetails.waypointIndex, jobDetails.latLong, jobDetails.realAddress, 
             jobDetails.startDate, jobDetails.formattedDuration, jobDetails.durationSeconds, 
-            jobDetails.isCompleted, jobDetails.isStartOfRoute, jobDetails.routeStarted]);
+            jobDetails.isCompleted, jobDetails.isStartOfRoute, jobDetails.routeStarted, jobDetails.isSubmitted]);
   
 
       }
@@ -148,7 +280,9 @@ router.post('/api/addresses', async (req, res) => {
     }
 
   
-  res.send({ message: 'Addresses processed' }); //This is sent back to frontend
+  res.send({ message: 'Addresses processed, ready for routing!' }); //This is sent back to frontend
+ 
+
 
 });
 
