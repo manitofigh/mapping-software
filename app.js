@@ -4,7 +4,6 @@ import passport from './config/passport.js';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
-import indexRoutes from './routes/indexRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
@@ -16,13 +15,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Session configuration with 2-hour cookie expiration
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 2, // 7200000 ms for 2 hrs
+    maxAge: 1000 * 60 * 60 * 2, // 2 hours
   }
 }));
 
@@ -31,8 +29,15 @@ app.use(passport.session());
 
 app.set('view engine', 'ejs');
 
+// Redirection Middleware
+app.use((req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/auth/login'); // Redirect all unauthenticated requests to login
+  }
+  next(); // Continue to next middleware if authenticated
+});
+
 // Routes
-app.use('/', indexRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
@@ -41,4 +46,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
