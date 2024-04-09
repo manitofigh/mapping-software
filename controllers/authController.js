@@ -1,4 +1,4 @@
-import passport from './config/passport.js';
+import passport from '../config/passport.js';
 
 const getLogin = (req, res) => {
   if (req.isAuthenticated()) {
@@ -13,11 +13,12 @@ const getLogin = (req, res) => {
   res.render("login", { title: "Login" }); // Show login page if not authenticated
 };
 
-const postLogin = passport.authenticate("local", {
-  successRedirect: "/", // This will be intercepted by the middleware to redirect based on role
-  failureRedirect: "/auth/login",
-  failureFlash: true, // Optional: Display error messages
-});
+const postLogin = (req, res, next) => {
+  passport.authenticate("local", {
+    successRedirect: "/", // Intercepts based on middleware to redirect
+    failureRedirect: "/auth/login",
+  })(req, res, next);  // Makes sure `req, res, next` are passed to Passport's authenticate method
+};
 
 const getRegister = (req, res) => {
   res.render("register", { title: "Register" });
@@ -49,5 +50,5 @@ export default {
   postRegister,
   logout,
   getReset,
-  postReset,
+  // postReset,
 };
