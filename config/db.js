@@ -21,10 +21,10 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
+// request to pull all users from table users
 pool.query('SELECT * FROM users', (err, res) => {
-  console.log("ABOUT TO CONNECT TO THE DATABASE");
   if (err) {
-    console.error('Error fetching users', err);
+    console.log('Error fetching users', err);
   } else {
     console.log(res.rows);
   }
