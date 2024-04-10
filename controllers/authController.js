@@ -10,14 +10,14 @@ const getLogin = (req, res) => {
       return res.redirect("/user/dashboard");
     }
   }
-  res.render("login", { title: "Login" }); // Show login page if not authenticated
+  res.render("login.ejs", { title: "Login" }); // if not authenticated -> login
 };
 
 const postLogin = (req, res, next) => {
   passport.authenticate("local", {
     successRedirect: "/", // Intercepts based on middleware to redirect
     failureRedirect: "/auth/login",
-  })(req, res, next);  // Makes sure `req, res, next` are passed to Passport's authenticate method
+  })(req, res, next);  // req res next passed to passport.authenticate
 };
 
 const getRegister = (req, res) => {
@@ -25,7 +25,7 @@ const getRegister = (req, res) => {
 };
 
 const postRegister = (req, res) => {
-  // future logic - tdo
+  // future logic - todo
   res.redirect("/auth/login");
 };
 

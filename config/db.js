@@ -12,6 +12,24 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+// checking successful connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.log('Error connecting to the database', err);
+  } else {
+    console.log('Connected to the database successfully');
+  }
+});
+
+pool.query('SELECT * FROM users', (err, res) => {
+  console.log("ABOUT TO CONNECT TO THE DATABASE");
+  if (err) {
+    console.error('Error fetching users', err);
+  } else {
+    console.log(res.rows);
+  }
+});
+
 export default {
   query: (text, params) => pool.query(text, params),
 };

@@ -20,7 +20,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 2, // 2 hours
+    maxAge: 1000 * 60 * 60 * 2, // 2 hours in ms
   }
 }));
 
@@ -29,20 +29,20 @@ app.use(passport.session());
 
 app.set('view engine', 'ejs');
 
-// Redirection Middleware
-app.use((req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/auth/login'); // Redirect all unauthenticated requests to login
-  }
-  next(); // Continue to next middleware if authenticated
-});
-
 // Routes
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
 
-const PORT = process.env.PORT || 3000;
+// Redirection Middleware
+app.use((req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/auth/login'); // Redirect all unauthenticated requests to login
+  }
+  next(); // next mw if authenticated
+});
+
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

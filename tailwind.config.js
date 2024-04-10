@@ -7,5 +7,19 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }
+
+// /** @type {import('tailwindcss').Config} */
+// export default {
+//   mode: 'aot', // Ensure 'ahead-of-time' compilation mode to generate all styles
+//   content: [], // Remove content paths to disable purge and include all styles
+//   theme: {
+//     extend: {},
+//   },
+//   plugins: [
+//     require('@tailwindcss/forms'), // Include the forms plugin
+//   ],
+// }

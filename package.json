@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
     "watch-css": "nodemon -e css --exec \"npm run build-css\"",
-    "build-css": "postcss public/css/styles.css -o public/css/output.css"
+    "build-css": "postcss public/styles/styles.css -o public/styles/output.css"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/manitofigh/mapping-software#readme",
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
