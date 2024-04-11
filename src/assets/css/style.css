@@ -116,7 +116,7 @@ div {
     border-left: 2px solid var(--border-color-bars);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     /* y axis scroll */
     overflow-y: auto;
 }

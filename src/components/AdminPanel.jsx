@@ -19,9 +19,9 @@ const AdminPanel = () => {
 	
   const childToParent = (data) => {
 	// setData(data);
-	console.log("Parent Function Called");
+	// console.log("Parent Function Called");
 	var geometry = data.trips[0].geometry;
-	console.log("Creating Feature")
+	// console.log("Creating Feature")
 	var gjson_feature = {
 		"type" : "Feature",
 		"properties": {
@@ -29,15 +29,16 @@ const AdminPanel = () => {
 		},
 		"geometry":geometry
 	};
-	console.log("Created Feature")
-	console.log(data);
-	console.log(gjson_feature);
+	//console.log("Created Feature")
+	//console.log(data);
+	//console.log(gjson_feature);
 	
 	if(mapRef.gJSONLayer != null)
 	  mapRef.gJSONLayer.remove();	
 
         mapRef.gJSONLayer = L.geoJSON(geometry);
 	mapRef.gJSONLayer.addTo(mapRef.current);
+	mapRef.current.fitBounds(mapRef.gJSONLayer.getBounds());
   }
 
   useEffect(() => {
@@ -78,6 +79,20 @@ const AdminPanel = () => {
     setIsResetDisabled(!anyCollapsed);
   };
 
+  const sideButtonPressed = (barName) => {
+	toggleBar(barName);
+	console.log(bars.left);
+	console.log(bars.right);
+	var num = 1;
+	if(!bars.left)
+	   num++;
+	if(!bars.right)
+	   num++;
+
+	console.log(num);
+
+  }
+
   const toggleBar = (barName) => {
     setBars(prevBars => {
       const updatedBars = { ...prevBars, [barName]: !prevBars[barName] };
@@ -88,6 +103,18 @@ const AdminPanel = () => {
   // Utilize effect hook to apply layout changes whenever bars' states change
   useEffect(() => {
     updateLayout();
+    var num = 1;
+    if(bars.left)
+	  num++;
+    if(bars.right)
+	  num++;
+    
+    console.log(num);
+    var adminMap = document.getElementById("adminMap")
+    adminMap.style.gridColumn = "span " + num.toString();
+    
+    //console.log(bars.left);
+    //console.log(bars.right);
   }, [bars]);
 
   const isAnyBarCollapsed = () => Object.values(bars).some((status) => status);

@@ -151,7 +151,7 @@ function Geocoding({childToParent}) {
           console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
           // console.log(data.trips[0].legs[i-1].duration);
          }
-	 console.log("Child To Parent");
+	 // console.log("Child To Parent");
 	 childToParent(data);
         //console.log(data)
       } else 
