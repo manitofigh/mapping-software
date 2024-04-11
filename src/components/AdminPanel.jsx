@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../assets/css/styleLeaflet.css";
@@ -14,6 +14,32 @@ const AdminPanel = () => {
 
   // Additional state to manage whether the reset button is disabled
   const [isResetDisabled, setIsResetDisabled] = useState(true);
+  const [data, setData] = useState({})
+  const mapRef = useRef(null);
+	
+  const childToParent = (data) => {
+	// setData(data);
+	console.log("Parent Function Called");
+	var geometry = data.trips[0].geometry;
+	console.log("Creating Feature")
+	var gjson_feature = {
+		"type" : "Feature",
+		"properties": {
+			"name": "Path",
+		},
+		"geometry":geometry
+	};
+	console.log("Created Feature")
+	console.log(data);
+	console.log(gjson_feature);
+	
+	if(mapRef.gJSONLayer != null)
+	  mapRef.gJSONLayer.remove();	
+
+        mapRef.gJSONLayer = L.geoJSON(geometry);
+	mapRef.gJSONLayer.addTo(mapRef.current);
+	//L.geoJSON(line)
+  }
 
   useEffect(() => {
     // Ensure the map container is clean before initializing a new map
@@ -27,15 +53,18 @@ const AdminPanel = () => {
       zoom: 15,
     };
 
-    const map = new L.map('adminMap', mapOptions);
+    mapRef.current = new L.map('adminMap', mapOptions);
     const layer = new L.TileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     );
-    map.addLayer(layer);
+    mapRef.current.addLayer(layer);
+    // mapRef.gJsonLayer = L.geoJSON().addTo(mapRef.current);
+    
 
     // Cleanup function to remove the map when the component unmounts or needs to reinitialize
     return () => {
-      map.remove();
+      mapRef.current.remove();
+      mapRef.current = null;
     };
   }, []);
 
@@ -168,7 +197,7 @@ const AdminPanel = () => {
         left bar
       </div>
       <div className={`right-bar ${bars.right ? "bar-collapsed" : ""}`}>
-        < Geocoding />
+        < Geocoding childToParent={childToParent}/>
       </div>
       <div className={`bottom-bar ${bars.bottom ? "bar-collapsed" : ""}`}>
         bottom bar

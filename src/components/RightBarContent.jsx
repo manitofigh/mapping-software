@@ -1,10 +1,21 @@
 import '../assets/css/style.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function Geocoding() {
+function Geocoding({childToParent}) {
   const [addresses, setAddresses] = useState([""]);
  
   const [results, setResults] = useState([]);
+
+  // const [data, setData] = useState({});
+
+  /*useEffect(() => {
+    console.log("Data Setup");
+    console.log(data);
+    return () => {
+    	console.log("Data Changed");
+	console.log(data);
+    }
+  },data);*/
 
   const handleFileChange = (e) => {
     e.preventDefault();
@@ -34,7 +45,6 @@ function Geocoding() {
   };
 
   
-
   
 
   const geocodeAddresses = async () => {
@@ -132,16 +142,18 @@ function Geocoding() {
       const response = await fetch("http://router.project-osrm.org/trip/v1/driving/" + res + "?source=first&roundtrip=false&geometries=geojson");
       const data = await response.json();
       if(data.code === "Ok"){
-        console.log("Everything worked")
-        console.log("Duration in mins: " + data.trips[0].duration / 60)
+        // console.log("Everything worked")
+        // console.log("Duration in mins: " + data.trips[0].duration / 60)
         
         var waypointIndices = returnWaypointsIndexes(data.waypoints)
         
         for(var i = 1; i < results.length; i++){
           console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
           // console.log(data.trips[0].legs[i-1].duration);
-        }
-        console.log(data)
+         }
+	 console.log("Child To Parent");
+	 childToParent(data);
+        //console.log(data)
       } else 
         console.error(data.code + ": " + data.message);
       } catch (error) {
@@ -168,21 +180,21 @@ function Geocoding() {
       var minutes = secs / 60
       var m = Math.floor(minutes%60)
       var hours = minutes / 60
-      var h = Math.floor(hours % 60)
-      var days = hours / 60
+      var h = Math.floor(hours % 24)
+      var days = hours / 24
       var d = Math.floor(days)
 
       var arr = [d,h,m,s];
       var str = ""
-      arr.forEach(e => {
-        if(e === d)
-          str += e.toFixed(0).toString();
+      for(var i = 0; i < arr.length; i++){
+        if(i == 0)
+           str += arr[i].toFixed(0).toString();
         else
-     str += String(e.toFixed(0)).padStart(2,'0');
-
+           str += String(arr[i].toFixed(0)).padStart(2,'0');
+      
         str += ":"
-      });
-            str = str.substring(0,str.length-1);
+         }
+               str = str.substring(0,str.length-1);
 
       // str = d.toFixed(0).toString() + ":" + h.toFixed(0).toString() + ":" + m.toFixed(0).toString() + ":" + s.toFixed(0).toString()
       return str;
