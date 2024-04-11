@@ -206,16 +206,17 @@ function Geocoding({childToParent}) {
   }
 
   return (
-    <div>
+    <div class="right_sidebar">
       {addresses.map((address, index) => (
-        <div key={index}>
+        <div class="input_bar" key={index}>
           <input
             type="text"
             placeholder="Enter address"
+	    class = "input_box"
             value={address}
             onChange={(e) => setAddresses([...addresses.slice(0, index), e.target.value, ...addresses.slice(index + 1)])}
           />
-          <button onClick={() => setAddresses(addresses.filter((_, i) => i !== index))}>Remove</button>
+          <button class="remove_button" onClick={() => setAddresses(addresses.filter((_, i) => i !== index))}>X</button>
         </div>
       ))}
       <button onClick={addAddressInput}>Add Address</button>

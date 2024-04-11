@@ -38,7 +38,6 @@ const AdminPanel = () => {
 
         mapRef.gJSONLayer = L.geoJSON(geometry);
 	mapRef.gJSONLayer.addTo(mapRef.current);
-	//L.geoJSON(line)
   }
 
   useEffect(() => {
