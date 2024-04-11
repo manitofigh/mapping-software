@@ -1,29 +1,35 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import bcrypt from "bcrypt";
-import userModel from "../models/userModel.js";
-// import adminModel from '../models/adminModel.js';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import DriverModel from '../models/DriverModel.js';
+import AdminModel from '../models/AdminModel.js';
 
 passport.use(
   new LocalStrategy(
-    { usernameField: "email" },
+    { usernameField: 'email' },
     async (email, password, done) => {
       try {
-        const user = await userModel.findByEmail(email);
-        if (user) {
-          const match = await bcrypt.compare(password, user.password);
-          if (match) {
-            return done(null, user);
-          } else {
-            return done(null, false, { message: "Incorrect password." });
-          }
-        } else {
-          return done(null, false, {
-            message: "No user found with that email address.",
-          });
+        let user = await DriverModel.findByEmail(email);
+        if (!user) {
+          user = await AdminModel.findByEmail(email);
         }
-      } catch (error) {
-        return done(error);
+
+        if (!user) {
+          return done(null, false, { message: 'Invalid email or password' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return done(null, false, { message: 'Invalid email or password' });
+        }
+
+        if (user.status !== 'approved') {
+          return done(null, false, { message: 'Your account is pending approval' });
+        }
+
+        return done(null, user);
+      } catch (err) {
+        return done(err);
       }
     }
   )
@@ -35,14 +41,13 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await userModel.findById(id);
-    if (user) {
-      done(null, user);
-    } else {
-      done(new Error("User not found."), null);
+    let user = await DriverModel.findById(id);
+    if (!user) {
+      user = await AdminModel.findById(id);
     }
-  } catch (error) {
-    done(error, null);
+    done(null, user);
+  } catch (err) {
+    done(err);
   }
 });
 

@@ -1,18 +1,9 @@
-const dashboard = (req, res) => {
-  // res.render("admin/dashboard", { title: "Admin Dashboard" });
-  res.send("working");
+const adminController = {
+  renderDashboard(req, res) {
+    res.render('admin/adminDashboard', { user: req.user });
+  },
+  
+  // rest of the future controllers
 };
 
-const manageUsers = (req, res) => {
-  res.render("", { title: "Manage Users" });
-};
-
-const systemSettings = (req, res) => {
-  res.render("admin/settings", { title: "System Settings" });
-};
-
-export default {
-  dashboard,
-  manageUsers,
-  systemSettings,
-};
+export default adminController;

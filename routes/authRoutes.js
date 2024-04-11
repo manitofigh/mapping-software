@@ -3,19 +3,23 @@ import authController from '../controllers/authController.js';
 
 const router = express.Router();
 
-// Login Route
-router.get('/login', authController.getLogin);
-router.post('/login', authController.postLogin);
+router.get('/', (req, res) => {
+  res.redirect('/login');
+});
 
-// Registration Route
-router.get('/register', authController.getRegister);
-router.post('/register', authController.postRegister);
+router.get('/login', (req, res) => {
+  if (req.isAuthenticated()) {
+    if (req.user.role == 'admin') {
+      return res.redirect('/admin/dashboard');
+    } else if (req.user.role == 'driver') {
+      return res.redirect('/driver/dashboard');
+    }
+  }
+  res.render('auth/login');
+});
 
-// Logout Route
-router.get('/logout', authController.logout);
+router.post('/login', authController.login);
 
-// // Password Reset Routes
-// router.get('/reset', authController.getReset);
-// router.post('/reset', authController.postReset);
+router.post('/logout', authController.logout);
 
 export default router;
