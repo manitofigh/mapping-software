@@ -7,19 +7,14 @@ router.get('/', (req, res) => {
   res.redirect('/login');
 });
 
-router.get('/login', (req, res) => {
-  if (req.isAuthenticated()) {
-    if (req.user.role == 'admin') {
-      return res.redirect('/admin/dashboard');
-    } else if (req.user.role == 'driver') {
-      return res.redirect('/driver/dashboard');
-    }
-  }
-  res.render('auth/login');
-});
-
+// ## /login handlers START ## 
+router.get('/login', authController.renderLogin);
 router.post('/login', authController.login);
+// ## /login handlers END ##
 
 router.post('/logout', authController.logout);
+
+router.get('/signup', authController.renderSignup);
+router.post('/signup', authController.signup);
 
 export default router;

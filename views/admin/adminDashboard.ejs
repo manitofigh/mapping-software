@@ -1,10 +1,22 @@
 <%- include('../partials/head') %>
 <body>
+  <%- include('../partials/header') %>
   <div class="container mx-auto mt-8">
     <h1 class="text-2xl">Admin Dashboard</h1>
     <p>Welcome, <%= user.name %>!</p>
-    <form action="/logout" method="POST">
-      <button type="submit" class="bg-red-500 text-white rounded px-4 py-2">Logout</button>
-    </form>
+    <div class="mt-4">
+      <a href="/admin/applications" class="bg-blue-500 text-white rounded px-4 py-2 relative inline-block">
+        View Applications
+        <% if (pendingApplications > 0) { %>
+          <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+            <%= pendingApplications %>
+          </span>
+        <% } else { %>
+          <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">
+            0
+          </span>
+        <% } %>
+      </a>
+    </div>
   </div>
 </body>

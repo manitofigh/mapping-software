@@ -6,6 +6,10 @@ import { isAdmin } from '../middleware/isAdmin.js';
 const router = express.Router();
 
 router.get('/dashboard', isAuthenticated, isAdmin, adminController.renderDashboard);
-// Add other admin routes as needed
+
+router.get('/applications', isAuthenticated, isAdmin, adminController.renderApplications);
+
+router.post('/applications/:id/approve', isAuthenticated, isAdmin, adminController.approveApplication);
+router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminController.rejectApplication);
 
 export default router;

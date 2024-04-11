@@ -27,6 +27,15 @@ const DriverModel = {
   async delete(email) {
     await pool.query('DELETE FROM users WHERE email = $1 AND role = $2', [email, 'driver']);
   },
+
+  async findPendingApplications() {
+    const result = await pool.query('SELECT * FROM users WHERE role = $1 AND status = $2', ['driver', 'pending']);
+    return result.rows;
+  },
+
+  async updateStatus(id, status) {
+    await pool.query('UPDATE users SET status = $1 WHERE id = $2', [status, id]);
+  },
 };
 
 export default DriverModel;
