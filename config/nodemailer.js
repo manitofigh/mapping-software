@@ -11,12 +11,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export function sendEmail(to, subject, text) {
+export function sendEmail(to, subject, html) {
   const mailOptions = {
-    from: process.env.ADMIN_EMAIL,
+    from: 'SLICK <no-reply@slick.routing@gmail.com>',
     to,
     subject,
-    text
+    html
   };
 
   return transporter.sendMail(mailOptions);

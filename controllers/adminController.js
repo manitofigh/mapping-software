@@ -1,12 +1,25 @@
+import DriverModel from '../models/DriverModel.js';
+import AdminModel from '../models/AdminModel.js';
+import { sendEmail } from '../config/nodemailer.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const adminController = {
-  renderDashboard(req, res) {
-    res.render('admin/adminDashboard', { user: req.user });
+  async renderDashboard(req, res) {
+    try {
+      const pendingApplications = await DriverModel.countPendingApplications();
+      res.render('admin/adminDashboard.ejs', { user: req.user, pendingApplications });
+    } catch (err) {
+      console.error(err);
+      res.redirect('/admin/dashboard');
+    }
   },
   
   async renderApplications(req, res) {
     try {
       const applications = await DriverModel.findPendingApplications();
-      res.render('admin/applications', { applications });
+      res.render('admin/applications.ejs', { applications, user: req.user });
     } catch (err) {
       console.error(err);
       res.redirect('/admin/dashboard');
@@ -18,13 +31,41 @@ const adminController = {
       const applicationId = req.params.id;
       await DriverModel.updateStatus(applicationId, 'approved');
       const driver = await DriverModel.findById(applicationId);
-      await sendEmail(driver.email, 'Application Approved', 'Your driver application has been approved.');
-      req.flash('success', 'Application approved successfully');
-      res.redirect('/admin/applications');
+      // sendEmail(to, subject, html)
+      // random 8-letter long password for user to login after approval
+      const password = Math.random().toString(36).slice(-8);
+      await DriverModel.updateDriverPassword(driver.email, password);
+      await sendEmail(
+        // email
+        driver.email, 
+        // subject
+        'Driver Application Approval', 
+        // html
+        `<h1>You have been approved, ${driver.name}!</h1>
+        </br>
+        <p>Congratulations! Your driver application has been approved. 
+        </br>
+        <p>Here are your credentials:</p>
+        </br>
+        <p>Email: ${driver.email}</p>
+        </br>
+        <p>Password: ${password}</p>
+        </br>
+        <strong style="color: red;">Please change your password right after logging in.</strong>
+        </br>
+        You can now login to the system at http://localhost:${process.env.PORT}</p>`
+      );
+      console.log(`Approval email sent to ${driver.email}`)
+
+      res.render('admin/applications.ejs', { 
+        user: req.user,
+        applications: await DriverModel.findPendingApplications(),
+        approvalSuccessMessage: `Approval Email sent to ${driver.email} successfully` 
+      });
     } catch (err) {
       console.error(err);
-      req.flash('error', 'An error occurred while approving the application');
-      res.redirect('/admin/applications');
+      // req.flash('error', 'An error occurred while approving the application');
+      res.redirect('admin/applications.ejs', { approvalErrorMessage: 'An error occurred while approving the application' });
     }
   },
 
@@ -33,12 +74,13 @@ const adminController = {
       const applicationId = req.params.id;
       const driver = await DriverModel.findById(applicationId);
       await sendEmail(driver.email, 'Application Rejected', 'Your driver application has been rejected.');
+      console.log(`Rejection email sent to ${driver.email}`);
       await DriverModel.delete(driver.email);
-      req.flash('success', 'Application rejected successfully');
+      // req.flash('success', 'Application rejected successfully');
       res.redirect('/admin/applications');
     } catch (err) {
       console.error(err);
-      req.flash('error', 'An error occurred while rejecting the application');
+      // req.flash('error', 'An error occurred while rejecting the application');
       res.redirect('/admin/applications');
     }
   },

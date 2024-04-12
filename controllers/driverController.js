@@ -1,6 +1,6 @@
 const driverController = {
   renderDashboard(req, res) {
-    res.render('driver/driverDashboard', { user: req.user });
+    res.render('driver/driverDashboard.ejs', { user: req.user });
   },
   
   // future driver controllers

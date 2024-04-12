@@ -17,4 +17,7 @@ router.post('/logout', authController.logout);
 router.get('/signup', authController.renderSignup);
 router.post('/signup', authController.signup);
 
+router.get('/forgot-password', authController.renderForgotPassword);
+router.post('/forgot-password', authController.forgotPassword);
+
 export default router;

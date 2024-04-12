@@ -23,6 +23,16 @@ const AdminModel = {
     return result.rows[0];  
   },
 
+  async updateDriverPassword(email, password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await pool.query('UPDATE users SET password = $1 WHERE email = $2 AND role = $3', [hashedPassword, email, 'driver']);
+  },
+
+  async updateAdminPassword(email, password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await pool.query('UPDATE users SET password = $1 WHERE email = $2 AND role = $3', [hashedPassword, email, 'admin']);
+  },
+
   async delete(email) {
     await pool.query('DELETE FROM users WHERE email = $1 AND role = $2', [email, 'admin']);
   },
