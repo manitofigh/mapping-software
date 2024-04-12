@@ -22,13 +22,13 @@ const AdminPanel = () => {
 	// console.log("Parent Function Called");
 	var geometry = data.trips[0].geometry;
 	// console.log("Creating Feature")
-	var gjson_feature = {
+	/*var gjson_feature = {
 		"type" : "Feature",
 		"properties": {
 			"name": "Path",
 		},
 		"geometry":geometry
-	};
+	};*/
 	//console.log("Created Feature")
 	//console.log(data);
 	//console.log(gjson_feature);
@@ -109,12 +109,25 @@ const AdminPanel = () => {
     if(bars.right)
 	  num++;
     
-    console.log(num);
+    // console.log(num);
     var adminMap = document.getElementById("adminMap")
     adminMap.style.gridColumn = "span " + num.toString();
     
-    //console.log(bars.left);
-    //console.log(bars.right);
+    var leftSideBar = document.getElementsByClassName("left-bar")
+
+    var rightSideBar = document.getElementsByClassName("right-bar")
+    if(bars.bottom){
+	rightSideBar[0].style.gridRow = "2 / span 2"
+	leftSideBar[0].style.gridRow = "2 / span 2"
+	adminMap.style.gridRow = "2 / span 2"
+    } else {
+	rightSideBar[0].style.gridRow = "2 / span 1"
+	leftSideBar[0].style.gridRow = "2 / span 1"
+	adminMap.style.gridRow = "2 / span 1"
+    }
+    
+
+    
   }, [bars]);
 
   const isAnyBarCollapsed = () => Object.values(bars).some((status) => status);
@@ -226,7 +239,14 @@ const AdminPanel = () => {
         < Geocoding childToParent={childToParent}/>
       </div>
       <div className={`bottom-bar ${bars.bottom ? "bar-collapsed" : ""}`}>
-        bottom bar
+	  <table>
+	      <thead>
+	        <tr>
+	          <th scope="col">Start Time </th>
+	          <th scope="col">Route Leg </th>
+	        </tr>
+	      </thead>
+	  </table>
       </div>
       <div className="main-content" id="adminMap">
         <button
