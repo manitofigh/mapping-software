@@ -1,6 +1,6 @@
 import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
-import { sendEmail } from '../config/nodemailer.js';
+import { sendEmail } from '../utils/nodemailer.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

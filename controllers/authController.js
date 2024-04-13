@@ -1,6 +1,6 @@
-import passport from '../config/passport.js';
+import passport from '../utils/passport.js';
 import DriverModel from '../models/DriverModel.js';
-import { sendEmail } from '../config/nodemailer.js';
+import { sendEmail } from '../utils/nodemailer.js';
 
 const authController = {
   login(req, res, next) {
