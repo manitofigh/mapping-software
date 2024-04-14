@@ -8,7 +8,7 @@ dotenv.config();
 const adminController = {
   async renderDashboard(req, res) {
     try {
-      const pendingApplications = await DriverModel.countPendingApplications();
+      const pendingApplications = await AdminModel.countPendingApplications();
       res.render('admin/adminDashboard.ejs', { user: req.user, pendingApplications });
     } catch (err) {
       console.error(err);
@@ -18,7 +18,7 @@ const adminController = {
   
   async renderApplications(req, res) {
     try {
-      const applications = await DriverModel.findPendingApplications();
+      const applications = await AdminModel.findPendingApplications();
       res.render('admin/applications.ejs', { applications, user: req.user });
     } catch (err) {
       console.error(err);
@@ -29,12 +29,12 @@ const adminController = {
   async approveApplication(req, res) {
     try {
       const applicationId = req.params.id;
-      await DriverModel.updateStatus(applicationId, 'approved');
+      await AdminModel.updateStatus(applicationId, 'approved');
       const driver = await DriverModel.findById(applicationId);
       // sendEmail(to, subject, html)
       // random 8-letter long password for user to login after approval
       const password = Math.random().toString(36).slice(-8);
-      await DriverModel.updateDriverPassword(driver.email, password);
+      await AdminModel.updateDriverPassword(driver.email, password);
       await sendEmail(
         // email
         driver.email, 
@@ -59,7 +59,7 @@ const adminController = {
 
       res.render('admin/applications.ejs', { 
         user: req.user,
-        applications: await DriverModel.findPendingApplications(),
+        applications: await AdminModel.findPendingApplications(),
         approvalSuccessMessage: `Approval Email sent to ${driver.email} successfully` 
       });
     } catch (err) {
@@ -84,6 +84,48 @@ const adminController = {
       res.redirect('/admin/applications');
     }
   },
+
+  async resetUserPassword(req, res) {
+    try {
+      const { email } = req.body;
+      const admin = await AdminModel.findByEmail(email);
+      if (admin) {
+        // random 8-letter long password for user to login after approval
+        const password = Math.random().toString(36).slice(-8);
+        await AdminModel.updateAdminPassword(admin.email, password);
+        await sendEmail(
+          // email
+          admin.email, 
+          // subject
+          'Password Reset', 
+          // html
+          `<h1>Your password has been reset, ${admin.name}!</h1>
+          </br>
+          <p>Your new password is: ${password}</p>
+          </br>
+          <strong style="color: red;">Please change your password right after logging in.</strong>
+          </br>
+          You can now login to the system at http://localhost:${process.env.PORT}</p>`
+        );
+        console.log(`Password reset email sent to ${admin.email}`);
+        res.render('admin/resetPassword.ejs', { 
+          status: 'success', 
+          successTitle: 'Done', 
+          successBody: 'Check your email for the new password' });
+      } else {
+        res.render('admin/resetPassword.ejs', { 
+          status: 'error', 
+          errorTitle: 'Error',
+          errorBody: 'User not found' });
+      }
+    } catch (err) {
+      console.error(err);
+      res.render('admin/resetPassword.ejs', { 
+        status: 'error', 
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while resetting the password' });
+    }
+  }
 };
 
 export default adminController;

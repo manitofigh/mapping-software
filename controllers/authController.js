@@ -1,5 +1,6 @@
 import passport from '../utils/passport.js';
 import DriverModel from '../models/DriverModel.js';
+import AdminModel from '../models/AdminModel.js';
 import { sendEmail } from '../utils/nodemailer.js';
 import { render } from 'ejs';
 
@@ -63,6 +64,7 @@ const authController = {
     }
   },
 
+  // get /login
   renderLogin(req, res) {
     if (req.isAuthenticated()) {
       if (req.user.role == 'admin') {
@@ -77,26 +79,28 @@ const authController = {
     });
   },
 
+  // get /forgot-password
   renderForgotPassword(req, res) {
     res.render('auth/forgotPassword.ejs');
   },
 
+  // post /forgot-password
   async forgotPassword(req, res) {
     try {
       const { email } = req.body;
-      const driver = await DriverModel.findByEmail(email);
-      if (driver) {
-        // random 8-letter long password for user to login after approval
+      const user = await AdminModel.findByEmail(email);
+      if (user) {
+        // random 8-letter long password for user
         const password = Math.random().toString(36).slice(-8);
-        await DriverModel.updateDriverPassword(driver.email, password);
+        await AdminModel.updateUserPassword(user.email, password);
         // sendEmail(to, subject, html)
         await sendEmail(
           // email
-          driver.email, 
+          user.email, 
           // subject
           'Password Reset', 
           // html
-          `<h1>Your password has been reset, ${driver.name}!</h1>
+          `<h1>Your password has been reset, ${user.name}</h1>
           </br>
           <p>Your new password is: ${password}</p>
           </br>
@@ -104,11 +108,12 @@ const authController = {
           </br>
           You can now login to the system at http://localhost:${process.env.PORT}</p>`
         );
-        console.log(`Password reset email sent to ${driver.email}`);
+        console.log(`Password reset email sent to ${user.email}`);
         res.render('auth/forgotPassword.ejs', { 
           status: 'success', 
           successTitle: 'Done', 
-          successBody: 'Check your email for the new password' });
+          successBody: 'Check your email for the new password' 
+        });
       } else {
         res.render('auth/forgotPassword.ejs', { 
           status: 'error', 
