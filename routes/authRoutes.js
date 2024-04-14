@@ -20,4 +20,6 @@ router.post('/signup', authController.signup);
 router.get('/forgot-password', authController.renderForgotPassword);
 router.post('/forgot-password', authController.forgotPassword);
 
+router.get('/404', authController.render404);
+
 export default router;

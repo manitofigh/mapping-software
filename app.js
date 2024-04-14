@@ -1,9 +1,10 @@
 import express from 'express';
 import session from 'express-session';
-import passport from './config/passport.js';
+import passport from './utils/passport.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
+import authController from './controllers/authController.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -25,8 +26,10 @@ app.use(passport.session());
 app.use('/', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/driver', driverRoutes);
+app.use('*', authController.render404);
 
 const PORT = process.env.PORT
+const BASE_URL = process.env.BASE_URL
 app.listen(process.env.PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server is running at ${BASE_URL || 'http://localhost'}:${PORT || 3000}`);
 });

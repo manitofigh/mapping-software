@@ -1,6 +1,7 @@
 import passport from '../utils/passport.js';
 import DriverModel from '../models/DriverModel.js';
 import { sendEmail } from '../utils/nodemailer.js';
+import { render } from 'ejs';
 
 const authController = {
   login(req, res, next) {
@@ -9,7 +10,12 @@ const authController = {
         return next(err);
       }
       if (!user) {
-        return res.render('auth/login.ejs', { errorMessage: info.message });
+        console.log(`INFO MESSAGE: ${info.message}`);
+        return res.render('auth/login.ejs', { 
+          status: 'error',
+          errorLineOne: 'Error',
+          errorLineTwo: 'Invalid email or password'
+         });
       }
       req.logIn(user, (err) => {
         if (err) {
@@ -43,10 +49,17 @@ const authController = {
       // random 8-letter long password for now
       const tempPassword = Math.random().toString(36).slice(-8);
       await DriverModel.create(name, email, tempPassword, 'driver', 'pending');
-      res.render('auth/login.ejs', { status: 'success', message: 'Your application has been submitted successfully' });
+      res.render('auth/login.ejs', { 
+        status: 'success', 
+        successLineOne: 'Application Submitted',
+        successLineTwo: 'Your will be notified once an admin reviews your application.' 
+      });
     } catch (err) {
       console.error(err);
-      res.render('auth/login.ejs', { status: 'error', message: 'An error occurred while submitting your application' });
+      res.render('auth/login.ejs', { 
+        status: 'error', 
+        errorLineOne: 'Error',
+        errorLineTwo: 'An error occurred while submitting your application.' });
     }
   },
 
@@ -58,7 +71,9 @@ const authController = {
         return res.redirect('/driver/dashboard');
       }
     }
-    res.render('auth/login.ejs', { errorMessage: req.query.error });
+    res.render('auth/login.ejs', { 
+      errorMessage: req.query.error 
+    });
   },
 
   renderForgotPassword(req, res) {
@@ -89,15 +104,19 @@ const authController = {
           You can now login to the system at http://localhost:${process.env.PORT}</p>`
         );
         console.log(`Password reset email sent to ${driver.email}`);
-        res.render('auth/login.ejs', { status: 'success', message: 'Password reset email sent successfully' });
+        res.render('auth/forgotPassword.ejs', { status: 'success', successLineOne: 'Done' , successLineTwo: 'Check your email for the new password' });
       } else {
-        res.render('auth/login.ejs', { status: 'error', message: 'No user found with that email' });
+        res.render('auth/forgotPassword.ejs', { status: 'error', errorLineOne: 'No user found with that email' });
       }
     } catch (err) {
       console.error(err);
-      res.render('auth/login.ejs', { status: 'error', message: 'An error occurred while resetting the password' });
+      res.render('auth/forgotPassword.ejs', { status: 'error', errorLineOne: 'Error', errorLineTwo: 'An error occurred while resetting the password' });
     }
   },
+
+  render404(req, res) {
+    res.render('auth/404.ejs');
+  }
 
 };
 
