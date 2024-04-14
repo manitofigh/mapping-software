@@ -14,14 +14,11 @@
             <%= message %>
           </div>
         <% } else if (status === 'error') { %>
-          <% if (typeof errorLineOne !== 'undefined' && typeof errorLineTwo !== 'undefined') { %>
-            <%- include('../partials/errorNotif.ejs', { errorLineOne: 'Error', errorLineTwo: errorMessage }) %>
+          <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
+            <%- include('../partials/errorNotif.ejs', { errorTitle: errorTitle, errorBody: errorBody }) %>
           <% } %>
         <% } %>
       <% } %>
-      <!-- <% if (typeof errorMessage !== 'undefined') { %>
-          <%- include('../partials/errorNotif.ejs', { errorLineOne: 'Error', errorLineTwo: 'Wrong Email or Password. Try again.' }) %>
-      <% } %> -->
 
       <!-- Login form -->
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -51,12 +48,10 @@
         </form>
         
         <div class="mt-4 flex items-center justify-center">
-          <p class="text-sm text-gray-400">
+          <p class="mt-4 text-center text-sm text-gray-400">
             Want to become a driver?
+            <a href="/signup" class="font-semibold leading-6 text-amber-700 decoration-white hover:underline">Apply now &rarr;</a>
           </p>
-          <div class="flex items-center justify-center gap-x-6 ml-2">
-            <a href="/signup" class="rounded-md bg-amber-700 px-2 py-2 text-xs font-semibold text-white shadow-sm border border-transparent hover:border-white">Apply here <span aria-hidden="true">&rarr;</span></a>
-          </div>
         </div>
         
       </div>

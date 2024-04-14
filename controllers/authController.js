@@ -13,8 +13,8 @@ const authController = {
         console.log(`INFO MESSAGE: ${info.message}`);
         return res.render('auth/login.ejs', { 
           status: 'error',
-          errorLineOne: 'Error',
-          errorLineTwo: 'Invalid email or password'
+          errorTitle: 'Error',
+          errorBody: 'Invalid Email or password'
          });
       }
       req.logIn(user, (err) => {
@@ -51,15 +51,15 @@ const authController = {
       await DriverModel.create(name, email, tempPassword, 'driver', 'pending');
       res.render('auth/login.ejs', { 
         status: 'success', 
-        successLineOne: 'Application Submitted',
-        successLineTwo: 'Your will be notified once an admin reviews your application.' 
+        successTitle: 'Application Submitted',
+        successBody: 'Your will be notified once an admin reviews your application.' 
       });
     } catch (err) {
       console.error(err);
       res.render('auth/login.ejs', { 
         status: 'error', 
-        errorLineOne: 'Error',
-        errorLineTwo: 'An error occurred while submitting your application.' });
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while submitting your application.' });
     }
   },
 
@@ -72,7 +72,8 @@ const authController = {
       }
     }
     res.render('auth/login.ejs', { 
-      errorMessage: req.query.error 
+      errorTitle: 'Error',
+      errorBody: req.query.error 
     });
   },
 
@@ -104,13 +105,19 @@ const authController = {
           You can now login to the system at http://localhost:${process.env.PORT}</p>`
         );
         console.log(`Password reset email sent to ${driver.email}`);
-        res.render('auth/forgotPassword.ejs', { status: 'success', successLineOne: 'Done' , successLineTwo: 'Check your email for the new password' });
+        res.render('auth/forgotPassword.ejs', { 
+          status: 'success', 
+          successTitle: 'Done', 
+          successBody: 'Check your email for the new password' });
       } else {
-        res.render('auth/forgotPassword.ejs', { status: 'error', errorLineOne: 'No user found with that email' });
+        res.render('auth/forgotPassword.ejs', { 
+          status: 'error', 
+          errorTitle: 'Error',
+          errorBody: 'No user found with that email'});
       }
     } catch (err) {
       console.error(err);
-      res.render('auth/forgotPassword.ejs', { status: 'error', errorLineOne: 'Error', errorLineTwo: 'An error occurred while resetting the password' });
+      res.render('auth/forgotPassword.ejs', { status: 'error', errorTitle: 'Error', errorBody: 'An error occurred while resetting the password' });
     }
   },
 
