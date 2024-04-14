@@ -111,14 +111,14 @@ const authController = {
         console.log(`Password reset email sent to ${user.email}`);
         res.render('auth/forgotPassword.ejs', { 
           status: 'success', 
-          successTitle: 'Done', 
+          successTitle: 'Success', 
           successBody: 'Check your email for the new password' 
         });
       } else {
         res.render('auth/forgotPassword.ejs', { 
           status: 'error', 
           errorTitle: 'Error',
-          errorBody: 'No user found with that email'});
+          errorBody: 'No user found with that Email'});
       }
     } catch (err) {
       console.error(err);

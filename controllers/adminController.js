@@ -110,7 +110,7 @@ const adminController = {
         console.log(`Password reset email sent to ${admin.email}`);
         res.render('admin/resetPassword.ejs', { 
           status: 'success', 
-          successTitle: 'Done', 
+          successTitle: 'Success', 
           successBody: 'Check your email for the new password' });
       } else {
         res.render('admin/resetPassword.ejs', { 
