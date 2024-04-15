@@ -53,7 +53,7 @@ const adminController = {
         </br>
         <strong style="color: red;">Please change your password right after logging in.</strong>
         </br>
-        You can now login to the system at http://localhost:${process.env.PORT}</p>`
+        You can now login to the system at ${process.env.BASE_URL}:${process.env.PORT}</p>`
       );
       console.log(`Approval email sent to ${driver.email}`)
 
@@ -88,7 +88,7 @@ const adminController = {
   async resetUserPassword(req, res) {
     try {
       const { email } = req.body;
-      const admin = await AdminModel.findByEmail(email);
+      const admin = await AdminModel.findUserByEmail(email);
       if (admin) {
         // random 8-letter long password for user to login after approval
         const password = Math.random().toString(36).slice(-8);
@@ -111,7 +111,7 @@ const adminController = {
         res.render('admin/resetPassword.ejs', { 
           status: 'success', 
           successTitle: 'Success', 
-          successBody: 'Check your email for the new password' });
+          successBody: 'Check your Email for the new password' });
       } else {
         res.render('admin/resetPassword.ejs', { 
           status: 'error', 

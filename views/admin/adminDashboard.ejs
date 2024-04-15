@@ -1,4 +1,4 @@
-<%- include ('../partials/head') %>
+<%- include ('../partials/head.ejs') %>
 
 <body>
 <div>
@@ -7,7 +7,7 @@
     <!-- Sidebar component, swap this element with another sidebar if you like -->
     <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6">
       <div class="flex h-16 shrink-0 items-center">
-        <img class="h-20 w-auto" src="https://svgshare.com/i/15N6.svg" alt="Your Company">
+        <img class="h-20 w-auto" src="https://svgshare.com/i/15N6.svg" alt="Slick">
       </div>
       <nav class="flex flex-1 flex-col">
         <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -68,8 +68,8 @@
           </li>
           <li class="-mx-6 mt-auto">
             <form action="/logout" method="POST" class="flex justify-between items-center px-6 py-3">
-              <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 text-xs font-normal text-white shadow-sm border border-transparent hover:border-white"> <span aria-hidden="true">&larr;</span> Logout</button>
-
+              <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
+              
               <a href="#" class="text-sm font-normal leading-6 text-white">
                 <%= user.name %> <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">Admin</span>
               </a>

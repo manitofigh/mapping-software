@@ -5,7 +5,7 @@ const saltRounds = 10;
 
 const DriverModel = {
 
-  async findByEmail(email) {
+  async findDriverByEmail(email) {
     const result = await pool.query('SELECT * FROM users WHERE email = $1 AND role = $2', [email, 'driver']);
     return result.rows[0];
   },

@@ -88,7 +88,7 @@ const authController = {
   async forgotPassword(req, res) {
     try {
       const { email } = req.body;
-      const user = await AdminModel.findByEmail(email);
+      const user = await AdminModel.findUserByEmail(email);
       if (user) {
         // random 8-letter long password for user
         const password = Math.random().toString(36).slice(-8);
@@ -112,7 +112,7 @@ const authController = {
         res.render('auth/forgotPassword.ejs', { 
           status: 'success', 
           successTitle: 'Success', 
-          successBody: 'Check your email for the new password' 
+          successBody: 'Check your Email for the new password' 
         });
       } else {
         res.render('auth/forgotPassword.ejs', { 

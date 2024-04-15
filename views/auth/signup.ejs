@@ -1,4 +1,4 @@
-<%- include('../partials/head') %>
+<%- include('../partials/head.ejs') %>
 
 <body class="flex justify-center items-center min-h-screen bg-gray-900">
   <div class="max-w-4xl mx-auto px-4 py-12">
@@ -10,21 +10,36 @@
 
           <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div class="sm:col-span-3">
-              <label for="first-name" class="block text-sm font-medium leading-6 text-white">First name</label>
+              <label for="first-name" class="block text-sm font-medium leading-6 text-white">
+                First name
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6">
               </div>
             </div>
 
             <div class="sm:col-span-3">
-              <label for="last-name" class="block text-sm font-medium leading-6 text-white">Last name</label>
+              <label for="last-name" class="block text-sm font-medium leading-6 text-white">
+                Last name
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6">
               </div>
             </div>
 
             <div class="sm:col-span-4">
-              <label for="email" class="block text-sm font-medium leading-6 text-white">Email address</label>
+              <label for="email" class="block text-sm font-medium leading-6 text-white">
+                Email address
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <input id="email" name="email" type="email" autocomplete="email" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6">
               </div>
@@ -41,21 +56,36 @@
             </div>
 
             <div class="col-span-full">
-              <label for="street-address" class="block text-sm font-medium leading-6 text-white">Street address</label>
+              <label for="street-address" class="block text-sm font-medium leading-6 text-white">
+                Street address
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <input type="text" name="street-address" id="street-address" autocomplete="street-address" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6">
               </div>
             </div>
 
             <div class="sm:col-span-2 sm:col-start-1">
-              <label for="city" class="block text-sm font-medium leading-6 text-white">City</label>
+              <label for="city" class="block text-sm font-medium leading-6 text-white">
+                City
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <input type="text" name="city" id="city" autocomplete="address-level2" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6">
               </div>
             </div>
 
             <div class="sm:col-span-2">
-              <label for="state" class="block text-sm font-medium leading-6 text-white">State</label>
+              <label for="state" class="block text-sm font-medium leading-6 text-white">
+                State
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <select id="state" name="state" autocomplete="state-name" class="block w-full rounded-md border-0 bg-white/5 px-2 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6 [&_*]:text-black">
                   <option value="" selected="selected">Select a State</option>
@@ -115,7 +145,12 @@
             </div>
 
             <div class="sm:col-span-2">
-              <label for="zip" class="block text-sm font-medium leading-6 text-white">ZIP</label>
+              <label for="zip" class="block text-sm font-medium leading-6 text-white">
+                ZIP
+                <svg class="h-1.5 w-1.5 fill-red-500 inline-block ml-1" viewBox="0 0 6 6" aria-hidden="true">
+                  <circle cx="3" cy="3" r="3" />
+                </svg>
+              </label>
               <div class="mt-2">
                 <input type="text" name="zip" id="zip" autocomplete="zip" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700 sm:text-sm sm:leading-6">
               </div>

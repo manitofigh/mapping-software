@@ -9,9 +9,9 @@ passport.use(
     { usernameField: 'email' },
     async (email, password, done) => {
       try {
-        let user = await DriverModel.findByEmail(email);
+        let user = await DriverModel.findDriverByEmail(email);
         if (!user) {
-          user = await AdminModel.findByEmail(email);
+          user = await AdminModel.findAdminByEmail(email);
         }
 
         if (!user) {
