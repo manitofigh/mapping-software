@@ -1,4 +1,6 @@
 import express from 'express';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import session from 'express-session';
 import passport from './utils/passport.js';
 import authRoutes from './routes/authRoutes.js';
@@ -11,6 +13,9 @@ dotenv.config();
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: false }));
@@ -22,6 +27,8 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', authRoutes);
 app.use('/admin', adminRoutes);

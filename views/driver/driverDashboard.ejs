@@ -1,4 +1,10 @@
-<%- include ('../partials/head.ejs') %>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slick</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
 <body>
 <div>
@@ -64,6 +70,14 @@
   <main class="pl-72">
     <div class="px-4 sm:px-6 lg:px-8">
       <!-- Main content -->
+      <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
+        <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
+      <% } %>
+      <div id="mapContainer" style="height: 400px;"></div>
+
+      <script src="/js/driverDashboard.js"></script>
+      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </div>
   </main>
 </div>

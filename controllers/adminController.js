@@ -1,6 +1,7 @@
 import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
 import { sendEmail } from '../utils/nodemailer.js';
+import axios from 'axios';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -125,7 +126,64 @@ const adminController = {
         errorTitle: 'Error',
         errorBody: 'An error occurred while resetting the password' });
     }
-  }
+  },
+
+  async getDrivers(req, res) {
+    try {
+      const drivers = await AdminModel.getDrivers();
+      res.json(drivers);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      res.render('admin/adminDashboard.ejs', {
+        errorTitle: 'Error Fetching Drivers',
+        errorBody: 'An error occurred while fetching the drivers. Please try again.',
+      });
+    }
+  },
+
+  async getAddressesForDriver(req, res) {
+    const driverId = req.params.driverId;
+    try {
+      const addresses = await AdminModel.getAddressesForDriver(driverId);
+      res.json(addresses);
+    } catch (error) {
+      console.error('Error fetching addresses for driver:', error);
+      res.render('admin/adminDashboard.ejs', {
+        errorTitle: 'Error Fetching Addresses',
+        errorBody: 'An error occurred while fetching addresses for the selected driver. Please try again.',
+      });
+    }
+  },
+
+  async addAddress(req, res) {
+    const { address, driverId } = req.body;
+    try {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.GOOGLE_MAPS_API_KEY}`);
+      const { lat, lng } = response.data.results[0].geometry.location;
+      const newAddress = await AdminModel.addAddress(address, lat, lng, driverId);
+      res.json(newAddress);
+    } catch (error) {
+      console.error('Error adding address:', error);
+      res.render('admin/adminDashboard.ejs', {
+        errorTitle: 'Error Adding Address',
+        errorBody: 'An error occurred while adding the address. Please try again.',
+      });
+    }
+  },
+
+  async deleteAddress(req, res) {
+    const addressId = req.params.addressId;
+    try {
+      await AdminModel.deleteAddress(addressId);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      res.render('admin/adminDashboard.ejs', {
+        errorTitle: 'Error Deleting Address',
+        errorBody: 'An error occurred while deleting the address. Please try again.',
+      });
+    }
+  },
 };
 
 export default adminController;

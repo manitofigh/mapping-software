@@ -12,4 +12,9 @@ router.get('/applications', isAuthenticated, isAdmin, adminController.renderAppl
 router.post('/applications/:id/approve', isAuthenticated, isAdmin, adminController.approveApplication);
 router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminController.rejectApplication);
 
+router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
+router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, adminController.getAddressesForDriver);
+router.post('/addresses', isAuthenticated, isAdmin, adminController.addAddress);
+router.delete('/addresses/:addressId', isAuthenticated, isAdmin, adminController.deleteAddress);
+
 export default router;

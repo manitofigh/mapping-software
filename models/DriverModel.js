@@ -32,6 +32,11 @@ const DriverModel = {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     await pool.query('UPDATE users SET password = $1 WHERE email = $2 AND role = $3', [hashedPassword, email, 'driver']);
   },
+  
+  async getOptimizedRoute(driverId) {
+    const route = await db.query('SELECT * FROM routes WHERE driverId = $1 ORDER BY id DESC LIMIT 1', [driverId]);
+    return route.rows[0];
+  },
 };
 
 export default DriverModel;

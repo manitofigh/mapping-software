@@ -1,11 +1,10 @@
 import express from "express";
 import { isAuthenticated } from "../middleware/auth.js";
+import driverController from "../controllers/driverController.js";
 
 const router = express.Router();
 
-router.get("/dashboard", isAuthenticated, (req, res) => {
-  res.render("driver/driverDashboard.ejs", { user: req.user });
-});
+router.get("/dashboard", isAuthenticated, driverController.renderDashboard);
 
 //future driver routes
 
