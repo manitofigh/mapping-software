@@ -13,10 +13,20 @@ const transporter = nodemailer.createTransport({
 
 export function sendMail(to, subject, html) {
   const mailOptions = {
-    from: 'SLICK <no-reply@slick.routing@gmail.com>',
+    from: 'SLICK <slick.routing@gmail.com>',
     to,
     subject,
-    html
+    html: 
+    `
+    ${html} 
+    </br>
+    <p>Best regards,</p> 
+    <strong>Slick Team</strong>
+    <center>
+      <img style="display: inline-block; height: 256px; width: auto;" src="https://svgshare.com/i/15N6.svg" alt="Slick">
+      </img>
+    </center>
+    `
   };
 
   return transporter.sendMail(mailOptions); // Corrected here

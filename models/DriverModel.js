@@ -34,7 +34,7 @@ const DriverModel = {
   },
   
   async getOptimizedRoute(driverId) {
-    const route = await db.query('SELECT * FROM routes WHERE driverId = $1 ORDER BY id DESC LIMIT 1', [driverId]);
+    const route = await pool.query('SELECT * FROM routes WHERE driverId = $1 ORDER BY id DESC LIMIT 1', [driverId]);
     return route.rows[0];
   },
 };

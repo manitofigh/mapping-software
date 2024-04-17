@@ -1,9 +1,11 @@
 import passport from '../utils/passport.js';
-import DriverModel from '../models/DriverModel.js';
+// import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
 import { sendMail } from '../utils/nodemailer.js';
 
 const authController = {
+
+  // POST /login
   login(req, res, next) {
     passport.authenticate('local', (err, user, info) => {
       if (err) {
@@ -30,6 +32,7 @@ const authController = {
     })(req, res, next);
   },
 
+  // POST /logout
   logout(req, res) {
     req.logout(function (err) {
       if (err) {
@@ -39,18 +42,19 @@ const authController = {
     });
   },
 
+  // GET /signup
   renderSignup(req, res) {
     res.render('auth/signup.ejs');
   },
 
-  // post /signup 
+  // POST /signup 
   async signup(req, res) {
     try {
       const application = req.body;
       
       // Input sanitization and validation
       const nameRegex = /^[a-zA-Z\s,'-]{2,}$/; // At least 2 characters, allows letters, spaces, commas, apostrophes, and hyphens
-      const zipRegex = /^\d{5}(-\d{4})?$/; // U.S. ZIP code, allows five digits or nine digits with hyphen (e.g., 12345-6789)
+      const zipRegex = /^\d{5}$/; // U.S. ZIP code, allows exactly five digits
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/; // Email address, broadly accepting 2-4 letter domain extensions
       const addressRegex = /^[a-zA-Z0-9\s,.'-]{3,}$/; // At least 3 characters, allows letters, numbers, spaces, commas, periods, apostrophes, and hyphens
       
@@ -63,9 +67,10 @@ const authController = {
         res.render('auth/signup.ejs', { 
           status: 'error', 
           errorTitle: 'Error',
-          errorBody: `All fields must be filled out correctly. 
+          errorBody: `All fields must be filled out correctly.
                       Names must be at least 2 letters long with no special characters or numbers. 
-                      Zip code must be exactly 5 digits. Email must be a valid email address. 
+                      Zip code must be exactly 5 digits long. 
+                      Email must be a valid email address.
                       Street and city must be at least 3 characters long and are allowed letters, numbers, spaces, commas, periods, apostrophes, and hyphens.`
         });
       }
@@ -79,23 +84,21 @@ const authController = {
         // subject
         'Application Submitted', 
         // html
-        `<h1>We got your application, ${application.firstName} ${application.lastName}!</h1>
-        </br>
-        <p>Your application has been submitted successfully. 
-        </br>
-        You will be notified once an admin reviews your application.</p>`
+        `<h1 style="color: #b45309">We got your application, ${application.firstName} ${application.lastName}!</h1>
+        <p>Your application has been submitted successfully.</p> 
+        <p>You will be notified on the status of your application upon an administrator's review.</p>`
       );
       res.render('auth/login.ejs', { 
         status: 'success', 
         successTitle: 'Application Submitted',
-        successBody: 'Your will be notified once an admin reviews your application.' 
+        successBody: 'Please check your Email for confirmation.' 
       });
     } catch (err) {
       console.error(err);
     }
   },
 
-  // get /login
+  // GET /login
   renderLogin(req, res) {
     if (req.isAuthenticated()) {
       if (req.user.role == 'admin') {
