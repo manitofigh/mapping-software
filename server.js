@@ -14,6 +14,7 @@ require("dotenv").config();
 require('./passportConfig')(passport, pool);
 
 const addressRoutes = require('./addressRoutes');
+const prcoessingRoutes = require('./processingRoutes');
 const upload = multer({ dest: 'uploads/' });
 
 const app = express();
@@ -31,6 +32,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', addressRoutes);
+app.use('/', prcoessingRoutes);
 
 app.use(
   session({
