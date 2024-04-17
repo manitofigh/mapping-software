@@ -1,8 +1,7 @@
 import passport from '../utils/passport.js';
 import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
-import { sendEmail } from '../utils/nodemailer.js';
-import { render } from 'ejs';
+import { sendMail } from '../utils/nodemailer.js';
 
 const authController = {
   login(req, res, next) {
@@ -44,12 +43,48 @@ const authController = {
     res.render('auth/signup.ejs');
   },
 
+  // post /signup 
   async signup(req, res) {
     try {
-      const { name, email } = req.body;
-      // random 8-letter long password for now
-      const tempPassword = Math.random().toString(36).slice(-8);
-      await DriverModel.create(name, email, tempPassword, 'driver', 'pending');
+      const application = req.body;
+      
+      // Input sanitization and validation
+      const nameRegex = /^[a-zA-Z\s,'-]{2,}$/; // At least 2 characters, allows letters, spaces, commas, apostrophes, and hyphens
+      const zipRegex = /^\d{5}(-\d{4})?$/; // U.S. ZIP code, allows five digits or nine digits with hyphen (e.g., 12345-6789)
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/; // Email address, broadly accepting 2-4 letter domain extensions
+      const addressRegex = /^[a-zA-Z0-9\s,.'-]{3,}$/; // At least 3 characters, allows letters, numbers, spaces, commas, periods, apostrophes, and hyphens
+      
+      if (!nameRegex.test(application.firstName) || 
+          !nameRegex.test(application.lastName) || 
+          !zipRegex.test(application.zip) || 
+          !emailRegex.test(application.email) || 
+          !addressRegex.test(application.street) || 
+          !addressRegex.test(application.city)) {
+        res.render('auth/signup.ejs', { 
+          status: 'error', 
+          errorTitle: 'Error',
+          errorBody: `All fields must be filled out correctly. 
+                      Names must be at least 2 letters long with no special characters or numbers. 
+                      Zip code must be exactly 5 digits. Email must be a valid email address. 
+                      Street and city must be at least 3 characters long and are allowed letters, numbers, spaces, commas, periods, apostrophes, and hyphens.`
+        });
+      }
+      // If about is empty, set it to N/A
+      application.about = application.about === null || /^ *$/.test(application.about) ? "N/A" : application.about;
+      
+      await AdminModel.createApplication(application);
+      await sendMail(
+        // email
+        application.email, 
+        // subject
+        'Application Submitted', 
+        // html
+        `<h1>We got your application, ${application.firstName} ${application.lastName}!</h1>
+        </br>
+        <p>Your application has been submitted successfully. 
+        </br>
+        You will be notified once an admin reviews your application.</p>`
+      );
       res.render('auth/login.ejs', { 
         status: 'success', 
         successTitle: 'Application Submitted',
@@ -57,10 +92,6 @@ const authController = {
       });
     } catch (err) {
       console.error(err);
-      res.render('auth/login.ejs', { 
-        status: 'error', 
-        errorTitle: 'Error',
-        errorBody: 'An error occurred while submitting your application.' });
     }
   },
 
@@ -93,8 +124,8 @@ const authController = {
         // random 8-letter long password for user
         const password = Math.random().toString(36).slice(-8);
         await AdminModel.updateUserPassword(user.email, password);
-        // sendEmail(to, subject, html)
-        await sendEmail(
+        // sendMail(to, subject, html)
+        await sendMail(
           // email
           user.email, 
           // subject

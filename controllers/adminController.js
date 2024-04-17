@@ -1,6 +1,6 @@
 import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
-import { sendEmail } from '../utils/nodemailer.js';
+import { sendMail } from '../utils/nodemailer.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
@@ -9,11 +9,20 @@ dotenv.config();
 const adminController = {
   async renderDashboard(req, res) {
     try {
+      const drivers = await AdminModel.getDrivers();
       const pendingApplications = await AdminModel.countPendingApplications();
-      res.render('admin/adminDashboard.ejs', { user: req.user, pendingApplications });
+      res.render('admin/adminDashboard.ejs', { 
+        user: req.user, 
+        pendingApplications: pendingApplications, 
+        drivers: drivers 
+        }
+      );
     } catch (err) {
       console.error(err);
-      res.redirect('/admin/dashboard');
+      res.render('admin/adminDashboard.ejs', { user:req.user,
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while rendering your dashboard. Please try again.' }
+      );
     }
   },
   
@@ -23,7 +32,10 @@ const adminController = {
       res.render('admin/applications.ejs', { applications, user: req.user });
     } catch (err) {
       console.error(err);
-      res.redirect('/admin/dashboard');
+      res.render('admin/adminDashboard.ejs', { 
+        user: user.req, 
+        errorTitle: 'Error', 
+        errorBody: 'An error occurred while rendering the applications. Please try again.' });
     }
   },
 
@@ -32,11 +44,13 @@ const adminController = {
       const applicationId = req.params.id;
       await AdminModel.updateStatus(applicationId, 'approved');
       const driver = await DriverModel.findById(applicationId);
-      // sendEmail(to, subject, html)
+
       // random 8-letter long password for user to login after approval
       const password = Math.random().toString(36).slice(-8);
       await AdminModel.updateDriverPassword(driver.email, password);
-      await sendEmail(
+
+      // sendMail(to, subject, html)
+      await sendMail(
         // email
         driver.email, 
         // subject
@@ -61,12 +75,13 @@ const adminController = {
       res.render('admin/applications.ejs', { 
         user: req.user,
         applications: await AdminModel.findPendingApplications(),
-        approvalSuccessMessage: `Approval Email sent to ${driver.email} successfully` 
+        successTitle: 'Success',
+        successBody: `Approval Email sent to ${driver.email} successfully` 
       });
     } catch (err) {
       console.error(err);
       // req.flash('error', 'An error occurred while approving the application');
-      res.redirect('admin/applications.ejs', { approvalErrorMessage: 'An error occurred while approving the application' });
+      res.render('admin/applications.ejs', { approvalErrorMessage: 'An error occurred while approving the application' });
     }
   },
 
@@ -74,15 +89,15 @@ const adminController = {
     try {
       const applicationId = req.params.id;
       const driver = await DriverModel.findById(applicationId);
-      await sendEmail(driver.email, 'Application Rejected', 'Your driver application has been rejected.');
+      await sendMail(driver.email, 'Application Rejected', 'Your driver application has been rejected.');
       console.log(`Rejection email sent to ${driver.email}`);
       await DriverModel.delete(driver.email);
       // req.flash('success', 'Application rejected successfully');
-      res.redirect('/admin/applications');
+      res.render('admin/applications.ejs', {user: req.user, successTitle: 'Successful', successBody: `Rejection Email sent successfully to ${driver.email}` });
     } catch (err) {
       console.error(err);
       // req.flash('error', 'An error occurred while rejecting the application');
-      res.redirect('/admin/applications');
+      res.render('admin/applications.ejs', {user: req.user, errorTitle: 'Error', errorBody: 'An error occurred while rejecting the application.' });
     }
   },
 
@@ -94,7 +109,7 @@ const adminController = {
         // random 8-letter long password for user to login after approval
         const password = Math.random().toString(36).slice(-8);
         await AdminModel.updateAdminPassword(admin.email, password);
-        await sendEmail(
+        await sendMail(
           // email
           admin.email, 
           // subject
@@ -156,15 +171,30 @@ const adminController = {
   },
 
   async addAddress(req, res) {
+    // input sanitization and validation
+    if (!req.body.address || !req.body.driverId) {
+      res.render('admin/adminDashboard.ejs', 
+      {
+      user: req.user,
+      drivers: await AdminModel.getDrivers(),
+      errorTitle: 'Error',
+      errorBody: 'Please make sure you have chose a driver and entered an address.',
+      });
+      return;
+    }
     const { address, driverId } = req.body;
     try {
-      const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.GOOGLE_MAPS_API_KEY}`);
-      const { lat, lng } = response.data.results[0].geometry.location;
+      console.log(`Address received: ${address} for driverId: ${driverId}`);
+      const geocodedResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.GOOGLE_MAPS_API_KEY}`);
+      const { lat, lng } = geocodedResponse.data.results[0].geometry.location;
+      console.log(`Lat Lng for ${address} is: ${lat}, ${lng}`);
       const newAddress = await AdminModel.addAddress(address, lat, lng, driverId);
       res.json(newAddress);
     } catch (error) {
       console.error('Error adding address:', error);
       res.render('admin/adminDashboard.ejs', {
+        user: req.user,
+        drivers: await AdminModel.getDrivers(),
         errorTitle: 'Error Adding Address',
         errorBody: 'An error occurred while adding the address. Please try again.',
       });

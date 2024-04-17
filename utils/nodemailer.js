@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export function sendEmail(to, subject, html) {
+export function sendMail(to, subject, html) {
   const mailOptions = {
     from: 'SLICK <no-reply@slick.routing@gmail.com>',
     to,
@@ -19,5 +19,5 @@ export function sendEmail(to, subject, html) {
     html
   };
 
-  return transporter.sendMail(mailOptions);
+  return transporter.sendMail(mailOptions); // Corrected here
 }

@@ -48,40 +48,81 @@ const AdminModel = {
     await pool.query('DELETE FROM users WHERE email = $1 AND role = $2', [email, 'admin']);
   },
 
+  // create new application with fields 
+  // first_name, last_name, email, street, city, state, zip, full_address, about, timestamp, status
+  // status is pending by default
+  async createApplication(application) {
+    const fullAddress = `${application.street}, ${application.city}, ${application.state} ${application.zip}`;
+    // timestamp like April 17, 2024 at 14:22
+    const currentDate = new Date();
+    const datePart = currentDate.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+    const timePart = currentDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+    
+    const timestamp = `${datePart} at ${timePart}`;
+
+    const result = await pool.query(
+      `INSERT INTO applications 
+       (first_name, last_name, email, street, city, state, zip, full_address, about, timestamp, status) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [
+        application.firstName,
+        application.lastName,
+        application.email,
+        application.street,
+        application.city,
+        application.state,
+        application.zip,
+        fullAddress,
+        application.about,
+        timestamp,
+        'pending',
+      ]
+    );
+    return result.rows[0];
+  },
+
   async findPendingApplications() {
-    const result = await pool.query('SELECT * FROM users WHERE role = $1 AND status = $2', ['driver', 'pending']);
+    const result = await pool.query('SELECT * FROM applications WHERE status = $1', ['pending']);
     return result.rows;
   },
 
   async countPendingApplications() {
-    const result = await pool.query('SELECT COUNT(*) FROM users WHERE role = $1 AND status = $2', ['driver', 'pending']);
-    return parseInt(result.rows[0].count);
+    const result = await pool.query('SELECT COUNT(*) FROM applications WHERE status = $1', ['pending']);
+    return result.rows[0].count;
   },
 
   async updateStatus(id, status) {
-    await pool.query('UPDATE users SET status = $1 WHERE id = $2', [status, id]);
+    await pool.query('UPDATE applications SET status = $1 WHERE id = $2', [status, id]);
   },
 
   async getDrivers() {
-    const drivers = await db.query('SELECT * FROM drivers');
+    const drivers = await pool.query('SELECT * FROM users WHERE role = $1 AND status = $2', ['driver', 'approved']);
     return drivers.rows;
   },
 
   async getAddressesForDriver(driverId) {
-    const addresses = await db.query('SELECT * FROM addresses WHERE driverId = $1 AND status = $2', [driverId, 'active']);
+    const addresses = await pool.query('SELECT * FROM addresses WHERE driverId = $1 AND status = $2', [driverId, 'active']);
     return addresses.rows;
   },
 
   async addAddress(address, latitude, longitude, driverId) {
-    const newAddress = await db.query(
-      'INSERT INTO addresses (address, latitude, longitude, driverId) VALUES ($1, $2, $3, $4) RETURNING *',
-      [address, latitude, longitude, driverId]
+    const newAddress = await pool.query(
+      'INSERT INTO addresses (address, latitude, longitude, driver_id, status) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [address, latitude, longitude, driverId, 'active']
     );
     return newAddress.rows[0];
   },
 
   async deleteAddress(addressId) {
-    await db.query('UPDATE addresses SET status = $1 WHERE id = $2', ['inactive', addressId]);
+    await pool.query('UPDATE addresses SET status = $1 WHERE id = $2', ['inactive', addressId]);
   },  
 };
 

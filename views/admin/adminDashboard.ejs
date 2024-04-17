@@ -45,7 +45,7 @@
                 </a>
               </li>
               <li>
-                <a href="#" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                <a href="/admin/applications" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
                   </svg>
@@ -74,7 +74,7 @@
           </li>
           <li class="-mx-6 mt-auto">
             <form action="/logout" method="POST" class="flex justify-between items-center px-6 py-3">
-              <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
+              <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 mr-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
               
               <a href="#" class="text-sm font-normal leading-6 text-white">
                 <%= user.name %> <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">Admin</span>
@@ -92,24 +92,37 @@
       <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
         <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
       <% } %>
-      
-      <div class="flex space-x-4">
-        <div id="mapContainer" class="w-1/2 h-[400px]"></div>
-        
-        <div class="w-1/2">
-          <div class="mb-4">
-            <input type="text" id="addressInput" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search address">
-          </div>
-          
-          <div id="addressList" class="h-[calc(400px-56px)] overflow-y-auto">
+      <div class="flex">
+        <div id="mapContainer" class="w-2/3 h-screen" style="z-index: -1;"></div>
+        <div class="w-1/3 h-screen overflow-y-auto p-4">
+          <form action="/admin/addresses" method="POST" class="mb-4">
+            <div class="mb-4">
+              <label for="driverSelect" class="block mb-2">Who do you want to assign this to?</label>
+              <% if (typeof drivers !== 'undefined' && drivers.length > 0) { %>
+                <select id="driverSelect" name="driverId" class="w-full p-2 border border-gray-300 rounded">
+                  <option value="">Choose a driver</option>
+                  <% drivers.forEach((driver) => { %>
+                    <option value="<%= driver.id %>"><%= driver.name %> - <%= driver.email %></option>
+                  <% }); %>
+                </select>
+              <% } else { %>
+                <select id="driverSelect" name="driverId" class="w-full p-2 border border-gray-300 rounded z-0">
+                  <option value="">No Drivers available</option>
+                </select>
+              <% } %>
+            </div>
+            <div class="mb-4">
+              <input type="text" id="addressInput" name="address" class="w-full p-2 border border-gray-300 rounded" placeholder="Search address">
+            </div>
+            <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Search</button>
+          </form>
+          <div id="addressList">
             <!-- Address items will be dynamically added here -->
           </div>
-          
-          <button id="navigateButton" class="fixed bottom-0 right-0 mb-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none">Navigate</button>
         </div>
-      </div>
-      
-      <script src="/js/adminDashboard.js"></script>
+      </div>      
+  
+      <script src="/js/driverDashboard.js"></script>
       <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </div>

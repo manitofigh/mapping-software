@@ -10,9 +10,9 @@
       <!-- Status messages -->
       <% if (typeof status !== 'undefined') { %>
         <% if (status === 'success') { %>
-          <div class="bg-green-900 border border-green-800 text-green-400 px-4 py-3 rounded mb-4">
-            <%= message %>
-          </div>
+          <% if (typeof successTitle !== 'undefined' && typeof successBody !== 'undefined') { %>
+            <%- include('../partials/successNotif.ejs', { successTitle: successTitle, successBody: successBody }) %>
+          <% } %>
         <% } else if (status === 'error') { %>
           <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
             <%- include('../partials/errorNotif.ejs', { errorTitle: errorTitle, errorBody: errorBody }) %>
