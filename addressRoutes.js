@@ -205,9 +205,11 @@ async function returnDurationArr(trip){
   var len = trip.legs.length;
   //console.log(trip.legs);
 
-  for(var i = 0; i<len; i++){
+  for(var i = 1; i<len; i++){
     arr.push(trip.legs[i].duration);
   }
+  arr.push(0) // push 0 duration for the last address as we are at the end 
+
 
   //console.log("duration: ",arr);
   return arr;
@@ -221,9 +223,9 @@ async function callOSRMForRouting(locations) {
       console.log(osrmBaseUrl + locations + osrmRequestUrl);
       const response = await fetch(osrmBaseUrl + locations + osrmRequestUrl); 
       const data = await response.json();
-      console.log("Everything worked");
+      console.log(" OSRM Everything worked");
       //console.log("OSRM Response Data:", data);
-      console.log("Duration in mins: " + data.trips[0].duration /60);
+      //console.log("Duration in mins: " + data.trips[0].duration /60);
 
       return data; // The OSRM routing result
   } catch (error) {
@@ -259,7 +261,7 @@ router.post('/api/addresses', async (req, res) => {
           waypointIndex: 0, // default index
           latLong: row.lat_long,
           realAddress: row.realaddress,
-          startDate: new Date(), // Placeholder - TO CHANGE
+          startDate: null, // default
           formattedDuration: "seconds",
           durationSeconds: 0,
           isCompleted: false, // default
@@ -303,7 +305,7 @@ router.post('/api/addresses', async (req, res) => {
           waypointIndex: 0, // default
           latLong: latLong,
           realAddress: realAddress,
-          startDate: new Date(), // Placeholder - TO CHANGE
+          startDate: null, // default
           formattedDuration: "seconds", // default
           durationSeconds: 0, // default
           isCompleted: false, // default

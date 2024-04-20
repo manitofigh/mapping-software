@@ -6,6 +6,7 @@ const flash = require("express-flash");
 const session = require("express-session");
 const multer = require('multer');
 const axios = require('axios');
+const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -49,6 +50,7 @@ app.use(passport.initialize());
 // Store our variables to be persisted across the whole session
 app.use(passport.session());
 app.use(flash());
+app.use(bodyParser.json());
 
 
 app.get("/users/logout", (req, res) => {

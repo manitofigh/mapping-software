@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Pool } = require('pg');
 const { pool } = require("./dbConfig"); 
+const fs = require('fs');
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
@@ -22,7 +23,7 @@ async function getRouteGeometry(routenumber){
             // Convert the geometry from a JSON string to an object
             const geometry = JSON.parse(rows[0].geometry);
             console.log(geometry);
-            return geometry; // or rows[0] if you want the routenumber and geometry together
+            return geometry; 
         } else {
             console.log(`Route with routenumber: ${routenumber} does not exist.`);
             return null;
@@ -53,6 +54,63 @@ router.post('/api/get-route-geometry', async (req, res) => {
         console.error('Failed to retrieve route geometry:', error);
         res.status(500).send({ error: 'Failed to retrieve route geometry' });
     }
+
 });
+
+router.post('/api/get-itineray', async (req, res) => {
+    try {
+        // Find the next routenumber where isStarted is false
+        const routeQuery = `
+            SELECT routenumber
+            FROM job
+            WHERE routestarted = false
+            ORDER BY routenumber
+            LIMIT 1;
+        `;
+        const routeResult = await pool.query(routeQuery);
+
+        if (routeResult.rows.length === 0) {
+            return res.status(404).send({ message: "No unstarted routes found." });
+        }
+
+        const routenumber = routeResult.rows[0].routenumber;
+
+        // Fetch waypoints for the determined routenumber
+        const waypointsQuery = `
+            SELECT *
+            FROM job
+            WHERE routenumber = $1
+            ORDER BY waypointindex;
+        `;
+        const { rows } = await pool.query(waypointsQuery, [routenumber]);
+
+        if (rows.length === 0) {
+            return res.status(404).send({ message: "No waypoints found for the route." });
+        }
+
+        // Process rows to group them by consecutive waypoints
+        const results = [];
+        for (let i = 0; i < rows.length - 1; i ++) {
+            const current = rows[i];
+            const next = rows[i + 1];
+            results.push({
+                "Start Time": current.startdate,
+                "Location_1": current.realaddress,
+                "Location_2": next ? next.realaddress : 'N/A',  // Handle odd number of locations
+                "Duration": current.durationseconds,
+                "Formatted Time": current.formattedduration
+            });
+        }
+
+        // Convert results to a JSON string
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(results, null, 4)); // Indent with 4 spaces
+    } catch (error) {
+        console.error('Failed to retrieve data:', error);
+        res.status(500).send({ error: 'Failed to retrieve data' });
+    }
+});
+
+
 
 module.exports = router;
