@@ -6,6 +6,4 @@ const router = express.Router();
 
 router.get("/dashboard", isAuthenticated, driverController.renderDashboard);
 
-//future driver routes
-
 export default router;

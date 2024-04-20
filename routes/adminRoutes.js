@@ -8,7 +8,6 @@ const router = express.Router();
 router.get('/dashboard', isAuthenticated, isAdmin, adminController.renderDashboard);
 
 router.get('/applications', isAuthenticated, isAdmin, adminController.renderApplications);
-
 router.post('/applications/:id/approve', isAuthenticated, isAdmin, adminController.approveApplication);
 router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminController.rejectApplication);
 

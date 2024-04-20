@@ -7,9 +7,8 @@
 </head>
 
 <body>
-<div>
   <!-- Static sidebar for desktop -->
-  <div class="fixed inset-y-0 z-50 flex w-72 flex-col bg-gray-900">
+  <div class="fixed inset-y-0 z-50 flex w-72 flex-col bg-gray-900 border-r border-gray-600">
     <!-- Sidebar component, swap this element with another sidebar if you like -->
     <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6">
       <div class="flex h-16 shrink-0 items-center">
@@ -87,17 +86,19 @@
   </div>
 
   <main class="pl-72">
-    <div class="px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8 bg-gray-900">
       <!-- Main content -->
       <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
         <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
       <% } %>
-      <div class="flex">
-        <div id="mapContainer" class="w-2/3 h-screen"></div>
-        <div class="w-1/3 h-screen overflow-y-auto p-4">
+      <div class="flex items-center justify-center h-screen">
+        <div class="w-3/4 h-[90vh] rounded-2xl overflow-hidden mr-4">
+          <div id="mapContainer" class="h-full"></div>
+        </div>
+        <div class="w-1/4 h-[90vh] overflow-y-auto p-4">
           <form action="/admin/addresses" method="POST" class="mb-4">
             <div class="mb-4">
-              <label for="driverSelect" class="block mb-2">Who do you want to assign this to?</label>
+              <label for="driverSelect" class="block mb-2 text-white">Who do you want to assign this to?</label>
               <% if (typeof drivers !== 'undefined' && drivers.length > 0) { %>
                 <select id="driverSelect" name="driverId" class="w-full p-2 border border-gray-300 rounded">
                   <option value="">Choose a driver</option>
@@ -116,17 +117,15 @@
             </div>
             <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Search</button>
           </form>
-          <div id="addressList">
+          <div id="addressList" class="text-white">
             <!-- Address items will be dynamically added here -->
           </div>
         </div>
-      </div>      
+      </div>
   
       <script src="/js/driverDashboard.js"></script>
       <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </div>
   </main>
-</div>
-
 </body>
