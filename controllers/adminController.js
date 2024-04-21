@@ -9,17 +9,17 @@ dotenv.config();
 const adminController = {
   async renderDashboard(req, res) {
     try {
-      const drivers = await AdminModel.getDrivers();
-      const pendingApplications = await AdminModel.countPendingApplications();
       res.render('admin/adminDashboard.ejs', { 
         user: req.user, 
-        pendingApplications: pendingApplications, 
-        drivers: drivers 
+        pendingApplications: await AdminModel.countPendingApplications(), 
+        drivers: await AdminModel.getDrivers() 
         }
       );
     } catch (err) {
       console.error(err);
-      res.render('admin/adminDashboard.ejs', { user:req.user,
+      res.render('admin/adminDashboard.ejs', { 
+        user:req.user,
+        pendingApplidations: await AdminModel.countPendingApplications(),
         errorTitle: 'Error',
         errorBody: 'An error occurred while rendering your dashboard. Please try again.' }
       );
@@ -29,11 +29,15 @@ const adminController = {
   async renderApplications(req, res) {
     try {
       const applications = await AdminModel.findPendingApplications();
-      res.render('admin/applications.ejs', { applications, user: req.user });
+      res.render('admin/applications.ejs', { 
+        applications,
+        user: req.user }
+      );
     } catch (err) {
       console.error(err);
       res.render('admin/adminDashboard.ejs', { 
         user: user.req, 
+        pendingApplications: await AdminModel.countPendingApplications(),
         errorTitle: 'Error', 
         errorBody: 'An error occurred while rendering the applications. Please try again.' });
     }
@@ -150,6 +154,8 @@ const adminController = {
     } catch (error) {
       console.error('Error fetching drivers:', error);
       res.render('admin/adminDashboard.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
         errorTitle: 'Error Fetching Drivers',
         errorBody: 'An error occurred while fetching the drivers. Please try again.',
       });
@@ -164,6 +170,8 @@ const adminController = {
     } catch (error) {
       console.error('Error fetching addresses for driver:', error);
       res.render('admin/adminDashboard.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
         errorTitle: 'Error Fetching Addresses',
         errorBody: 'An error occurred while fetching addresses for the selected driver. Please try again.',
       });
@@ -173,9 +181,9 @@ const adminController = {
   async addAddress(req, res) {
     // input sanitization and validation
     if (!req.body.address || !req.body.driverId) {
-      res.render('admin/adminDashboard.ejs', 
-      {
+      res.render('admin/adminDashboard.ejs', {
       user: req.user,
+      pendingApplications: await AdminModel.countPendingApplications(),
       drivers: await AdminModel.getDrivers(),
       errorTitle: 'Error',
       errorBody: 'Please make sure you have chose a driver and entered an address.',
@@ -194,6 +202,7 @@ const adminController = {
       console.error('Error adding address:', error);
       res.render('admin/adminDashboard.ejs', {
         user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
         drivers: await AdminModel.getDrivers(),
         errorTitle: 'Error Adding Address',
         errorBody: 'An error occurred while adding the address. Please try again.',
@@ -209,6 +218,8 @@ const adminController = {
     } catch (error) {
       console.error('Error deleting address:', error);
       res.render('admin/adminDashboard.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
         errorTitle: 'Error Deleting Address',
         errorBody: 'An error occurred while deleting the address. Please try again.',
       });
