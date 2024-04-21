@@ -145,19 +145,39 @@ function Geocoding({childToParent}) {
         // console.log("Everything worked")
         // console.log("Duration in mins: " + data.trips[0].duration / 60)
         
+	var dat = []
         var waypointIndices = returnWaypointsIndexes(data.waypoints)
         
+	// Logs the Addresses
+	var currentDate = new Date();
         for(var i = 1; i < results.length; i++){
-          console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
+	  var leg = {}
+  	  leg["start_time"] = 0;
+	  if(i == 1)
+	  	leg["start_time"] = currentDate.getTime() + convertSecondsToMiliseconds(3600);
+	  else
+	  	leg["start_time"] = dat[dat.length-1]["start_time"] + convertSecondsToMiliseconds(dat[dat.length-1]["duration"]) + convertSecondsToMiliseconds(1);
+	  leg["location1"] = results[waypointIndices[i-1]]['formatted_address']
+	  leg["location2"] = results[waypointIndices[i]]['formatted_address']
+	  leg["duration"] = data.trips[0].legs[i-1].duration;
+	  leg["formatted_time"] = convertsSecondsToTime(leg["duration"]);
+	  dat.push(leg);
+
+          //console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
           // console.log(data.trips[0].legs[i-1].duration);
          }
+	 // console.log(dat);
 	 // console.log("Child To Parent");
-	 childToParent(data);
+	 childToParent(data,dat);
         //console.log(data)
       } else 
         console.error(data.code + ": " + data.message);
       } catch (error) {
         console.error(`Error address sorting`);
+    }
+
+    function convertSecondsToMiliseconds(seconds){
+	return seconds * 1000;
     }
 
     function returnWaypointsIndexes(waypoints){

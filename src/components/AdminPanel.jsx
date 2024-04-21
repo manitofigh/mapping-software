@@ -16,8 +16,9 @@ const AdminPanel = () => {
   const [isResetDisabled, setIsResetDisabled] = useState(true);
   const [data, setData] = useState({})
   const mapRef = useRef(null);
+  const [legData,setLegData] = useState([])
 	
-  const childToParent = (data) => {
+  const childToParent = (data,ldat) => {
 	// setData(data);
 	// console.log("Parent Function Called");
 	var geometry = data.trips[0].geometry;
@@ -30,7 +31,8 @@ const AdminPanel = () => {
 		"geometry":geometry
 	};*/
 	//console.log("Created Feature")
-	//console.log(data);
+	console.log(ldat);
+	setLegData(ldat);
 	//console.log(gjson_feature);
 	
 	if(mapRef.gJSONLayer != null)
@@ -239,13 +241,23 @@ const AdminPanel = () => {
         < Geocoding childToParent={childToParent}/>
       </div>
       <div className={`bottom-bar ${bars.bottom ? "bar-collapsed" : ""}`}>
-	  <table>
-	      <thead>
+	  <table class="itinerary">
+	      <thead class="table-head">
 	        <tr>
 	          <th scope="col">Start Time </th>
 	          <th scope="col">Route Leg </th>
+	  	  <th scope="col">End Time </th>
 	        </tr>
 	      </thead>
+	      <tbody>
+	          {legData.map((legDat,index) => (
+		  <tr key={index}>
+			<th scope="row">{new Date(legDat["start_time"]).toString()}</th>
+	                <th >{legDat["location1"] + " to " + legDat["location2"]}</th>
+	                <th >{new Date((legDat["start_time"] + (legDat["duration"] * 1000))).toString()}</th>
+		  </tr>
+		  ))}
+	      </tbody>
 	  </table>
       </div>
       <div className="main-content" id="adminMap">

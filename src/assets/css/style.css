@@ -32,7 +32,7 @@ div {
     /* gap: 5px; */
     width: 100vw;
     height: 100vh;
-    grid-template-rows: minmax(70px, 80px) 1fr minmax(120px, 140px);
+    grid-template-rows: minmax(70px, 80px) 1fr minmax(120px, 200px);
     grid-template-columns: minmax(80px, 120px) auto minmax(80px, 160px);
 }
 
@@ -101,6 +101,38 @@ div {
     align-items: center;
 }
 
+table {
+    width: 100%;
+    table-layout:fixed;
+}
+th {
+    border: 1px solid rgb(160 160 160);
+    padding: 8px 10px;
+}
+
+.table-head{
+    text-align: center;
+    vertical-align: middle;
+    height: fit-content;
+    border-width: 1px;
+}
+.table-head tr{
+    border-width: 1px;
+    height: fit-content;
+}
+.table-head tr th{
+    border-width: 1px;
+    height: fit-content;
+}
+.intinerary thead,tbody tr{
+    border-width: 1px;
+    text-align: center;
+    height: fit-content;
+}
+
+.intinerary thead,tbody tr th{
+    border-width: 1px;
+}
 #left-bar-collapse-btn {
     position: absolute;
     left: 0px;
@@ -116,6 +148,7 @@ div {
     border-left: 2px solid var(--border-color-bars);
     display: flex;
     justify-content: center;
+    overflow-y: auto;
     align-items: flex-start;
     /* y axis scroll */
     overflow-y: auto;
@@ -134,9 +167,10 @@ div {
     position: relative;
     background-color: var(--bg-color-main);
     border-top: 2px solid var(--border-color-bars);
-    display: flex;
+    /* display: flex; */
     justify-content: center;
     align-items: center;
+    overflow-y: auto;
 }
 
 #bottom-bar-collapse-btn {
@@ -199,7 +233,7 @@ div {
 @media (min-width: 880px) {
     .main-container {
         /* top to bottom: top-bar main-content(3 cols together) bottom-bar */
-        grid-template-rows: minmax(70px, 80px) 1fr minmax(120px, 140px);
+        grid-template-rows: minmax(70px, 80px) 1fr minmax(120px, 200px);
         /* left to right: left-bar main-content right-bar */
         grid-template-columns: minmax(80px, 120px) auto minmax(260px, 160px);
     }
