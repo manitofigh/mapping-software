@@ -1,5 +1,6 @@
 import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
+import authController from './authController.js';
 import { sendMail } from '../utils/nodemailer.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
@@ -13,26 +14,24 @@ const adminController = {
         user: req.user, 
         pendingApplications: await AdminModel.countPendingApplications(), 
         drivers: await AdminModel.getDrivers() 
-        }
-      );
+      });
     } catch (err) {
       console.error(err);
       res.render('admin/adminDashboard.ejs', { 
         user:req.user,
         pendingApplidations: await AdminModel.countPendingApplications(),
         errorTitle: 'Error',
-        errorBody: 'An error occurred while rendering your dashboard. Please try again.' }
-      );
+        errorBody: 'An error occurred while rendering your dashboard. Please try again.' 
+      });
     }
   },
   
   async renderApplications(req, res) {
     try {
-      const applications = await AdminModel.findPendingApplications();
       res.render('admin/applications.ejs', { 
-        applications,
-        user: req.user }
-      );
+        user: req.user,
+        applications : await AdminModel.findPendingApplications()
+      });
     } catch (err) {
       console.error(err);
       res.render('admin/adminDashboard.ejs', { 
@@ -46,63 +45,85 @@ const adminController = {
   async approveApplication(req, res) {
     try {
       const applicationId = req.params.id;
+      const application = await AdminModel.findApplicationById(applicationId);
+  
       await AdminModel.updateStatus(applicationId, 'approved');
-      const driver = await DriverModel.findById(applicationId);
-
+  
       // random 8-letter long password for user to login after approval
-      const password = Math.random().toString(36).slice(-8);
-      await AdminModel.updateDriverPassword(driver.email, password);
-
+      const password = authController.generatePassword();
+      const driver = await DriverModel.create(`${application.first_name} ${application.last_name}`, application.email, password, 'driver', 'approved');
+  
       // sendMail(to, subject, html)
       await sendMail(
         // email
-        driver.email, 
+        application.email, 
         // subject
         'Driver Application Approval', 
         // html
-        `<h1>You have been approved, ${driver.name}!</h1>
+        `<h1>You have been approved, ${application.first_name}!</h1>
         </br>
         <p>Congratulations! Your driver application has been approved. 
         </br>
         <p>Here are your credentials:</p>
-        </br>
-        <p>Email: ${driver.email}</p>
-        </br>
+        <p>Email: ${application.email}</p>
         <p>Password: ${password}</p>
         </br>
         <strong style="color: red;">Please change your password right after logging in.</strong>
-        </br>
         You can now login to the system at ${process.env.BASE_URL}:${process.env.PORT}</p>`
       );
-      console.log(`Approval email sent to ${driver.email}`)
-
+      console.log(`Approval email sent to ${application.email}`)
+  
       res.render('admin/applications.ejs', { 
         user: req.user,
         applications: await AdminModel.findPendingApplications(),
-        successTitle: 'Success',
+        successTitle: 'Approved successfully',
         successBody: `Approval Email sent to ${driver.email} successfully` 
       });
     } catch (err) {
       console.error(err);
-      // req.flash('error', 'An error occurred while approving the application');
-      res.render('admin/applications.ejs', { approvalErrorMessage: 'An error occurred while approving the application' });
+      res.render('admin/applications.ejs', { 
+        user: req.user,
+        applications: await AdminModel.findPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while approving the application' 
+      });
     }
   },
 
   async rejectApplication(req, res) {
-    try {
-      const applicationId = req.params.id;
-      const driver = await DriverModel.findById(applicationId);
-      await sendMail(driver.email, 'Application Rejected', 'Your driver application has been rejected.');
-      console.log(`Rejection email sent to ${driver.email}`);
-      await DriverModel.delete(driver.email);
-      // req.flash('success', 'Application rejected successfully');
-      res.render('admin/applications.ejs', {user: req.user, successTitle: 'Successful', successBody: `Rejection Email sent successfully to ${driver.email}` });
-    } catch (err) {
-      console.error(err);
-      // req.flash('error', 'An error occurred while rejecting the application');
-      res.render('admin/applications.ejs', {user: req.user, errorTitle: 'Error', errorBody: 'An error occurred while rejecting the application.' });
-    }
+   try {
+    const applicationId = req.params.id;
+    const application = await AdminModel.findApplicationById(applicationId);
+    await AdminModel.updateStatus(applicationId, 'rejected');
+    
+    await sendMail(
+      // email
+      application.email,
+      // subject
+      'Driver Application Rejection',
+      // html
+      `<h1>Dear, ${application.first_name}!</h1>
+      <p>We regret to inform you that your driver application has been rejected. 
+      </br>
+      <p>For further details, please contact su directly.</p>`
+    );
+
+    res.render('admin/applications.ejs', {
+      user: req.user,
+      applications: await AdminModel.findPendingApplications(),
+      successTitle: 'Rejected successfully',
+      successBody: `Rejection Email sent to ${application.email} successfully`
+    });
+    
+  } catch (err) {
+    console.error(err);
+    res.render('admin/applications.ejs', { 
+      user: req.user,
+      applications: await AdminModel.findPendingApplications(),
+      errorTitle: 'Error',
+      errorBody: 'An error occurred while rejecting the application' 
+    });
+  }
   },
 
   async resetUserPassword(req, res) {
@@ -119,13 +140,15 @@ const adminController = {
           // subject
           'Password Reset', 
           // html
-          `<h1>Your password has been reset, ${admin.name}!</h1>
+          `
+          <h1>Your password has been reset, ${admin.name}!</h1>
           </br>
           <p>Your new password is: ${password}</p>
           </br>
           <strong style="color: red;">Please change your password right after logging in.</strong>
           </br>
-          You can now login to the system at http://localhost:${process.env.PORT}</p>`
+          You can now login to the system at http://localhost:${process.env.PORT}</p>
+          `
         );
         console.log(`Password reset email sent to ${admin.email}`);
         res.render('admin/resetPassword.ejs', { 

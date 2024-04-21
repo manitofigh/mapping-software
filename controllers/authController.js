@@ -4,6 +4,30 @@ import AdminModel from '../models/AdminModel.js';
 import { sendMail } from '../utils/nodemailer.js';
 
 const authController = {
+  generatePassword() {
+    const charset = "abcdefghijklmnopqrstuvwxyz";
+    const specialChars = "!@#$%^&*()_+";
+    let password = "";
+  
+    // Generate a random uppercase letter
+    password += charset[Math.floor(Math.random() * charset.length)].toUpperCase();
+  
+    // Generate a random special character
+    password += specialChars[Math.floor(Math.random() * specialChars.length)];
+  
+    // Generate a random number
+    password += Math.floor(Math.random() * 10);
+  
+    // Generate remaining lowercase letters
+    for (let i = 0; i < 5; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+  
+    // Shuffle the password characters
+    password = password.split("").sort(() => Math.random() - 0.5).join("");
+  
+    return password;
+  },
 
   // POST /login
   login(req, res, next) {

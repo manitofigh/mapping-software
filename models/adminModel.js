@@ -94,6 +94,16 @@ const AdminModel = {
     return result.rows;
   },
 
+  async findApplicationByEmail(email) {
+    const result = await pool.query('SELECT * FROM applications WHERE email = $1', [email]);
+    return result.rows[0];
+  },
+
+  async findApplicationById (id) {
+    const result = await pool.query('SELECT * FROM applications WHERE id = $1', [id]);
+    return result.rows[0];
+  },
+
   async countPendingApplications() {
     const result = await pool.query('SELECT COUNT(*) FROM applications WHERE status = $1', ['pending']);
     return result.rows[0].count;

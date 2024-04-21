@@ -95,6 +95,9 @@
       <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
         <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
       <% } %>
+      <% if (typeof successTitle !== 'undefined' && typeof successBody !== 'undefined') { %>
+        <%- include('../partials/successNotif.ejs', { successTitle, successBody }) %>
+      <% } %>
       <div class="flex items-center justify-center h-screen">
         <div class="w-3/4 h-[90vh] rounded-2xl overflow-hidden mr-4">
           <div id="mapContainer" class="h-full"></div>
