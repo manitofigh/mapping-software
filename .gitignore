@@ -17,4 +17,5 @@ __MACOSX
 npm-debug.log*
 
 .env
-.env.*
+node_modules/
+
