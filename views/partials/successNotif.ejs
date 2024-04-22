@@ -1,6 +1,6 @@
 <!-- views/partials/successNotif.ejs -->
 <!-- No head.ejs include because this partial has to be included inside of a file that already has head.ejs included-->
-<div aria-live="assertive" class="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6 z-999">
+<div aria-live="assertive" id="success-notif" class="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6 z-999">
     <div class="flex w-full flex-col items-center space-y-4 sm:items-end">
       <div class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-green-50 shadow-lg ring-1 ring-black ring-opacity-5">
         <div class="p-4">
@@ -29,8 +29,12 @@
 </div>
 
 <script>
+const successNotif = document.querySelector('#success-notif');
 const closeButton = document.querySelector('.close-notification');
 const notification = document.querySelector('.pointer-events-auto');
+
+// set z-index to 9999
+successNotif.style.zIndex = 9999;
 
 closeButton.addEventListener('click', () => {
   notification.classList.add('opacity-0');
