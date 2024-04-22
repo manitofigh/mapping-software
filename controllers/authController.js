@@ -119,6 +119,12 @@ const authController = {
       });
     } catch (err) {
       console.error(err);
+      res.render('auth/signup.ejs', { 
+        status: 'error', 
+        errorTitle: 'Error',
+        errorBody: `An error occurred while submitting the application.
+                    Make sure you have not already submitted an application with this email address.`
+      });
     }
   },
 

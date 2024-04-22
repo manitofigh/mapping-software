@@ -102,7 +102,7 @@ const adminController = {
       // subject
       'Driver Application Rejection',
       // html
-      `<h1>Dear, ${application.first_name}!</h1>
+      `<h1 style="color: #b45309">Dear, ${application.first_name}!</h1>
       <p>We regret to inform you that your driver application has been rejected. 
       </br>
       <p>For further details, please contact su directly.</p>`
@@ -209,7 +209,7 @@ const adminController = {
       pendingApplications: await AdminModel.countPendingApplications(),
       drivers: await AdminModel.getDrivers(),
       errorTitle: 'Error',
-      errorBody: 'Please make sure you have chose a driver and entered an address.',
+      errorBody: 'Please make sure you have selected a driver and entered an address.',
       });
       return;
     }
