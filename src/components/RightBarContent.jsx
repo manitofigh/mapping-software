@@ -168,7 +168,15 @@ function Geocoding({childToParent}) {
          }
 	 // console.log(dat);
 	 // console.log("Child To Parent");
-	 childToParent(data,dat);
+   var pinpoints = [];
+   for (var i = 0; i < results.length; i++) {
+     var result = results[i];
+     var coordinate = [result.longitude, result.latitude];
+     var formattedAddress = result.formatted_address;
+     pinpoints.push({ longitude: coordinate[0], latitude: coordinate[1], formattedAddress: formattedAddress });
+   }
+   
+	 childToParent(data,dat,pinpoints);
         //console.log(data)
       } else 
         console.error(data.code + ": " + data.message);
