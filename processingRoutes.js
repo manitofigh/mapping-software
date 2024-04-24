@@ -1,4 +1,6 @@
 const express = require("express");
+const bodyParser = require('body-parser');
+const path = require('path');
 const router = express.Router();
 const { Pool } = require('pg');
 const { pool } = require("./dbConfig"); 
@@ -7,6 +9,9 @@ const fs = require('fs');
 const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(express.text());
+app.use(bodyParser.json());
+
+const outputDirectory = path.join(__dirname, 'routes'); // FIX PLS
 
 async function getRouteGeometry(routenumber){
     try {
@@ -57,7 +62,7 @@ router.post('/api/get-route-geometry', async (req, res) => {
 
 });
 
-router.post('/api/get-itineray', async (req, res) => {
+router.post('/api/get-itineray', async (req, res) => { //NEED TO CHANGE TO RECIEVING A ROUTE NUMBER TO DISPLAY ITINERY
     try {
         // Find the next routenumber where isStarted is false
         const routeQuery = `
