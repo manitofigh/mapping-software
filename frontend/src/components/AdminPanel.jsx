@@ -42,7 +42,7 @@ const AdminPanel = () => {
 
   // Add markers for each pinpoint
   pinpoints.forEach((pinpoint) => {
-    var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
+    var marker = L.marker([pinpoint.lat, pinpoint.long])
       .bindPopup(pinpoint.formattedAddress)
       .addTo(mapRef.current);
   });

@@ -141,6 +141,37 @@ async function OSRMdataFormat(locations){
       
 }
 
+function convertSecondsToMiliseconds(seconds){
+	return seconds * 1000;
+}
+
+function convertsSecondsToTime(secs){
+  // seconds
+  var s = Math.floor(secs % 60)
+  var minutes = secs / 60
+  var m = Math.floor(minutes%60)
+  var hours = minutes / 60
+  var h = Math.floor(hours % 24)
+  var days = hours / 24
+  var d = Math.floor(days)
+
+  var arr = [d,h,m,s];
+  var str = ""
+  for(var i = 0; i < arr.length; i++){
+    if(i == 0)
+       str += arr[i].toFixed(0).toString();
+    else
+       str += String(arr[i].toFixed(0)).padStart(2,'0');
+  
+    str += ":"
+     }
+           str = str.substring(0,str.length-1);
+
+  // str = d.toFixed(0).toString() + ":" + h.toFixed(0).toString() + ":" + m.toFixed(0).toString() + ":" + s.toFixed(0).toString()
+  return str;
+
+}  
+
 
 async function updateAddressIndexes(waypointIndices, distanceArr, durationArr, routeNumber,id){
   try{
@@ -177,6 +208,10 @@ async function updateAddressIndexes(waypointIndices, distanceArr, durationArr, r
 }
 
 async function returnWaypointsIndexes(waypoints){
+  if (!waypoints || !waypoints.length) {
+    console.error('Invalid or empty data provided:', waypoints);
+    return []; // Return an empty array
+  }
 	var arr = []
 	var len = waypoints.length
   //console.log(waypoints);
@@ -226,7 +261,7 @@ async function callOSRMForRouting(locations) {
       const response = await fetch(osrmBaseUrl + locations + osrmRequestUrl); 
       const data = await response.json();
       console.log(" OSRM Everything worked");
-      //console.log("OSRM Response Data:", data);
+      console.log("OSRM Response Data:", data);
       //console.log("Duration in mins: " + data.trips[0].duration /60);
 
       return data; // The OSRM routing result

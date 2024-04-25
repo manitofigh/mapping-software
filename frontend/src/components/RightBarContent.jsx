@@ -120,7 +120,7 @@ function Geocoding({childToParent}) {
   const addressSort = async () => {	
     try {
       const response = await fetch('http://localhost:3000/api/fetch-and-group-addresses',{
-        method: 'POST',
+        method: 'POST'
       });
       const textResponse = await response.text();
 
@@ -129,10 +129,10 @@ function Geocoding({childToParent}) {
       setTimeout(async () => {
         const tripsData = await fetchgeometry();
         const itineraryData = await fetchitineary();
-        var pinpoints = []; // TO CHANGE
+        const pinpoints = await fetchpinpoints(); 
 
         childToParent(tripsData,itineraryData,pinpoints);
-    }, 1000); //1 second delay to allow db to process and store data before being called again
+    }, 3000); //3 second delay to allow db to process and store data before being called again
 
 
     } else {
@@ -144,6 +144,25 @@ function Geocoding({childToParent}) {
     }
   }
 
+  var fetchpinpoints = async () => {
+    try {
+      const data = await fetch('http://localhost:3000/api/get-pinpoints', {
+        method: 'POST',
+      });
+      const pinpoints = await data.json(); // Assuming JSON response for simplicity
+      
+
+      if (data.ok) {
+          console.log("Second fetch successful:", pinpoints);
+          return pinpoints
+      } else {
+          console.error('Error in second fetch:', pinpoints);
+      }
+    } catch (error) {
+      console.error('Error during second fetch:', error);
+      }
+  }
+
   const fetchitineary = async () => {
     try {
         const data = await fetch('http://localhost:3000/api/get-itineray', {
@@ -153,7 +172,7 @@ function Geocoding({childToParent}) {
         
 
         if (data.ok) {
-            console.log("Second fetch successful:", itineraryData);
+            //console.log("Second fetch successful:", itineraryData);
             return itineraryData
         } else {
             console.error('Error in second fetch:', itineraryData);

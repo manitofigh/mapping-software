@@ -69,6 +69,123 @@ router.post('/api/get-route-geometry', async (req, res) => {
     }
 });
 
+router.post('/api/get-pinpoints', async (req,res) => {
+    try{
+
+        const routeNumberQuery =`
+            SELECT routenumber
+            FROM job
+            WHERE routestarted = false
+            ORDER BY routenumber DESC
+            LIMIT 1
+        `;
+        const routeNumberResult = await pool.query(routeNumberQuery);
+        if (routeNumberResult.rows.length === 0) {
+            return res.status(404).send({ message: "No unstarted routes found." });
+        }
+
+        const routenumber = routeNumberResult.rows[0].routenumber;
+
+        const pinpontsQuery =`
+            SELECT routenumber, lat_long
+            FROM job
+            WHERE routenumber = $1 AND routestarted = false;
+        `;
+
+        const pinpointsResults = await pool.query(pinpontsQuery, [routenumber]);
+        if (pinpointsResults.rows.length === 0) {
+            return res.status(404).send({ message: "No data found for selected routes." });
+        }
+
+        const results = pinpointsResults.rows.map(row => {
+            if(row.lat_long) {
+                const[lat,long] = row.lat_long.split(',');
+                return {
+                    lat: lat.trim(),
+                    long: long.trim()
+                };
+            }
+        })
+
+        // Convert results to a JSON string
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(results, null, 4)); // Indent with 4 spaces
+        //console.log(JSON.stringify(results, null, 4));
+    } catch (error) {
+        console.error('Failed to retrieve data:', error);
+        res.status(500).send({ error: 'Failed to retrieve data' });
+    }
+});
+
+async function updateroutetime(){
+    try{
+        const routeQuery = `
+            SELECT MAX(routenumber) AS routenumber
+            FROM job
+            WHERE routestarted = false;
+        `;
+
+        const routeResult = await pool.query(routeQuery);
+
+        if(routeResult.rows[0].length == 0 || routeResult.rows[0].routenumber === null){
+            return res.status(400).send({ message: "No unstarted routes found"});
+        }
+
+        const routenumber = routeResult.rows[0].routenumber;
+
+        const query = `
+            SELECT id, durationseconds
+            FROM job
+            WHERE routenumber = $1 AND routestarted = false
+            ORDER BY waypointindex;
+        `;
+        const {rows} = await pool.query(query, [routenumber]);
+
+        if(rows.length === 0){
+            return res.status(404).send({message: "No route data found"});
+        }
+
+
+        //SOLUTION FOR NOW
+        let previousTime = new Date();
+        for(let i = 0; i<rows.length; i++){
+            const job = rows[i];
+        const updateTimeQuery =`
+            UPDATE job
+            SET startdate = $1
+            WHERE id = $2;
+        `;
+        await pool.query(updateTimeQuery, [previousTime, job.id]);
+        }
+/*
+        let previousTime = new Date();
+
+        for(let i = 0; i<rows.length; i++){
+            const job = rows[i];
+            if(i>0){
+                const Duration = rows[i].durationseconds;
+                //console.log(Duration);
+                console.log(previousTime);
+                previousTime = new Date(previousTime.getTime() + Duration)
+                //console.log(previousTime);
+            }
+
+            //update starttime for current job
+            const updateTimeQuery =`
+                UPDATE job
+                SET startdate = $1
+                WHERE id = $2;
+            `;
+            await pool.query(updateTimeQuery, [previousTime.toISOString(), job.id]);
+        }
+        */
+
+    } catch(error){
+        console.error('Failed to update route times: ',error);
+    }
+}
+
+
 router.post('/api/get-itineray', async (req, res) => { //NEED TO CHANGE TO RECIEVING A ROUTE NUMBER TO DISPLAY ITINERY
     try {
         // Find the next routenumber where isStarted is false
@@ -113,6 +230,8 @@ router.post('/api/get-itineray', async (req, res) => { //NEED TO CHANGE TO RECIE
                 "Formatted_Time": current.formattedduration
             });
         }
+
+        updateroutetime();
 
         // Convert results to a JSON string
         res.setHeader('Content-Type', 'application/json');
