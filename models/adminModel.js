@@ -100,8 +100,8 @@ const AdminModel = {
   async getDriverById(id) {
     const result = await pool.query('SELECT * FROM users WHERE id = $1 AND role = $2', [id, 'driver']);
     return result.rows[0];
-  }
-
+  },
+  
 };
 
 export default AdminModel;

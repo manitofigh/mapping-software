@@ -66,7 +66,7 @@ const addressController = {
     }
   
     try {
-      const driver = await AdminModel.getDriverByEmail(driverId);
+      const driver = await AdminModel.getDriverById(driverId);
       if (!driver) {
         res.render('admin/adminDashboard.ejs', {
           user: req.user,
