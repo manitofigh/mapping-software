@@ -7,3 +7,52 @@
     -ms-overflow-style: none;  /* for Internet Explorer, Edge */
     scrollbar-width: none;  /* for Firefox */
 }
+
+#mapContainer {
+    border-radius: 12px;
+}
+
+.address-editor {
+    border: 1px solid #4b5563;
+    border-radius: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    height: 200px;
+}
+
+.address-editor .CodeMirror {
+  height: 100%;
+  background-color: transparent;
+  border-radius: 0.75rem 0 0 0.75rem;
+  color: white;
+}
+
+.address-editor .CodeMirror-gutters {
+    background-color: #1f2937;
+    color: #6b7280;
+    border-color: #6b7280;
+    border-right: 1px solid #6b7280;
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+    padding-right: 10px; /* Add this line */
+}
+
+.address-editor .CodeMirror-linenumber {
+  color: #b9bfcc;
+  border-color: #b9bfcc;
+}
+
+.address-editor .CodeMirror-line {
+  padding: 0 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.816);
+}
+
+.address-editor .CodeMirror-cursor {
+    caret-color: white;
+}
+
+.address-editor .CodeMirror-scrollbar-filler {
+  background-color: transparent;
+}

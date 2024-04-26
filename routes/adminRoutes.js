@@ -13,7 +13,7 @@ router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminControlle
 
 router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
 router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, adminController.getAddressesForDriver);
-router.post('/addresses', isAuthenticated, isAdmin, adminController.addAddress);
-router.delete('/addresses/:addressId', isAuthenticated, isAdmin, adminController.deleteAddress);
+router.post('/submit-address', isAuthenticated, isAdmin, adminController.addAddress);
+router.delete('/submit-address/:addressId', isAuthenticated, isAdmin, adminController.deleteAddress);
 
 export default router;

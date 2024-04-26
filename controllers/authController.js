@@ -78,7 +78,7 @@ const authController = {
       
       // Input sanitization and validation
       const nameRegex = /^[a-zA-Z\s,'-]{2,}$/; // At least 2 characters, allows letters, spaces, commas, apostrophes, and hyphens
-      const zipRegex = /^\d{5}$/; // U.S. ZIP code, allows exactly five digits
+      const zipRegex = /^\d{5}$/; // U.S. ZIP code, exactly five digits
       const emailRegex = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+[a-zA-Z0-9]|[a-zA-Z0-9]+[a-zA-Z0-9-])+\.[a-zA-Z]{2,4}$/; // No dashes at start/end of domain and limits TLDs to 2-4 characters.
       const addressRegex = /^[a-zA-Z0-9\s,.'-]{3,}$/; // At least 3 characters, allows letters, numbers, spaces, commas, periods, apostrophes, and hyphens
       
@@ -87,8 +87,9 @@ const authController = {
           !zipRegex.test(application.zip) || 
           !emailRegex.test(application.email) || 
           !addressRegex.test(application.street) || 
-          !addressRegex.test(application.city)) {
-        res.render('auth/signup.ejs', { 
+          !addressRegex.test(application.city)) 
+      {
+        return res.render('auth/signup.ejs', { 
           status: 'error', 
           errorTitle: 'Error',
           errorBody: `All fields must be filled out correctly.
