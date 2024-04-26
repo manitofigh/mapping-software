@@ -117,7 +117,13 @@
         <div class="w-2/5 h-full overflow-y-auto p-4 border-l border-gray-500">
           <form action="/admin/submit-address" method="POST" class="mb-4">
             <div class="mb-4">
-              <div id="addressEditor" class="address-editor mb-4">
+              <div id="container" class="flex mb-4 border bg-gray-900 border-gray-600 rounded-md overflow-hidden resize-y h-32 relative">
+                <div id="line-numbers" class="border-r border-gray-600 p-2 text-right text-white overflow-hidden">
+                </div>
+                <textarea id="textarea" name="address" class="bg-white/10 text-white flex-1 border-none outline-none p-2 resize-y" placeholder="Enter address(es) or drag text file"><%= typeof previousAddress !== 'undefined' ? previousAddress : '' %></textarea>
+                <div id="dropMask" class="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-75 flex items-center justify-center text-white text-xl pointer-events-none opacity-0 transition-opacity duration-200">
+                  Drop text file here
+                </div>
               </div>
               <div class="flex">
                 <% if (typeof drivers !== 'undefined' && drivers.length > 0) { %>
@@ -172,10 +178,14 @@
         </div>
       </div>
   
-      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
       <!-- link to css file under public folder -->
       <link rel="stylesheet" href="/styles/main.css">
+      <!-- link to leaflet css and axios -->
+      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <!-- link to js file under public folder -->
+      <script src="/js/addressBox.js"></script>
+      <!-- leaflet map settings for admin -->
       <script>
         document.addEventListener('DOMContentLoaded', () => {
           const map = L.map('mapContainer', {
@@ -215,30 +225,15 @@
               marker.bindPopup(address.address);
             });
           }
+
+          document.getElementById('search-address').addEventListener('click', () => {
+            document.getElementById('search-address').innerHTML = `
+              <div class="loading-spinner"></div>
+            `;
+          });
         
           // Event listener for driver selection change
           document.getElementById('driverSelect').addEventListener('change', fetchAddressesForDriver);
-
-          // Initialize CodeMirror editor
-          const addressEditor = CodeMirror(document.getElementById('addressEditor'), {
-          lineNumbers: true,
-          lineWrapping: true,
-          extraKeys: {
-            "F11": function(cm) {
-              cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-            },
-            "Esc": function(cm) {
-              if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-            }
-          },
-          theme: 'default',
-          textColor: 'white',
-          height: '200px' // Set the default height of the editor
-          });
-
-          document.getElementById('search-address').addEventListener('click', () => {
-            document.getElementById('search-address').innerHTML = 'Searching...';
-          });
         });
       </script>
     </div>

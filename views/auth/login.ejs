@@ -67,10 +67,22 @@
       </div>
     </div>
 
+    <!-- css under styles and main.css-->
+    <link rel="stylesheet" href="/styles/main.css">
     <script>
-      const loginBtn = document.getElementById('login-btn');
-      loginBtn.addEventListener('click', () => {
-        loginBtn.innerHTML = 'Loading...';
+      // dom load
+      document.addEventListener('DOMContentLoaded', () => {
+        // login button
+        document.getElementById('login-btn').addEventListener('click', () => {
+          document.getElementById('login-btn').innerHTML = `
+            <div class="loading-spinner"></div>
+          `;
+
+          // Remove the loading spinner after 1.5 seconds
+          setTimeout(() => {
+            document.getElementById('login-btn').innerHTML = 'Login';
+          }, 500);
+        });
       });
     </script>
 </body>

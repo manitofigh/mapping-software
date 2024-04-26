@@ -188,11 +188,17 @@
     </form>
   </div>
 
+  <link rel="stylesheet" href="/styles/main.css">
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const submitBtn = document.getElementById('submit-btn');
-      submitBtn.addEventListener('click', () => {
-        submitBtn.innerHTML = 'Submitting...';
+      document.getElementById('submit-btn').addEventListener('click', () => {
+        document.getElementById('submit-btn').innerHTML = `
+          <div class="loading-spinner"></div>
+        `;
+
+        setTimeout(() => {
+          document.getElementById('submit-btn').innerHTML = 'Submit Application';
+        }, 500);
       });
     });
   </script>

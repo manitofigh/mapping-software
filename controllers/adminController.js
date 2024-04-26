@@ -203,7 +203,7 @@ const adminController = {
   },
 
   async addAddress(req, res) {
-    // input sanitization and validation
+    // Input sanitization and validation
     if (!req.body.address || !req.body.driverId) {
       res.render('admin/adminDashboard.ejs', {
         user: req.user,
@@ -211,8 +211,8 @@ const adminController = {
         drivers: await AdminModel.getDrivers(),
         errorTitle: 'Error',
         errorBody: 'Please make sure you have selected a driver and entered an address.',
-        previousAddress: req.body.address, // to retrieve the user-entered address on reload
-        previousDriverId: req.body.driverId 
+        previousAddress: req.body.address, // Corrected to use 'address' from 'req.body'
+        previousDriverId: req.body.driverId
       });
       return;
     }
@@ -232,11 +232,11 @@ const adminController = {
         drivers: await AdminModel.getDrivers(),
         errorTitle: 'Error Adding Address',
         errorBody: 'An error occurred while adding the address. Please try again.',
-        previousAddress: address, // Pass the user-entered address back to the template
-        previousDriverId: driverId // Pass the user-selected driver ID back to the template
+        previousAddress: address, // Corrected to use 'address' from the try block
+        previousDriverId: driverId
       });
     }
-  },
+  },  
 
   async deleteAddress(req, res) {
     const addressId = req.params.addressId;
