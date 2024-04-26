@@ -8,19 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
     container.addEventListener('dragover', handleDragOver);
     container.addEventListener('drop', handleDrop);
 
-    // Show the mask when a file is being dragged over the container
-    container.addEventListener('dragenter', () => {
-        dropMask.style.opacity = '1';
-    });
-
-    // Hide the mask when the file is no longer being dragged over the container
-    container.addEventListener('dragleave', () => {
-        dropMask.style.opacity = '0';
-    });
-
     function handleDragOver(e) {
         e.preventDefault();
         e.stopPropagation();
+
+        // Add the 'drag-over' class when a file is being dragged over the container
+        if (e.dataTransfer.types.includes('Files')) {
+            container.classList.add('drag-over');
+        }
     }
 
     function handleDrop(e) {
@@ -28,17 +23,38 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
 
         const file = e.dataTransfer.files[0];
-        const reader = new FileReader();
+        const fileType = file.type;
 
-        reader.onload = function (event) {
-            const fileContent = event.target.result;
-            textarea.value = fileContent;
-            displayLineNumbers();
-        };
+        if (fileType === 'text/plain' || fileType === 'text/csv') {
+            const reader = new FileReader();
 
-        reader.readAsText(file);
-        dropMask.style.opacity = '0';
+            reader.onload = function (event) {
+                const fileContent = event.target.result;
+                let updatedContent = fileContent;
+
+                // If the file is a CSV, remove the first line (header)
+                if (fileType === 'text/csv') {
+                    const lines = fileContent.split('\n');
+                    lines.shift();
+                    updatedContent = lines.join('\n');
+                }
+
+                textarea.value = updatedContent;
+                displayLineNumbers();
+            };
+
+            reader.readAsText(file);
+        } else {
+            alert('Please drop a TXT or CSV file.');
+        }
+
+        container.classList.remove('drag-over');
     }
+
+    // Remove the 'drag-over' class when the file is no longer being dragged over the container
+    container.addEventListener('dragleave', () => {
+        container.classList.remove('drag-over');
+    });
 
     const textareaStyles = window.getComputedStyle(textarea);
     [

@@ -97,22 +97,11 @@ const AdminModel = {
     return drivers.rows;
   },
 
-  async getAddressesForDriver(driverId) {
-    const addresses = await pool.query('SELECT * FROM addresses WHERE driverId = $1 AND status = $2', [driverId, 'active']);
-    return addresses.rows;
-  },
+  async getDriverById(id) {
+    const result = await pool.query('SELECT * FROM users WHERE id = $1 AND role = $2', [id, 'driver']);
+    return result.rows[0];
+  }
 
-  async addAddress(address, latitude, longitude, driverId) {
-    const newAddress = await pool.query(
-      'INSERT INTO addresses (address, latitude, longitude, driver_id, status) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [address, latitude, longitude, driverId, 'active']
-    );
-    return newAddress.rows[0];
-  },
-
-  async deleteAddress(addressId) {
-    await pool.query('UPDATE addresses SET status = $1 WHERE id = $2', ['inactive', addressId]);
-  },  
 };
 
 export default AdminModel;

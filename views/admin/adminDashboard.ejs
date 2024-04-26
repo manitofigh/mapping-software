@@ -120,9 +120,14 @@
               <div id="container" class="flex mb-4 border bg-gray-900 border-gray-600 rounded-md overflow-hidden resize-y h-32 relative">
                 <div id="line-numbers" class="border-r border-gray-600 p-2 text-right text-white overflow-hidden">
                 </div>
-                <textarea id="textarea" name="address" class="bg-white/10 text-white flex-1 border-none outline-none p-2 resize-y" placeholder="Enter address(es) or drag text file"><%= typeof previousAddress !== 'undefined' ? previousAddress : '' %></textarea>
+                <textarea id="textarea" name="address" class="bg-white/10 text-white flex-1 border-none outline-none p-2 resize-y" placeholder="Enter address(es) or drag text/csv file"><%= typeof previousAddress !== 'undefined' ? previousAddress : '' %></textarea>
                 <div id="dropMask" class="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-75 flex items-center justify-center text-white text-xl pointer-events-none opacity-0 transition-opacity duration-200">
-                  Drop text file here
+                  <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-md font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                    </svg>
+                    Drop text/csv file
+                  </span>
                 </div>
               </div>
               <div class="flex">
@@ -205,26 +210,6 @@
             [49.5904, -66.9326]   // Northeast coordinates
           ];
           map.setMaxBounds(usBounds);
-        
-          // Fetch addresses for the selected driver and render on the map
-          async function fetchAddressesForDriver() {
-            const driverId = document.getElementById('driverSelect').value;
-            try {
-              const response = await axios.get(`/admin/drivers/${driverId}/addresses`);
-              const addresses = response.data;
-              renderAddressesOnMap(addresses);
-            } catch (error) {
-              console.error('Error fetching addresses for driver:', error);
-            }
-          }
-        
-          // Render addresses on the map
-          function renderAddressesOnMap(addresses) {
-            addresses.forEach(address => {
-              const marker = L.marker([address.latitude, address.longitude]).addTo(map);
-              marker.bindPopup(address.address);
-            });
-          }
 
           document.getElementById('search-address').addEventListener('click', () => {
             document.getElementById('search-address').innerHTML = `

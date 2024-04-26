@@ -41,6 +41,6 @@
     transition: opacity 0.2s ease-in-out;
 }
 
-#container:hover #dropMask {
+#container.drag-over #dropMask {
     opacity: 1;
 }
