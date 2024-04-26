@@ -29,6 +29,22 @@ const authController = {
     return password;
   },
 
+  // Get current formatted time
+  getFormattedTime() {
+    const currentDate = new Date();
+    const datePart = currentDate.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    const timePart = currentDate.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: false
+    });
+    return `${datePart} at ${timePart}`;
+  },
+
   // POST /login
   login(req, res, next) {
     passport.authenticate('local', (err, user, info) => {
@@ -99,10 +115,28 @@ const authController = {
                       Street and city must be at least 3 characters long and are allowed letters, numbers, spaces, commas, periods, apostrophes, and hyphens.`
         });
       }
+
       // If about is empty, set it to N/A
       application.about = application.about === null || /^ *$/.test(application.about) ? "N/A" : application.about;
       
-      await AdminModel.createApplication(application);
+      // Create user but with pending status
+      // createUser(firstName, lastName, email, password, status, role, country, city, state, zip, street, about, color, createTime)
+      await AdminModel.createUser(
+        application.firstName,
+        application.lastName,
+        application.email,
+        'NULL',
+        'pending',
+        'driver',
+        application.country,
+        application.city,
+        application.state,
+        application.zip,
+        application.street,
+        application.about,
+        'NULL',
+        authController.getFormattedTime()
+      );
       await sendMail(
         // email
         application.email, 

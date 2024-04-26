@@ -99,51 +99,61 @@
       <% } %>
         <!-- START of applicants' applications -->
         <div class="bg-gray-900 h-screen p-10 overflow-y-scroll">
-          <% applications.forEach(application => { %>
-            <div class="overflow-hidden bg-white/5 sm:rounded-lg shadow-sm ring-1 ring-inset ring-white/10 mb-4">
-              <div class="flex justify-between items-center px-4 py-6 sm:px-6">
-                <h3 class="text-base font-semibold leading-7 text-white"><%= application.first_name %> <%= application.last_name %></h3>
-                <div class="flex gap-x-2">
-                  <form action="/admin/applications/<%= application.id %>/reject" method="POST">
-                    <button type="submit" class="flex items-center justify-center gap-x-2 rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-semibold text-red-800 shadow-sm hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                      Reject
-                      <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
-                  </form>
-                  <form action="/admin/applications/<%= application.id %>/approve" method="POST">
-                    <button type="submit" class="flex items-center justify-center gap-x-2 rounded-md bg-green-50 px-2.5 py-1.5 text-sm font-semibold text-green-800 shadow-sm hover:bg-green-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                      Approve
-                      <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
-                  </form>
+          <div class="bg-gray-900 h-screen p-10 overflow-y-scroll">
+            <% if (applications.length === 0) { %>
+              <div class="flex justify-center items-center">
+                <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-2xl font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                  No pending applications!
+                </span>
+              </div>
+            <% } else { %>
+              <% applications.forEach(application => { %>
+                <div class="overflow-hidden bg-white/5 sm:rounded-lg shadow-sm ring-1 ring-inset ring-white/10 mb-4">
+                  <div class="flex justify-between items-center px-4 py-6 sm:px-6">
+                    <h3 class="text-base font-semibold leading-7 text-white"><%= application.first_name %> <%= application.last_name %></h3>
+                    <div class="flex gap-x-2">
+                      <form action="/admin/applications/<%= application.id %>/reject" method="POST">
+                        <button type="submit" class="flex items-center justify-center gap-x-2 rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-semibold text-red-800 shadow-sm hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                          Reject
+                          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                          </svg>
+                        </button>
+                      </form>
+                      <form action="/admin/applications/<%= application.id %>/approve" method="POST">
+                        <button type="submit" class="flex items-center justify-center gap-x-2 rounded-md bg-green-50 px-2.5 py-1.5 text-sm font-semibold text-green-800 shadow-sm hover:bg-green-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                          Approve
+                          <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                          </svg>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="border-t border-gray-700">
+                    <dl class="divide-y divide-gray-700">
+                      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-white">Email address</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.email %></dd>
+                      </div>
+                      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-white">Full Address</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.full_address %></dd>
+                      </div>
+                      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-white">Submission Date</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.create_time %></dd>
+                      </div>
+                      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-white">About</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.about %></dd>
+                      </div>
+                    </dl>
+                  </div>
                 </div>
-              </div>
-              <div class="border-t border-gray-700">
-                <dl class="divide-y divide-gray-700">
-                  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-white">Email address</dt>
-                    <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.email %></dd>
-                  </div>
-                  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-white">Full Address</dt>
-                    <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.full_address %></dd>
-                  </div>
-                  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-white">Submission Date</dt>
-                    <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.timestamp %></dd>
-                  </div>
-                  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-white">About</dt>
-                    <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0"><%= application.about %></dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-          <% }); %>
+              <% }); %>
+            <% } %>
+          </div>
         </div>
       </div>
   </body>

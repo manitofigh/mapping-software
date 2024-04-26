@@ -181,8 +181,20 @@
 
       <div class="mt-6 flex items-center justify-end gap-x-6">
         <button type="button" class="text-sm font-semibold leading-6 text-gray-400 hover:text-white focus:outline-none focus:underline"><a href="/login">Cancel</a></button>
-        <button type="submit" class="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Submit Application</button>
+        <button type="submit" id="submit-btn" class="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+          Submit Application
+        </button>
       </div>
     </form>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.addEventListener('click', () => {
+        submitBtn.innerHTML = 'Submitting...';
+      });
+    });
+  </script>
+  </script>
 </body>

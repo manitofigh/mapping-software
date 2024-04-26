@@ -1,8 +1,6 @@
 import DriverModel from './models/DriverModel.js';
 import AdminModel from './models/AdminModel.js';
-import AddressModel from './models/AddressModel.js';
-import RouteModel from './models/RouteModel.js';
-import TravelTimeModel from './models/TravelTimeModel.js';
+import authController from './controllers/authController.js';
 
 // Create drivers with different statuses
 // DriverModel.create('John Doe', 'john@example.com', 'password123', 'driver', 'pending');
@@ -15,6 +13,8 @@ import TravelTimeModel from './models/TravelTimeModel.js';
 
 // Delete a driver
 // DriverModel.delete('mike@example.com');
+
+// Delete admin
 
 // Create admins with different statuses
 // AdminModel.create('Admin User 1', 'admin1@example.com', 'adminpass123', 'admin', 'approved');
@@ -61,3 +61,22 @@ import TravelTimeModel from './models/TravelTimeModel.js';
 
 // Delete a travel time entry
 // TravelTimeModel.delete(2);
+
+/*
+AdminModel.createUser(
+    'First Name', 
+    'Last Name', 
+    'email@example.com', 
+    'password123', 
+    'status', 
+    'role', 
+    'Country', 
+    'City', 
+    'State', 
+    12345, 
+    'Address', 
+    'Description', 
+    'some_color', 
+    authController.getFormattedTime()
+)
+*/

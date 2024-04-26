@@ -1,9 +1,22 @@
 CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  role VARCHAR(10) NOT NULL
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(64),
+    last_name VARCHAR(64),
+    email TEXT,
+    password VARCHAR(256),
+    nonce VARCHAR(128),
+    status VARCHAR(64),
+    role VARCHAR(64),
+    country VARCHAR(128),
+    city VARCHAR(128),
+    state VARCHAR(128),
+    zip VARCHAR(16),
+    street TEXT,
+    full_address TEXT,
+    about TEXT,
+	  color VARCHAR(16),
+    create_time VARCHAR(64),
+    delete_time VARCHAR(64)
 );
 
 -- Create Drivers table

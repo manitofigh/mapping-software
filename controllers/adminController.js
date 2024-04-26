@@ -35,23 +35,24 @@ const adminController = {
     } catch (err) {
       console.error(err);
       res.render('admin/adminDashboard.ejs', { 
-        user: user.req, 
+        user: req.user, 
         pendingApplications: await AdminModel.countPendingApplications(),
         errorTitle: 'Error', 
         errorBody: 'An error occurred while rendering the applications. Please try again.' });
     }
   },
 
+  // After user gets approved
   async approveApplication(req, res) {
     try {
       const applicationId = req.params.id;
       const application = await AdminModel.findApplicationById(applicationId);
   
-      await AdminModel.updateStatus(applicationId, 'approved');
-  
       // random 8-letter long password for user to login after approval
       const password = authController.generatePassword();
-      const driver = await DriverModel.create(`${application.first_name} ${application.last_name}`, application.email, password, 'driver', 'approved');
+      await DriverModel.updateDriverPassword(application.email, password);
+      // update status to approved so they can sign in
+      await AdminModel.updateStatus(applicationId, 'approved');
   
       // sendMail(to, subject, html)
       await sendMail(
@@ -68,7 +69,7 @@ const adminController = {
         <p>Email: ${application.email}</p>
         <p>Password: ${password}</p>
         </br>
-        <strong style="color: red;">Please change your password right after logging in.</strong>
+        <strong style="display: block; color: red;">Please change your password right after logging in.</strong>
         You can now login to the system at ${process.env.BASE_URL}:${process.env.PORT}</p>`
       );
       console.log(`Approval email sent to ${application.email}`)
@@ -77,7 +78,7 @@ const adminController = {
         user: req.user,
         applications: await AdminModel.findPendingApplications(),
         successTitle: 'Approved successfully',
-        successBody: `Approval Email sent to ${driver.email} successfully` 
+        successBody: `Approval Email sent to ${application.email} successfully` 
       });
     } catch (err) {
       console.error(err);
@@ -202,7 +203,6 @@ const adminController = {
   },
 
   async addAddress(req, res) {
-    
     // input sanitization and validation
     if (!req.body.address || !req.body.driverId) {
       res.render('admin/adminDashboard.ejs', {
@@ -212,7 +212,7 @@ const adminController = {
         errorTitle: 'Error',
         errorBody: 'Please make sure you have selected a driver and entered an address.',
         previousAddress: req.body.address, // to retrieve the user-entered address on reload
-        previousDriverId: req.body.driverId // to retrieve the user-selected driver on reload
+        previousDriverId: req.body.driverId 
       });
       return;
     }
