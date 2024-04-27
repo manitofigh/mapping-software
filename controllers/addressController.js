@@ -41,6 +41,7 @@ const addressController = {
             user: req.user,
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: await AdminModel.getDrivers(),
+            pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
             errorTitle: 'Error',
             errorBody: 'Please make sure you have selected a driver and entered an address.',
             previousAddress: req.body.address || '',
@@ -51,13 +52,14 @@ const addressController = {
     }
 
     const { address, driverEmail } = req.body;
-    const addressLines = address.split('\n').filter(line => line.trim() !== '');
+    const addressLines = address.trim().split('\n').filter(line => line.trim() !== '');
 
     if (addressLines.length === 0) {
         const renderOptions = {
             user: req.user,
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: await AdminModel.getDrivers(),
+            pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
             errorTitle: 'Error',
             errorBody: 'Please enter at least one valid address.',
             previousAddress: '',
@@ -84,7 +86,7 @@ const addressController = {
         }
 
         const geocodedAddresses = await Promise.all(addressLines.map(async (line) => {
-            const cachedLocation = await AddressModel.getGeocodedLocation(line);
+            const cachedLocation = await AddressModel.getGeocodedLocation(line.trim());
             if (cachedLocation) {
                 console.log(`Using cached location for address: ${line}`);
                 return {
@@ -100,7 +102,7 @@ const addressController = {
                     const { latitude, longitude, formattedAddress, countryCode } = geocodedResponse[0];
                     const latLon = `${latitude},${longitude}`;
                     const quality = countryCode === 'US' ? 'valid' : 'invalid';
-                    await AddressModel.addGeocodedLocation(line, latLon, formattedAddress, quality);
+                    await AddressModel.addGeocodedLocation(line.trim(), latLon, formattedAddress, quality);
                     return { address: line, latLon, realAddress: formattedAddress, quality };
                 } else {
                     await AddressModel.addGeocodedLocation(line, null, null, 'invalid');
@@ -126,13 +128,13 @@ const addressController = {
         ).map(address => address.address);
 
         await Promise.all(filteredValidAddresses.map(async (address) => {
-            await AddressModel.addDeliveryLocation(address.address, address.latLon, driverEmail, driver.color, 'pending', authController.getFormattedTime());
+            await AddressModel.addDeliveryLocation(address.address.trim(), address.latLon, driverEmail, driver.color, 'pending', authController.getFormattedTime());
         }));
 
         const errorBody = invalidAddresses.length > 0
             ? 'List of invalid addresses have been provided in the address entry field.'
             : duplicateAddresses.length > 0
-                ? `You have duplicate entries.`
+                ? `You entered duplicate addresses.`
                 : undefined;
         const duplicateAddressesMessage = duplicateAddresses.length > 0 ? `Previously-assigned addresses for ${driverEmail}: ${duplicateAddresses.join('--- ')}` : '';
 
@@ -140,6 +142,7 @@ const addressController = {
             user: req.user,
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: await AdminModel.getDrivers(),
+            pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
             errorTitle: invalidAddresses.length > 0 || duplicateAddresses.length > 0 ? 'Error' : undefined,
             errorBody: errorBody ? `${errorBody} ${duplicateAddressesMessage}` : undefined,
             successTitle: filteredValidAddresses.length > 0 ? 'Success' : undefined,
@@ -155,6 +158,7 @@ const addressController = {
             user: req.user,
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: await AdminModel.getDrivers(),
+            pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
             errorTitle: 'Error Adding Addresses',
             errorBody: 'An error occurred while adding the addresses. Please try again.',
             previousAddress: address,
@@ -164,19 +168,31 @@ const addressController = {
     }
   },
 
-  async deleteAddress(req, res) {
-    const addressId = req.params.addressId;
+  async removeDeliveryLocation(req, res) {
+    const { address, driverEmail } = req.body;
+  
     try {
-      await AdminModel.deleteAddress(addressId);
-      res.sendStatus(200);
-    } catch (error) {
-      console.error('Error deleting address:', error);
-      res.render('admin/adminDashboard.ejs', {
+      await AddressModel.updateDeliveryLocationStatus(address, driverEmail, 'deleted');
+      const renderOptions = {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
-        errorTitle: 'Error Deleting Address',
-        errorBody: 'An error occurred while deleting the address. Please try again.',
-      });
+        drivers: await AdminModel.getDrivers(),
+        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        successTitle: 'Success',
+        successBody: `Removed location ${address} for ${driverEmail}.`,
+      };
+      res.render('admin/adminDashboard.ejs', renderOptions);
+    } catch (error) {
+      console.error('Error removing delivery location:', error);
+      const renderOptions = {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        errorTitle: 'Error Removing Delivery Location',
+        errorBody: 'An error occurred while removing the delivery location. Please try again.',
+      };
+      res.render('admin/adminDashboard.ejs', renderOptions);
     }
   },
 

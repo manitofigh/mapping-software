@@ -15,6 +15,6 @@ router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminControlle
 router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
 router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, addressController.getAddressesForDriver);
 router.post('/submit-address', isAuthenticated, isAdmin, addressController.addAddress);
-router.delete('/submit-address/:addressId', isAuthenticated, isAdmin, addressController.deleteAddress);
+router.post('/remove-delivery-location', isAuthenticated, isAdmin, addressController.removeDeliveryLocation);
 
 export default router;

@@ -27,6 +27,25 @@ const AddressModel = {
     return result.rows[0];
   },
 
+  async getDeliveryLocationsByDriverEmail(driverEmail) {
+    const query = 'SELECT * FROM delivery_locations WHERE driver_email = $1 AND status = $2';
+    const result = await pool.query(query, [driverEmail, 'pending']);
+    return result.rows;
+  },
+
+  async getPendingDeliveryLocations() {
+    const query = 'SELECT address, driver_email, created_at FROM delivery_locations WHERE status = $1';
+    const values = ['pending'];
+    const result = await pool.query(query, values);
+    return result.rows;
+  },
+  
+  async updateDeliveryLocationStatus(address, driverEmail, status) {
+    const query = 'UPDATE delivery_locations SET status = $1 WHERE address = $2 AND driver_email = $3';
+    const values = [status, address, driverEmail];
+    await pool.query(query, values);
+  },
+
 };
 
 export default AddressModel;

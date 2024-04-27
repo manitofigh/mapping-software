@@ -1,6 +1,7 @@
 import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
 import authController from './authController.js';
+import AddressModel from '../models/AddressModel.js';
 import { sendMail } from '../utils/nodemailer.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
@@ -13,13 +14,15 @@ const adminController = {
       res.render('admin/adminDashboard.ejs', { 
         user: req.user, 
         pendingApplications: await AdminModel.countPendingApplications(), 
-        drivers: await AdminModel.getDrivers() 
+        drivers: await AdminModel.getDrivers(),
+        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
       });
     } catch (err) {
       console.error(err);
       res.render('admin/adminDashboard.ejs', { 
         user:req.user,
         pendingApplidations: await AdminModel.countPendingApplications(),
+        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
         errorTitle: 'Error',
         errorBody: 'An error occurred while rendering your dashboard. Please try again.' 
       });
