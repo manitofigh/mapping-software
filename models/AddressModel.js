@@ -34,7 +34,7 @@ const AddressModel = {
   },
 
   async getPendingDeliveryLocations() {
-    const query = 'SELECT address, driver_email, created_at FROM delivery_locations WHERE status = $1';
+    const query = 'SELECT address, driver_email, created_at, lat_lon, color FROM delivery_locations WHERE status = $1';
     const values = ['pending'];
     const result = await pool.query(query, values);
     return result.rows;

@@ -120,7 +120,7 @@
               <div id="container" class="flex mb-4 border bg-gray-900 border-gray-600 rounded-md overflow-hidden resize-y h-32 relative">
                 <div id="line-numbers" class="border-r border-gray-600 p-2 text-right text-white overflow-hidden">
                 </div>
-                <textarea id="textarea" name="address" class="bg-white/10 text-white flex-1 border-none outline-none p-2 resize-y" placeholder="Enter address(es) one per line or drag-and-drop a text/csv file"><%= typeof previousAddress !== 'undefined' ? previousAddress : '' %></textarea>
+                <textarea id="textarea" name="address" class="bg-white/10 text-white flex-1 border-none outline-none p-2 resize-y" placeholder="Enter US address(es) one per line or drag-and-drop a text/csv file"><%= typeof previousAddress !== 'undefined' ? previousAddress : '' %></textarea>
                 <div id="dropMask" class="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-75 flex items-center justify-center text-white text-xl pointer-events-none opacity-0 transition-opacity duration-200">
                   <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-md font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -167,62 +167,92 @@
                     </button>
                   </div>
                 </form>
-                <div class="flex items-center mb-2">
-                  <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <div class="flex items-center mb-2 text-sm">
+                  <svg class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
                   </svg>
                   <span><%= location.address %></span>
                 </div>
-                <div class="flex items-center">
-                  <svg class="h-6 w-5 text-gray-400 mr-2" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <div class="flex items-center text-sm">
+                  <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" />
                   </svg>
-                  <span><%= location.driver_email %> - <%= location.created_at %></span>
+                  <span><%= location.driver_email %></span>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                  <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                  </svg>
+                  <span>Searched at: <%= location.created_at %></span>
                 </div>
               </div>
             <% }); %>
           </div>
         </div>
       </div>
-  
-      <!-- link to css file under public folder -->
-      <link rel="stylesheet" href="/styles/main.css">
-      <!-- link to leaflet css and axios -->
-      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-      <!-- link to js file under public folder -->
-      <script src="/js/addressBox.js"></script>
-      <!-- leaflet map settings for admin -->
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const map = L.map('mapContainer', {
-            minZoom: 4, // Set the minimum zoom level
-            maxZoom: 18, // Set the maximum zoom level
-            zoomControl: true // Add zoom control
-          }).setView([40.7169, -73.5990], 4);
-
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }).addTo(map);
-        
-          // Set the maximum bounds to limit the map to the United States
-          const usBounds = [
-            [24.9493, -125.0011], // Southwest coordinates
-            [49.5904, -66.9326]   // Northeast coordinates
-          ];
-          map.setMaxBounds(usBounds);
-
-          document.getElementById('search-address').addEventListener('click', () => {
-            document.getElementById('search-address').innerHTML = `
-              <div class="loading-spinner"></div>
-            `;
-          });
-        
-          // Event listener for driver selection change
-          document.getElementById('driverSelect').addEventListener('change', fetchAddressesForDriver);
-        });
-      </script>
     </div>
   </main>
+  <!-- link to css file under public folder -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <!-- link to leaflet css and axios -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- link to js file under public folder -->
+  <script src="/js/addressBox.js"></script>
+  <!-- leaflet map settings for admin -->
+  <script>
+    const pendingDeliveryLocations = <%- JSON.stringify(pendingDeliveryLocations) %>;
+    console.log(pendingDeliveryLocations)
+    document.addEventListener('DOMContentLoaded', () => {
+      const map = L.map('mapContainer', {
+         minZoom: 3, // Set the minimum zoom level
+         maxZoom: 18, // Set the maximum zoom level
+         zoomControl: true // Add zoom control
+      }).setView([38.34, -100.21], 3); // center of US, zoom level 3
+      // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
+  
+      var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+         attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+         minZoom: 3,
+         maxZoom: 18,
+         accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
+      }).addTo(map);
+  
+      // Set the maximum bounds to limit the map to the United States
+      const usBounds = [
+        [24.9493, -125.0011], // Southwest coordinates
+        [49.5904, -66.9326]   // Northeast coordinates
+      ];
+      map.setMaxBounds(usBounds);
+  
+      // Loop through the pending delivery locations and add markers to the map
+      pendingDeliveryLocations.forEach((location) => {
+        const [lat, lng] = location.lat_lon.split(',').map(parseFloat);
+        const latLng = [lat, lng];
+        const markerColor = location.color;
+        
+        const marker = L.circleMarker(latLng, {
+          color: markerColor,
+          fillColor: markerColor,
+          fillOpacity: 1,
+          radius: 8
+        }).addTo(map);
+      });
+
+      // const logMapDetails = () => {
+      //   const center = map.getCenter(); // Gets the current geographical center of the map
+      //   const zoom = map.getZoom(); // Gets the current zoom level
+      //   console.log(`Latitude: ${center.lat.toFixed(2)}, Longitude: ${center.lng.toFixed(2)}, Zoom: ${zoom}`);
+      // };
+
+      // // Set the interval to log details every 5 seconds
+      // setInterval(logMapDetails, 5000);
+  
+      document.getElementById('search-address').addEventListener('click', () => {
+        document.getElementById('search-address').innerHTML = `
+          <div class="loading-spinner"></div>
+        `;
+      });
+    });
+  </script>
 </body>

@@ -143,11 +143,11 @@ const addressController = {
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: await AdminModel.getDrivers(),
             pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-            errorTitle: invalidAddresses.length > 0 || duplicateAddresses.length > 0 ? 'Error' : undefined,
+            errorTitle: invalidAddresses.length > 0 || duplicateAddresses.length > 0 ? 'Invalid address' : undefined,
             errorBody: errorBody ? `${errorBody} ${duplicateAddressesMessage}` : undefined,
             successTitle: filteredValidAddresses.length > 0 ? 'Success' : undefined,
             successBody: filteredValidAddresses.length > 0 ? `${filteredValidAddresses.length} ${filteredValidAddresses.length === 1 ? 'address was' : 'addresses were'} added successfully.` : undefined,
-            previousAddress: [...invalidAddresses.map(address => address.address), ...duplicateAddresses].join('\n'),
+            previousAddress: [...invalidAddresses.map(eaddress => address.address), ...duplicateAddresses].join('\n'),
             previousDriverEmail: driverEmail
         };
 
@@ -179,7 +179,7 @@ const addressController = {
         drivers: await AdminModel.getDrivers(),
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
         successTitle: 'Success',
-        successBody: `Removed location ${address} for ${driverEmail}.`,
+        successBody: `Removed location "${address}" for "${driverEmail}".`,
       };
       res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {
