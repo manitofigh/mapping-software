@@ -36,97 +36,131 @@ const addressController = {
 
   async addAddress(req, res) {
     // Input sanitization and validation
-    if (!req.body.address || !req.body.driverId) {
-      res.render('admin/adminDashboard.ejs', {
-        user: req.user,
-        pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
-        errorTitle: 'Error',
-        errorBody: 'Please make sure you have selected a driver and entered an address.',
-        previousAddress: req.body.address || '',
-        previousDriverId: req.body.driverId || ''
-      });
-      return;
-    }
-  
-    const { address, driverId } = req.body;
-    const addressLines = address.split('\n').filter(line => line.trim() !== '');
-  
-    if (addressLines.length === 0) {
-      res.render('admin/adminDashboard.ejs', {
-        user: req.user,
-        pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
-        errorTitle: 'Error',
-        errorBody: 'Please enter at least one valid address.',
-        previousAddress: '',
-        previousDriverId: driverId
-      });
-      return;
-    }
-  
-    try {
-      const driver = await AdminModel.getDriverById(driverId);
-      if (!driver) {
-        res.render('admin/adminDashboard.ejs', {
-          user: req.user,
-          pendingApplications: await AdminModel.countPendingApplications(),
-          drivers: await AdminModel.getDrivers(),
-          errorTitle: 'Error',
-          errorBody: 'Invalid driver selected.',
-          previousAddress: address,
-          previousDriverId: driverId
-        });
+    if (!req.body.address || !req.body.driverEmail) {
+        const renderOptions = {
+            user: req.user,
+            pendingApplications: await AdminModel.countPendingApplications(),
+            drivers: await AdminModel.getDrivers(),
+            errorTitle: 'Error',
+            errorBody: 'Please make sure you have selected a driver and entered an address.',
+            previousAddress: req.body.address || '',
+            previousDriverEmail: req.body.driverEmail || ''
+        };
+        res.render('admin/adminDashboard.ejs', renderOptions);
         return;
-      }
-  
-      const geocodedLocations = await Promise.all(addressLines.map(async (line) => {
-        const cachedLocation = await AddressModel.getGeocodedLocation(line);
-        if (cachedLocation) {
-          return cachedLocation;
-        } else {
-          const geocodedResponse = await geocoder.geocode(line);
-          if (geocodedResponse.length > 0) {
-            const { latitude, longitude, formattedAddress } = geocodedResponse[0];
-            const latLon = `${latitude},${longitude}`;
-            await AddressModel.addGeocodedLocation(line, latLon, formattedAddress, 'valid');
-            return { address: line, latLon, realAddress: formattedAddress, quality: 'valid' };
-          } else {
-            await AddressModel.addGeocodedLocation(line, null, null, 'invalid');
-            return { address: line, latLon: null, realAddress: null, quality: 'invalid' };
-          }
+    }
+
+    const { address, driverEmail } = req.body;
+    const addressLines = address.split('\n').filter(line => line.trim() !== '');
+
+    if (addressLines.length === 0) {
+        const renderOptions = {
+            user: req.user,
+            pendingApplications: await AdminModel.countPendingApplications(),
+            drivers: await AdminModel.getDrivers(),
+            errorTitle: 'Error',
+            errorBody: 'Please enter at least one valid address.',
+            previousAddress: '',
+            previousDriverEmail: driverEmail
+        };
+        res.render('admin/adminDashboard.ejs', renderOptions);
+        return;
+    }
+
+    try {
+        const driver = await AdminModel.getDriverByEmail(driverEmail);
+        if (!driver) {
+            const renderOptions = {
+                user: req.user,
+                pendingApplications: await AdminModel.countPendingApplications(),
+                drivers: await AdminModel.getDrivers(),
+                errorTitle: 'Error',
+                errorBody: 'Invalid driver selected.',
+                previousAddress: address,
+                previousDriverEmail: driverEmail
+            };
+            res.render('admin/adminDashboard.ejs', renderOptions);
+            return;
         }
-      }));
-  
-      const validLocations = geocodedLocations.filter(location => location.quality === 'valid');
-      const invalidLocations = geocodedLocations.filter(location => location.quality === 'invalid');
-  
-      await Promise.all(validLocations.map(async (location) => {
-        await AddressModel.addDeliveryLocation(location.address, location.latLon, driver.email , driver.color, 'pending', authController.getFormattedTime());
-      }));
-  
-      res.render('admin/adminDashboard.ejs', {
-        user: req.user,
-        pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
-        successTitle: 'Addresses Added',
-        successBody: `${validLocations.length} addresses were successfully added.`,
-        errorTitle: invalidLocations.length > 0 ? 'Invalid Addresses' : undefined,
-        errorBody: invalidLocations.length > 0 ? invalidLocations.map(location => location.address).join('\n') : undefined,
-        previousAddress: '',
-        previousDriverId: driverId
-      });
+
+        const geocodedAddresses = await Promise.all(addressLines.map(async (line) => {
+            const cachedLocation = await AddressModel.getGeocodedLocation(line);
+            if (cachedLocation) {
+                console.log(`Using cached location for address: ${line}`);
+                return {
+                    address: line,
+                    latLon: cachedLocation.lat_lon,
+                    realAddress: cachedLocation.real_address,
+                    quality: cachedLocation.quality
+                };
+            } else {
+                console.log(`Calling API for address: ${line}`);
+                const geocodedResponse = await geocoder.geocode(line);
+                if (geocodedResponse.length > 0) {
+                    const { latitude, longitude, formattedAddress, countryCode } = geocodedResponse[0];
+                    const latLon = `${latitude},${longitude}`;
+                    const quality = countryCode === 'US' ? 'valid' : 'invalid';
+                    await AddressModel.addGeocodedLocation(line, latLon, formattedAddress, quality);
+                    return { address: line, latLon, realAddress: formattedAddress, quality };
+                } else {
+                    await AddressModel.addGeocodedLocation(line, null, null, 'invalid');
+                    return { address: line, latLon: null, realAddress: null, quality: 'invalid' };
+                }
+            }
+        }));
+
+        const validAddresses = geocodedAddresses.filter(address => address.quality === 'valid');
+        const invalidAddresses = geocodedAddresses.filter(address => address.quality === 'invalid');
+    
+        const uniqueValidAddresses = await Promise.all(validAddresses.map(async (address) => {
+            const existingDeliveryLocation = await AddressModel.getDeliveryLocationByLatLonAndDriverEmail(address.latLon, driverEmail);
+            if (!existingDeliveryLocation || existingDeliveryLocation.status !== 'pending') {
+                return address;
+            }
+            return null;
+        }));
+    
+        const filteredValidAddresses = uniqueValidAddresses.filter(address => address !== null);
+        const duplicateAddresses = validAddresses.filter(address => 
+            uniqueValidAddresses.find(uniqueAddress => uniqueAddress !== null && uniqueAddress.latLon === address.latLon) === undefined
+        ).map(address => address.address);
+
+        await Promise.all(filteredValidAddresses.map(async (address) => {
+            await AddressModel.addDeliveryLocation(address.address, address.latLon, driverEmail, driver.color, 'pending', authController.getFormattedTime());
+        }));
+
+        const errorBody = invalidAddresses.length > 0
+            ? 'List of invalid addresses have been provided in the address entry field.'
+            : duplicateAddresses.length > 0
+                ? `You have duplicate entries.`
+                : undefined;
+        const duplicateAddressesMessage = duplicateAddresses.length > 0 ? `Previously-assigned addresses for ${driverEmail}: ${duplicateAddresses.join('--- ')}` : '';
+
+        const renderOptions = {
+            user: req.user,
+            pendingApplications: await AdminModel.countPendingApplications(),
+            drivers: await AdminModel.getDrivers(),
+            errorTitle: invalidAddresses.length > 0 || duplicateAddresses.length > 0 ? 'Error' : undefined,
+            errorBody: errorBody ? `${errorBody} ${duplicateAddressesMessage}` : undefined,
+            successTitle: filteredValidAddresses.length > 0 ? 'Success' : undefined,
+            successBody: filteredValidAddresses.length > 0 ? `${filteredValidAddresses.length} ${filteredValidAddresses.length === 1 ? 'address was' : 'addresses were'} added successfully.` : undefined,
+            previousAddress: [...invalidAddresses.map(address => address.address), ...duplicateAddresses].join('\n'),
+            previousDriverEmail: driverEmail
+        };
+
+        res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {
-      console.error('Error adding addresses:', error);
-      res.render('admin/adminDashboard.ejs', {
-        user: req.user,
-        pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
-        errorTitle: 'Error Adding Addresses',
-        errorBody: 'An error occurred while adding the addresses. Please try again.',
-        previousAddress: address,
-        previousDriverId: driverId
-      });
+        console.error('Error adding addresses:', error);
+        const renderOptions = {
+            user: req.user,
+            pendingApplications: await AdminModel.countPendingApplications(),
+            drivers: await AdminModel.getDrivers(),
+            errorTitle: 'Error Adding Addresses',
+            errorBody: 'An error occurred while adding the addresses. Please try again.',
+            previousAddress: address,
+            previousDriverEmail: driverEmail
+        };
+        res.render('admin/adminDashboard.ejs', renderOptions);
     }
   },
 

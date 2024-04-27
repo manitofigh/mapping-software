@@ -29,17 +29,17 @@
 </div>
 
 <script>
-const successNotif = document.querySelector('#success-notif');
-const closeButton = document.querySelector('.close-notification');
-const notification = document.querySelector('.pointer-events-auto');
-
-// set z-index to 9999
-successNotif.style.zIndex = 9999;
-
-closeButton.addEventListener('click', () => {
-  notification.classList.add('opacity-0');
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 100);
-});
+    const successNotif = document.querySelector('#success-notif');
+    const closeButton = document.querySelector('.close-notification');
+    const notification = document.querySelector('.pointer-events-auto');
+    
+    // set z-index of success-notif to 900
+    successNotif.style.zIndex = 900;
+    
+    closeButton.addEventListener('click', () => {
+      notification.classList.add('opacity-0');
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 100);
+    });
 </script>

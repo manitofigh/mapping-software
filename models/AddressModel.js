@@ -21,6 +21,12 @@ const AddressModel = {
     await pool.query(query, [address, latLon, driverEmail, color, status, createdAt]);
   },
 
+  async getDeliveryLocationByLatLonAndDriverEmail(latLon, driverEmail) {
+    const query = 'SELECT * FROM delivery_locations WHERE lat_lon = $1 AND driver_email = $2';
+    const result = await pool.query(query, [latLon, driverEmail]);
+    return result.rows[0];
+  },
+
 };
 
 export default AddressModel;

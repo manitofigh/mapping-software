@@ -101,7 +101,13 @@ const AdminModel = {
     const result = await pool.query('SELECT * FROM users WHERE id = $1 AND role = $2', [id, 'driver']);
     return result.rows[0];
   },
-  
+
+  async getDriverByEmail(email) {
+    const query = 'SELECT * FROM users WHERE email = $1 AND role = $2';
+    const result = await pool.query(query, [email, 'driver']);
+    return result.rows[0];
+  },
+
 };
 
 export default AdminModel;

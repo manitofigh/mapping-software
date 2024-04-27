@@ -27,17 +27,19 @@
 </div>
 
 <script>
-const errorNotif = document.querySelector('#error-notif');
-const closeButton = document.querySelector('.close-notification');
-const notification = document.querySelector('.pointer-events-auto');
-
-// set z-index of error-notif to 9999
-errorNotif.style.zIndex = 9999;
-
-closeButton.addEventListener('click', () => {
-  notification.classList.add('opacity-0');
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 100);
-});
+  document.addEventListener('DOMContentLoaded', () => {
+    const errorNotif = document.querySelector('#error-notif');
+    const closeButton = document.querySelector('.close-notification');
+    const notification = document.querySelector('.pointer-events-auto');
+    
+    // set z-index of error-notif to 9999
+    errorNotif.style.zIndex = 900;
+    
+    closeButton.addEventListener('click', () => {
+      notification.classList.add('opacity-0');
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 100);
+    });
+  });
 </script>

@@ -132,10 +132,10 @@
               </div>
               <div class="flex">
                 <% if (typeof drivers !== 'undefined' && drivers.length > 0) { %>
-                  <select id="driverSelect" name="driverId" class="w-3/4 rounded-md border-0 bg-white/10 px-2 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700">
+                  <select id="driverSelect" name="driverEmail" class="w-3/4 rounded-md border-0 bg-white/10 px-2 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700">
                     <option value="">Select Driver</option>
                     <% drivers.forEach((driver) => { %>
-                      <option value="<%= driver.email %>" <%= typeof previousDriverId !== 'undefined' && previousDriverId === driver.email ? 'selected' : '' %>><%= driver.first_name + " " + driver.last_name %> - <%= driver.email %></option>
+                      <option value="<%= driver.email %>" <%= typeof previousDriverEmail !== 'undefined' && previousDriverEmail === driver.email ? 'selected' : '' %>><%= driver.first_name + " " + driver.last_name %> - <%= driver.email %></option>
                     <% }); %>
                   </select>
                 <% } else { %>
