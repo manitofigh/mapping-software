@@ -1,42 +1,184 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import '../assets/css/styleLeaflet.css';
 import "../assets/css/style.css";
+import '../assets/css/styleLeaflet.css';
 
-const DriverPanel = () => {
-  const [bars, setBars] = useState({ right: false, bottom: false });
+
+const DriverPanel = ({changeState}) => {
+  
+  const [bars, setBars] = useState({ left: false, bottom: false });
+  const [isResetDisabled, setIsResetDisabled] = useState(true);
+
+  const [legData,setLegData] = useState([])
+  const mapRef = useRef(null);
 
   useEffect(() => {
-    // Map initialization
+    // Ensure the map container is clean before initializing a new map
+    let container = L.DomUtil.get('driverMap');
+    if (container != null) {
+      container._leaflet_id = null;
+    }
+
     const mapOptions = {
       center: [40.7169, -73.599],
       zoom: 15,
     };
 
-    const map = new L.map("driverMap", mapOptions);
-    L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+    mapRef.current = new L.map('driverMap', mapOptions);
+    const layer = new L.TileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    );
+    mapRef.current.addLayer(layer);
+    // mapRef.gJsonLayer = L.geoJSON().addTo(mapRef.current);
+    
+
+    // Cleanup function to remove the map when the component unmounts or needs to reinitialize
+    return () => {
+      mapRef.current.remove();
+      mapRef.current = null;
+    };
   }, []);
 
-  const toggleBar = (barName) => {
-    setBars((prevBars) => ({ ...prevBars, [barName]: !prevBars[barName] }));
+  useEffect(() => {
+    updateLayout();
+    
+    var num = 1;
+    if(bars.left)
+	    num++;
+
+    var driverMap = document.getElementById("driverMap");
+    driverMap.style.gridColumn = "span " + (num+1).toString();
+
+    var leftSideBar = document.getElementsByClassName("left-bar")
+    if(bars.bottom){
+      leftSideBar[0].style.gridRow = "2 / span 2"
+      driverMap.style.gridRow = "2 / span 2"
+    } else {
+      leftSideBar[0].style.gridRow = "2 / span 1"
+      driverMap.style.gridRow = "2 / span 1"
+    }
+
+  }, [bars]);
+
+  // Mimics the updateLayout function from jQuery, using React state
+  const updateLayout = () => {
+    const anyCollapsed = Object.values(bars).some(value => value);
+    setIsResetDisabled(!anyCollapsed);
   };
+
+  /*
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    // Ensure the map container is clean before initializing a new map
+    let container = L.DomUtil.get('driverMap');
+    if (container != null) {
+      container._leaflet_id = null;
+    }
+
+    const mapOptions = {
+      center: [40.7169, -73.599],
+      zoom: 15,
+    };
+
+    mapRef.current = new L.map('adminMap', mapOptions);
+    const layer = new L.TileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    );
+    mapRef.current.addLayer(layer);
+    // mapRef.gJsonLayer = L.geoJSON().addTo(mapRef.current);
+    
+
+    // Cleanup function to remove the map when the component unmounts or needs to reinitialize
+    return () => {
+      mapRef.current.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    updateLayout();
+
+    var num = 1;
+    if(bars.left)
+	  num++;
+    if(bars.right)
+	  num++;
+    
+    // console.log(num);
+    var adminMap = document.getElementById("adminMap")
+    adminMap.style.gridColumn = "span " + num.toString();
+    
+    var leftSideBar = document.getElementsByClassName("left-bar")
+
+    var rightSideBar = document.getElementsByClassName("right-bar")
+
+    if(bars.bottom){
+      rightSideBar[0].style.gridRow = "2 / span 2"
+      leftSideBar[0].style.gridRow = "2 / span 2"
+      adminMap.style.gridRow = "2 / span 2"
+    } else {
+      rightSideBar[0].style.gridRow = "2 / span 1"
+      leftSideBar[0].style.gridRow = "2 / span 1"
+      adminMap.style.gridRow = "2 / span 1"
+    }
+
+    
+  }, [bars]);
+
+
+
+ 
 
   const resetLayout = () => {
     setBars({ right: false, bottom: false });
   };
+  */
+  function returnEndTime(date){
+    var options = {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    }
+    var region = new Intl.DateTimeFormat();
+    options.timeZone = region.resolvedOptions().timeZone;
+    options.timeZoneName = "short";
+    
+  
+    var str = "";	
+    str += date.toLocaleString(region.locale,options)
+    // str += Intl.DateTimeFormat().resolvedOptions().timeZone; 
+    // console.log(Intl.DateTimeFormat().resolvedOptions());
+    return str;
+    
+  }
+
+  const toggleBar = (barName) => {
+    setBars(prevBars => {
+      const updatedBars = { ...prevBars, [barName]: !prevBars[barName] };
+      return updatedBars;
+    });
+  };
+
+  const changeToAdmin = () => {
+    //console.log("Driver Called");
+    changeState(1);
+  }
+
+  const signOut = () => {
+    changeState(0);
+  }
 
   return (
     <div className="main-container">
       <div className="top-bar">
-        <nav
-          className="navbar navbar-expand-lg bg-body-tertiary"
-          data-bs-theme="dark"
-        >
+        <nav className="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
           <div className="container-fluid">
-            <a className="navbar-brand" href="#">
-              Slick
-            </a>
+            <a className="navbar-brand" href="#">Slick</a>
             <button
               className="navbar-toggler"
               type="button"
@@ -54,121 +196,59 @@ const DriverPanel = () => {
             >
               <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">
-                    Home
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    Link
-                  </a>
-                </li>
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Dropdown
-                  </a>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Action
-                      </a>
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Another action
-                      </a>
-                    </li>
-                    <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Something else here
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li className="nav-item">
-                  <button
-                    type="button"
-                    className="btn btn-danger disabled"
-                    id="reset-layout-btn"
-                  >
-                    Reset Layout
+                    <a className="nav-link active" aria-current="page" href="#">
+                      Home
+                    </a>
+                  </li>
+                <li className="nav-item" style={{ marginLeft: 10 }}>
+                  <button className="btn btn-outline-danger" onClick={signOut}>
+                    Sign Out →
                   </button>
                 </li>
-                <li className="nav-item" style={{ marginLeft: 10 }}>
-                  <a
-                    className="btn btn-outline-danger"
-                    href="http://localhost:3000"
-                  >
-                    Sign Out →
-                  </a>
-                </li>
               </ul>
-              <form className="d-flex" role="search">
-                <a className="btn btn-outline-success" href="./adminPanel.html">
-                  Admin Panel →
-                </a>
-              </form>
+              <div className="d-flex" role="search">
+                <button className="btn btn-outline-succes" onClick={changeToAdmin}>Admin Portal →</button>
+              </div>
             </div>
           </div>
         </nav>
       </div>
 
-      <div
-        className={`main-content ${bars.bottom ? "main-expanded-bottom" : ""} ${
-          bars.right ? "main-expanded-left-right" : ""
-        }`}
-        id="driverMap"
-      >
-        <div className="main-content main-expanded-left" id="driverMap">
-          {/*hide/show (collapse) buttons*/}
-          <button
-            className="collapse-btn"
-            id="bottom-bar-collapse-btn"
-            title="Collapse/Show"
-          />
-          <button
-            className="collapse-btn"
-            id="right-bar-collapse-btn"
-            title="Collapse/Show"
-          />
-        </div>
-        <button
-          className="collapse-btn"
-          onClick={() => toggleBar("bottom")}
-          title="Collapse/Show Bottom Bar"
-        >
-          Bottom Bar
-        </button>
-        <button
-          className="collapse-btn"
-          onClick={() => toggleBar("right")}
-          title="Collapse/Show Right Bar"
-        >
-          < Geocoding />
-        </button>
-        <button
-          className="collapse-btn"
-          disabled={!bars.right && !bars.bottom}
-          onClick={resetLayout}
-          title="Reset Layout"
-        >
-          Reset Layout
-        </button>
-      </div>
-      <div className={`right-bar ${bars.right ? "bar-collapsed" : ""}`}>
-        right bar
+      <div className={`left-bar ${bars.left ? "bar-collapsed" : ""}`}>
+        left bar
       </div>
       <div className={`bottom-bar ${bars.bottom ? "bar-collapsed" : ""}`}>
-        bottom bar
+        <table class="itinerary">
+          <thead class="table-head">
+            <tr>
+              <th scope="col">Start Time </th>
+              <th scope="col">Route Leg </th>
+              <th scope="col">End Time </th>
+              <th scope="col">Finished</th>
+            </tr>
+          </thead>
+          <tbody>
+          {legData.map((legDat,index) => (
+			      <tr key={index}>
+				      <th scope="row">
+					      <div class="date">
+                  {legDat["date"]}
+                </div>
+						    <div>
+                  {legDat["time"]}
+						    </div>
+				    </th>
+					<th >{legDat["location1"] + " to " + legDat["location2"]}</th>
+					<th >{returnEndTime(new Date((legDat["start_time"] + (legDat["duration"] * 1000))))}</th>
+          <th><button>Send To User</button></th>
+			    </tr>
+			    ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="main-content" id="driverMap">
+        <button className="collapse-btn" id="left-bar-collapse-btn" onClick={() => toggleBar("left")} title="Collapse/Show"/>
+        <button className="collapse-btn" id="bottom-bar-collapse-btn" onClick={() => toggleBar("bottom")} title="Collapse/Show"/>
       </div>
     </div>
   );

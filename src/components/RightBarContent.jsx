@@ -184,12 +184,12 @@ const Geocoding = React.forwardRef(function Geocoding({childToParent},ref) {
 	 // console.log(dat);
 	 // console.log("Child To Parent");
    var pinpoints = [];
-   for (var i = 0; i < results.length; i++) {
-     var result = results[i];
-     var coordinate = [result.longitude, result.latitude];
-     var formattedAddress = result.formatted_address;
-     pinpoints.push({ longitude: coordinate[0], latitude: coordinate[1], formattedAddress: formattedAddress });
-   }
+   for (var i = 0; i < waypointIndices.length; i++) {
+    var result = results[waypointIndices[i]];
+    var coordinate = [result.longitude, result.latitude];
+    var formattedAddress = result.formatted_address;
+    pinpoints.push({ longitude: coordinate[0], latitude: coordinate[1], formattedAddress: formattedAddress });
+  }
    
 	 childToParent(data,dat,pinpoints);
         //console.log(data)
@@ -247,37 +247,39 @@ const Geocoding = React.forwardRef(function Geocoding({childToParent},ref) {
     // console.log(results);
   }
 
-  //       <button onClick={doneInputting}>Done Inputting</button>
-  //       <button onClick={addressSort}>Run Address Sorting</button>
+  //      <button onClick={doneInputting}>Done Inputting</button>
+  //      <button onClick={addressSort}>Run Address Sorting</button>
   return (
-    <div class="right_sidebar">
-      {addresses.map((address, index) => (
-        <div class="input_bar" key={index}>
-          <input
-            type="text"
-            placeholder="Enter address"
-	    class = "input_box"
-            value={address}
-            onChange={(e) => setAddresses([...addresses.slice(0, index), e.target.value, ...addresses.slice(index + 1)])}
-          />
-          <button class="remove_button" onClick={() => setAddresses(addresses.filter((_, i) => i !== index))}>X</button>
-        </div>
-      ))}
-      <button onClick={addAddressInput}>Add Address</button>
-      
-      
-      <div
-        id="drop_zone"
+    <div className="right_sidebar">
+      <div>
+      <label 
+        htmlFor="actual_button" 
+        id="upload_label" 
         onDrop={dropHandler}
         onDragOver={dragOverHandler}
         onDragEnter={dragEnterHandler}
-        onDragLeave={dragLeaveHandler}
-      >
-        <label htmlFor="actual_button" id="upload_label">Upload File</label>
-        <input type="file" id="actual_button" accept=".csv,.txt" onChange={handleFileChange} hidden />
+        onDragLeave={dragLeaveHandler}>Upload File</label>
+      <input type="file" id="actual_button" accept=".csv,.txt" onChange={handleFileChange} hidden />
       </div>
-
+      {addresses.map((address, index) => (
+        <div className="input_bar" key={index}>
+          <input
+            type="text"
+            placeholder="Enter address"
+            className = "input_box"
+            value={address}
+            onChange={(e) => setAddresses([...addresses.slice(0, index), e.target.value, ...addresses.slice(index + 1)])}
+          />
+          <button className="remove_button" onClick={() => setAddresses(addresses.filter((_, i) => i !== index))}>X</button>
+        </div>
+      ))}
+      <div className="addAddress">
+        <button className="addAddressBtn" onClick={addAddressInput}>+</button>
+      </div>
       
+
+
+
     </div>
   );
 });

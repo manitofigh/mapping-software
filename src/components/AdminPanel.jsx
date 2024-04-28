@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "../assets/css/styleLeaflet.css";
 import "../assets/css/style.css";
+import "../assets/css/styleLeaflet.css";
+
 import Geocoding from "./RightBarContent";
 
-const AdminPanel = () => {
+const AdminPanel = ({changeState}) => {
   const [bars, setBars] = useState({
     left: false,
     right: false,
@@ -23,7 +24,7 @@ const AdminPanel = () => {
 	
   const childToParent = (data,ldat,pinpoints) => {
 	// setData(data);
-	// console.log("Parent Function Called");
+	//console.log("Parent Function Called");
 	// console.log("Creating Feature")
 	/*var gjson_feature = {
 		"type" : "Feature",
@@ -44,11 +45,18 @@ const AdminPanel = () => {
   });
 
   // Add markers for each pinpoint
-  pinpoints.forEach((pinpoint) => {
-    var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
-      .bindPopup(pinpoint.formattedAddress)
-      .addTo(mapRef.current);
-  });
+  pinpoints.forEach((pinpoint,index) => {
+    const numberIcon = L.divIcon({
+      className: "number-icon",
+      iconSize: [25, 41],
+      iconAnchor: [10, 44],
+      popupAnchor: [3, -40],
+      html: `<div class="numbers">${index + 1}</div>`
+    });
+    var marker = L.marker([pinpoint.latitude, pinpoint.longitude], { icon: numberIcon })
+    .bindPopup(pinpoint.formattedAddress)
+    .addTo(mapRef.current)
+})
 	//console.log(gjson_feature);
 	
 	if(mapRef.gJSONLayer != null)
@@ -398,6 +406,13 @@ const AdminPanel = () => {
 	return str;
 	
   }
+  const changeToDriver = () => {
+	//console.log("Driver Called");
+	changeState(2);
+  }
+  const signOut = () => {
+	changeState(0);
+  }
 
   return (
     <div className="main-container">
@@ -431,11 +446,13 @@ const AdminPanel = () => {
                     Home
                   </a>
                 </li>
+				{/*
                 <li className="nav-item">
                   <a className="nav-link" href="#">
                     Link
                   </a>
                 </li>
+				
                 <li className="nav-item">
                   <button
                     type="button"
@@ -446,26 +463,20 @@ const AdminPanel = () => {
                     Reset Layout
                   </button>
                 </li>
+				
+				*/}
                 <li className="nav-item" style={{ marginLeft: 10 }}>
-                  <a
-                    className="btn btn-outline-danger"
-                    href="http://localhost:3000"
-                  >
+                  <button className="btn btn-outline-danger" onClick={signOut}>
                     Sign Out →
-                  </a>
+                  </button>
                 </li>
               </ul>
-              <form className="d-flex" role="search">
+              <div className="d-flex" role="search">
 			  	<button>Submit</button>
 			  	<button onClick={run}>Run</button>
 				<button onClick={save}>Save</button>
-                <a
-                  className="btn btn-outline-success"
-                  href="./driverPanel.html"
-                >
-                  Driver Portal →
-                </a>
-              </form>
+                <button className="btn btn-outline-danger" onClick={changeToDriver}>Driver Portal →</button>
+              </div>
             </div>
           </div>
         </nav>
@@ -478,39 +489,39 @@ const AdminPanel = () => {
         <Geocoding childToParent={childToParent} ref={functionRefs}/>
       </div>
       <div className={`bottom-bar ${bars.bottom ? "bar-collapsed" : ""}`}>
-	  <table class="itinerary">
-	      <thead class="table-head">
-	        <tr>
-	          <th scope="col">Start Time </th>
-	          <th scope="col">Route Leg </th>
-	  	  <th scope="col">End Time </th>
-	        </tr>
-	      </thead>
-	      <tbody>
-	          {legData.map((legDat,index) => (
-		  <tr key={index}>
-			<th scope="row">
-				<div class="date_input">
-			        <input 
-			  			type="text"
-			  			placeholder={returnDate(legDat["date_obj"])}
-			  			value={legDat["currentDate"]}
-			  			onChange={(e) => {handleCurrentDateChange(e.target.value,index);changeDate(e.target.value,index)}}/>
-			        </div>
-			        <div>
-			  		<input
-			  			type="text"
-			  			placeholder={returnTime(legDat["date_obj"])}
-						value={legDat["currentTime"]}
-						onChange={(e) => {handleCurrentTimeChange(e.target.value,index);changeTime(e.target.value,index)}}/>
-			        </div>
-			  </th>
-	                <th >{legDat["location1"] + " to " + legDat["location2"]}</th>
-	                <th >{returnEndTime(new Date((legDat["start_time"] + (legDat["duration"] * 1000))))}</th>
-		  </tr>
-		  ))}
-	      </tbody>
-	  </table>
+		<table class="itinerary">
+			<thead class="table-head">
+				<tr>
+					<th scope="col">Start Time </th>
+					<th scope="col">Route Leg </th>
+					<th scope="col">End Time </th>
+				</tr>
+			</thead>
+			<tbody>
+				{legData.map((legDat,index) => (
+			<tr key={index}>
+				<th scope="row">
+					<div class="date_input">
+						<input 
+							type="text"
+							placeholder={returnDate(legDat["date_obj"])}
+							value={legDat["currentDate"]}
+							onChange={(e) => {handleCurrentDateChange(e.target.value,index);changeDate(e.target.value,index)}}/>
+						</div>
+						<div>
+						<input
+							type="text"
+							placeholder={returnTime(legDat["date_obj"])}
+							value={legDat["currentTime"]}
+							onChange={(e) => {handleCurrentTimeChange(e.target.value,index);changeTime(e.target.value,index)}}/>
+						</div>
+				</th>
+						<th >{legDat["location1"] + " to " + legDat["location2"]}</th>
+						<th >{returnEndTime(new Date((legDat["start_time"] + (legDat["duration"] * 1000))))}</th>
+			</tr>
+			))}
+			</tbody>
+		</table>
       </div>
       <div className="main-content" id="adminMap">
         <button
