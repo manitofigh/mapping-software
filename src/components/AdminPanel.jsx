@@ -37,20 +37,20 @@ const AdminPanel = () => {
 	console.log(ldat);
 	setLegData(ldat);
 
-	mapRef.current.eachLayer((layer) => {
-		if (layer instanceof L.Marker) {
-		mapRef.current.removeLayer(layer);
-		}
-	});
+  mapRef.current.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      mapRef.current.removeLayer(layer);
+    }
+  });
 
-	// Add markers for each pinpoint
-	pinpoints.forEach((pinpoint) => {
-		var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
-		.bindPopup(pinpoint.formattedAddress)
-		.addTo(mapRef.current);
-	});
-		//console.log(gjson_feature);
-		
+  // Add markers for each pinpoint
+  pinpoints.forEach((pinpoint) => {
+    var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
+      .bindPopup(pinpoint.formattedAddress)
+      .addTo(mapRef.current);
+  });
+	//console.log(gjson_feature);
+	
 	if(mapRef.gJSONLayer != null)
 	  mapRef.gJSONLayer.remove();	
 
