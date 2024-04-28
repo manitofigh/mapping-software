@@ -318,7 +318,6 @@ const addressController = {
             return distance;
           }
           
-          // Helper function to convert degrees to radians
           function toRadians(degrees) {
             return degrees * (Math.PI / 180);
           }
