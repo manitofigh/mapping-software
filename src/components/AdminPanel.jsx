@@ -18,7 +18,7 @@ const AdminPanel = () => {
   const mapRef = useRef(null);
   const [legData,setLegData] = useState([])
 	
-  const childToParent = (data,ldat) => {
+  const childToParent = (data,ldat,pinpoints) => {
 	// setData(data);
 	// console.log("Parent Function Called");
 	var geometry = data.trips[0].geometry;
@@ -33,6 +33,19 @@ const AdminPanel = () => {
 	//console.log("Created Feature")
 	console.log(ldat);
 	setLegData(ldat);
+
+  mapRef.current.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      mapRef.current.removeLayer(layer);
+    }
+  });
+
+  // Add markers for each pinpoint
+  pinpoints.forEach((pinpoint) => {
+    var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
+      .bindPopup(pinpoint.formattedAddress)
+      .addTo(mapRef.current);
+  });
 	//console.log(gjson_feature);
 	
 	if(mapRef.gJSONLayer != null)
@@ -41,6 +54,7 @@ const AdminPanel = () => {
         mapRef.gJSONLayer = L.geoJSON(geometry);
 	mapRef.gJSONLayer.addTo(mapRef.current);
 	mapRef.current.fitBounds(mapRef.gJSONLayer.getBounds());
+  
   }
 
   useEffect(() => {
