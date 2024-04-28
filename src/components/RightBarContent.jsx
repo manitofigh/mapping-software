@@ -161,6 +161,11 @@ function Geocoding({childToParent}) {
 	  leg["location2"] = results[waypointIndices[i]]['formatted_address']
 	  leg["duration"] = data.trips[0].legs[i-1].duration;
 	  leg["formatted_time"] = convertsSecondsToTime(leg["duration"]);
+	  leg["date_obj"] = new Date(leg["start_time"])
+	  leg["date"] = leg["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"})
+	  leg["currentDate"] = new String(leg["date"])
+	  leg["time"] = leg["date_obj"].toLocaleString(Intl.DateTimeFormat().locale, {hour: "numeric",minute:"numeric",second:"numeric"})
+	  leg["currentTime"] = new String(leg["time"])
 	  dat.push(leg);
 
           //console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));

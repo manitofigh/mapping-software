@@ -158,6 +158,248 @@ const AdminPanel = () => {
 
   const isAnyBarCollapsed = () => Object.values(bars).some((status) => status);
 
+  function changeDate(targetDateValue,index){
+	//console.log(targetDateValue);
+	var check1 = false;
+	var inputValues = targetDateValue.split("/");
+	var valuesArr = [];
+	inputValues.forEach(val => {
+		valuesArr.push(parseInt(val));
+	})
+	var slashCount = inputValues.length - 1;
+	if(slashCount == 2){ // Checks if contains 2 slashes
+		check1 = true;
+		//console.log("has 2 slashes");
+	}
+	
+	if(check1 == false)
+	  return;
+
+	//console.log(valuesArr);
+	var check2 = true // Checks if each val > 0
+	valuesArr.forEach(val => {
+		if(val <= 0){
+			check2 = false
+		}
+		else if(isNaN(val))
+			check2 = false
+	}) 
+
+	if(check2 == false)
+	  return;
+	
+	var check3 = true; // Checks if each value is valid 
+
+	if(valuesArr[0] > 12)
+	  check3 = false;
+	if(valuesArr[1] > 31)
+	  check3 = false;
+	if(valuesArr[2] < 2024)
+	  check3 = false;
+	if(valuesArr[2] > 2099)
+	  check3 = false;
+	
+	if(check3 == false)
+	  return;
+
+
+	//console.log(check3);
+	//console.log("Passed Check 3");
+	
+	var inputtedDate = new Date();
+	//console.log(inputValues)
+	inputtedDate.setMonth(inputValues[0]-1);
+	inputtedDate.setDate(inputValues[1]);
+	inputtedDate.setYear(inputValues[2]);
+	//console.log(inputtedDate);
+	
+	var currentTime = legData[index]["time"];
+	var timeVals = parseTime(currentTime);
+	var hour = parseInt(timeVals[0]);
+	var minute = parseInt(timeVals[1]);
+	var seconds = parseInt(timeVals[2]);
+	if(timeVals[3] != "PM" && hour == 12)
+	  hour = 0;
+	if(timeVals[3] == "PM")
+	  hour += 12;
+	
+	inputtedDate.setHours(hour-1);
+	inputtedDate.setMinutes(minute);
+	inputtedDate.setSeconds(seconds);
+	
+	updateDate(inputtedDate,index);
+  }
+  function updateTime(date,index){
+	var tmp = null;
+	const nextLegData = legData.map((d,i) => {
+	  if(i === index){
+		d["date_obj"] = date;
+		d["start_time"] = date.getTime();
+		d["time"] = date.toLocaleString(Intl.DateTimeFormat().locale,{hour: "numeric",minute:"numeric",second:"numeric"})
+		  tmp = d;
+	  } else if( i > index){
+		d["start_time"] = tmp["start_time"] + (tmp["duration"] * 1000) + 1000;
+		d["date_obj"] = new Date(d["start_time"]);
+		d["date"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"});
+		d["time"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{hour: "numeric",minute:"numeric",second:"numeric"})
+		d["currentDate"] = new String(d["date"])
+		d["currentTime"] = new String(d["time"])
+		tmp = d;
+	  } 
+	  return d;
+	});
+	
+	setLegData(nextLegData);
+  }
+
+  function updateDate(date,index){
+	var tmp = null;
+	const nextLegData = legData.map((d,i) => {
+	  if(i === index){
+		d["date_obj"] = date;
+		d["date"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"});
+		d["start_time"] = date.getTime();
+		tmp = d;
+	  } else if (i > index) {
+		d["start_time"] = tmp["start_time"] + (tmp["duration"] * 1000) + 1000;
+		d["date_obj"] = new Date(d["start_time"]);
+		d["date"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"});
+		d["currentDate"] = new String(d["date"])
+		tmp = d;
+	  }
+	  return d;
+	});
+  }
+  function parseTime(time){
+	var arr = [];
+	var vals = time.split(":");
+	//console.log(vals);
+	var secondSplit = vals[2].split(" ");
+	//console.log(secondSplit);
+	arr.push(vals[0]);
+	arr.push(vals[1]);
+	arr.push(...secondSplit);
+	//console.log(arr);
+	return arr;
+  }
+  function changeTime(targetTimeValue,index){
+	// console.log(targetTimeValue);
+	// Check if it contains two ":"
+	var colonCount = targetTimeValue.split(":").length-1;
+	if(colonCount != 2)
+	  return;
+	// Check if contains AM or PM 
+	var amCheck = targetTimeValue.search("AM");
+	var pmCheck = targetTimeValue.search("PM");
+	if(amCheck == -1 && pmCheck == -1)
+	  return;
+	// Check if all values are positive
+	var timeVals = parseTime(targetTimeValue);
+	var timeArr = []
+	timeVals.forEach(val => {
+		if(!(val == "AM" || val == "PM"))
+			timeArr.push(parseInt(val));
+	});
+	// console.log(timeArr);
+	var check3 = true; // All values are positive
+	// if all inputs are not decimals or letter 
+
+
+	var check4 = true; // Is Valid
+	// Check if hour is 1-12
+	if(timeArr[0] > 12 && timeArr[0] < 1)
+	  check4 = false;
+	// Checks if minutes is 0-59
+	if(timeArr[1] > 59 && timeArr[1] < 0)
+	  check4 = false;
+	// Checks if seconds is 0-59
+	if(timeArr[2] > 59 && timeArr[2] < 0)
+	  check4 = false;
+	
+	if(check4 == false)
+	  return;
+	
+	var hour = timeArr[0];
+	if(timeVals[3] != "PM" && hour == 12)
+	  hour = 0;
+	if(timeVals[3] == "PM")
+	  hour += 12;
+	timeArr[0] = hour;
+	
+	var currentDate = legData[index]["date"];
+	var dateStrVals = currentDate.split("/");
+	var dateVals = []
+	dateStrVals.forEach(val => {
+		dateVals.push(parseInt(val));
+	});
+	
+	// console.log(dateVals);
+	var inputtedDate = new Date(dateVals[2],dateVals[0]-1,dateVals[1],...timeArr);
+	// console.log(inputtedDate);
+	updateTime(inputtedDate,index);
+  }
+  function changeLegCurrentTime(toValue){
+
+  }
+  
+  function handleCurrentTimeChange(value,index){
+	const nextLegData = legData.map((d,i) => {
+	  if(i === index){
+		d["currentTime"] = value;
+	  } 
+	  return d;
+	});
+	setLegData(nextLegData);
+  }
+  function handleCurrentDateChange(value,index){
+	const nextLegData = legData.map((d,i) => {
+	  if(i === index){
+		d["currentDate"] = value;
+	  } 
+	  return d;
+	});
+	setLegData(nextLegData);
+  }
+
+  function returnDate(date){
+	var options = {
+	  year: "numeric",
+	  month: "numeric",
+	  day: "numeric",
+	}
+	return date.toLocaleString(Intl.DateTimeFormat().locale,options);
+  }
+  function returnTime(date){
+	var options = {
+	  hour: "numeric",
+	  minute: "numeric",
+	  second: "numeric",
+	}
+	return date.toLocaleString(Intl.DateTimeFormat().locale,options);
+  }
+
+  function returnEndTime(date){
+	var options = {
+	  year: "numeric",
+	  month: "numeric",
+	  day: "numeric",
+	  hour: "numeric",
+	  minute: "numeric",
+	  second: "numeric",
+	}
+	var region = new Intl.DateTimeFormat();
+	options.timeZone = region.resolvedOptions().timeZone;
+	options.timeZoneName = "short";
+	
+
+	var str = "";	
+	str += date.toLocaleString(region.locale,options)
+	// str += Intl.DateTimeFormat().resolvedOptions().timeZone; 
+	// console.log(Intl.DateTimeFormat().resolvedOptions());
+	return str;
+	
+  }
+
   return (
     <div className="main-container">
       <div className="top-bar">
@@ -276,9 +518,25 @@ const AdminPanel = () => {
 	      <tbody>
 	          {legData.map((legDat,index) => (
 		  <tr key={index}>
-			<th scope="row">{new Date(legDat["start_time"]).toString()}</th>
+			<th scope="row">
+				<div class="date_input">
+			        	<input 
+			  			type="text"
+			  			placeholder={returnDate(legDat["date_obj"])}
+			  			value={legDat["currentDate"]}
+			  			onChange={(e) => {handleCurrentDateChange(e.target.value,index);changeDate(e.target.value,index)}}/>
+			        </div>
+			        <div>
+			  		<input
+			  			type="text"
+			  			placeholder={returnTime(legDat["date_obj"])}
+						value={legDat["currentTime"]}
+						onChange={(e) => {handleCurrentTimeChange(e.target.value,index);changeTime(e.target.value,index)}}/>
+
+			        </div>
+			  </th>
 	                <th >{legDat["location1"] + " to " + legDat["location2"]}</th>
-	                <th >{new Date((legDat["start_time"] + (legDat["duration"] * 1000))).toString()}</th>
+	                <th >{returnEndTime(new Date((legDat["start_time"] + (legDat["duration"] * 1000))))}</th>
 		  </tr>
 		  ))}
 	      </tbody>
