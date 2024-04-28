@@ -12,16 +12,18 @@ const AdminPanel = () => {
     bottom: false,
   });
 
+
+
   // Additional state to manage whether the reset button is disabled
   const [isResetDisabled, setIsResetDisabled] = useState(true);
-  const [data, setData] = useState({})
+  //const [data, setData] = useState({})
   const mapRef = useRef(null);
+  const functionRefs = useRef(null);
   const [legData,setLegData] = useState([])
 	
   const childToParent = (data,ldat,pinpoints) => {
 	// setData(data);
 	// console.log("Parent Function Called");
-	var geometry = data.trips[0].geometry;
 	// console.log("Creating Feature")
 	/*var gjson_feature = {
 		"type" : "Feature",
@@ -31,27 +33,28 @@ const AdminPanel = () => {
 		"geometry":geometry
 	};*/
 	//console.log("Created Feature")
+	var geometry = data.trips[0].geometry;
 	console.log(ldat);
 	setLegData(ldat);
 
-  mapRef.current.eachLayer((layer) => {
-    if (layer instanceof L.Marker) {
-      mapRef.current.removeLayer(layer);
-    }
-  });
+	mapRef.current.eachLayer((layer) => {
+		if (layer instanceof L.Marker) {
+		mapRef.current.removeLayer(layer);
+		}
+	});
 
-  // Add markers for each pinpoint
-  pinpoints.forEach((pinpoint) => {
-    var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
-      .bindPopup(pinpoint.formattedAddress)
-      .addTo(mapRef.current);
-  });
-	//console.log(gjson_feature);
-	
+	// Add markers for each pinpoint
+	pinpoints.forEach((pinpoint) => {
+		var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
+		.bindPopup(pinpoint.formattedAddress)
+		.addTo(mapRef.current);
+	});
+		//console.log(gjson_feature);
+		
 	if(mapRef.gJSONLayer != null)
 	  mapRef.gJSONLayer.remove();	
 
-        mapRef.gJSONLayer = L.geoJSON(geometry);
+	mapRef.gJSONLayer = L.geoJSON(geometry);
 	mapRef.gJSONLayer.addTo(mapRef.current);
 	mapRef.current.fitBounds(mapRef.gJSONLayer.getBounds());
   
@@ -168,29 +171,28 @@ const AdminPanel = () => {
 	//console.log(valuesArr);
 	var check2 = true // Checks if each val > 0
 	valuesArr.forEach(val => {
-		if(val <= 0){
+		if(val <= 0)
 			check2 = false
-		}
 		else if(isNaN(val))
 			check2 = false
 	}) 
 
 	if(check2 == false)
-	  return;
+	  	return;
 	
 	var check3 = true; // Checks if each value is valid 
 
 	if(valuesArr[0] > 12)
-	  check3 = false;
+	 	 check3 = false;
 	if(valuesArr[1] > 31)
-	  check3 = false;
+	  	check3 = false;
 	if(valuesArr[2] < 2024)
-	  check3 = false;
+	  	check3 = false;
 	if(valuesArr[2] > 2099)
-	  check3 = false;
+	  	check3 = false;
 	
 	if(check3 == false)
-	  return;
+	  	return;
 
 
 	//console.log(check3);
@@ -209,9 +211,9 @@ const AdminPanel = () => {
 	var minute = parseInt(timeVals[1]);
 	var seconds = parseInt(timeVals[2]);
 	if(timeVals[3] != "PM" && hour == 12)
-	  hour = 0;
+		hour = 0;
 	if(timeVals[3] == "PM")
-	  hour += 12;
+	  	hour += 12;
 	
 	inputtedDate.setHours(hour-1);
 	inputtedDate.setMinutes(minute);
@@ -219,24 +221,25 @@ const AdminPanel = () => {
 	
 	updateDate(inputtedDate,index);
   }
+  
   function updateTime(date,index){
 	var tmp = null;
 	const nextLegData = legData.map((d,i) => {
-	  if(i === index){
-		d["date_obj"] = date;
-		d["start_time"] = date.getTime();
-		d["time"] = date.toLocaleString(Intl.DateTimeFormat().locale,{hour: "numeric",minute:"numeric",second:"numeric"})
-		  tmp = d;
-	  } else if( i > index){
-		d["start_time"] = tmp["start_time"] + (tmp["duration"] * 1000) + 1000;
-		d["date_obj"] = new Date(d["start_time"]);
-		d["date"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"});
-		d["time"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{hour: "numeric",minute:"numeric",second:"numeric"})
-		d["currentDate"] = new String(d["date"])
-		d["currentTime"] = new String(d["time"])
-		tmp = d;
-	  } 
-	  return d;
+	  	if(i === index){
+			d["date_obj"] = date;
+			d["start_time"] = date.getTime();
+			d["time"] = date.toLocaleString(Intl.DateTimeFormat().locale,{hour: "numeric",minute:"numeric",second:"numeric"})
+			tmp = d;
+		} else if( i > index){
+			d["start_time"] = tmp["start_time"] + (tmp["duration"] * 1000) + 1000;
+			d["date_obj"] = new Date(d["start_time"]);
+			d["date"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"});
+			d["time"] = d["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{hour: "numeric",minute:"numeric",second:"numeric"})
+			d["currentDate"] = new String(d["date"])
+			d["currentTime"] = new String(d["time"])
+			tmp = d;
+		} 
+		return d;
 	});
 	
 	setLegData(nextLegData);
@@ -260,6 +263,7 @@ const AdminPanel = () => {
 	  return d;
 	});
   }
+
   function parseTime(time){
 	var arr = [];
 	var vals = time.split(":");
@@ -272,12 +276,20 @@ const AdminPanel = () => {
 	//console.log(arr);
 	return arr;
   }
+
+  const save = () => {
+	functionRefs.current.doneInputting();
+  }
+  function run(){
+	functionRefs.current.addressSort();
+  }
+
   function changeTime(targetTimeValue,index){
 	// console.log(targetTimeValue);
 	// Check if it contains two ":"
 	var colonCount = targetTimeValue.split(":").length-1;
 	if(colonCount != 2)
-	  return;
+	  	return;
 	// Check if contains AM or PM 
 	var amCheck = targetTimeValue.search("AM");
 	var pmCheck = targetTimeValue.search("PM");
@@ -291,7 +303,7 @@ const AdminPanel = () => {
 			timeArr.push(parseInt(val));
 	});
 	// console.log(timeArr);
-	var check3 = true; // All values are positive
+	//var check3 = true; // All values are positive
 	// if all inputs are not decimals or letter 
 
 
@@ -327,9 +339,6 @@ const AdminPanel = () => {
 	var inputtedDate = new Date(dateVals[2],dateVals[0]-1,dateVals[1],...timeArr);
 	// console.log(inputtedDate);
 	updateTime(inputtedDate,index);
-  }
-  function changeLegCurrentTime(toValue){
-
   }
   
   function handleCurrentTimeChange(value,index){
@@ -427,37 +436,6 @@ const AdminPanel = () => {
                     Link
                   </a>
                 </li>
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Dropdown
-                  </a>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Action
-                      </a>
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Another action
-                      </a>
-                    </li>
-                    <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Something else here
-                      </a>
-                    </li>
-                  </ul>
-                </li>
                 <li className="nav-item">
                   <button
                     type="button"
@@ -478,6 +456,9 @@ const AdminPanel = () => {
                 </li>
               </ul>
               <form className="d-flex" role="search">
+			  	<button>Submit</button>
+			  	<button onClick={run}>Run</button>
+				<button onClick={save}>Save</button>
                 <a
                   className="btn btn-outline-success"
                   href="./driverPanel.html"
@@ -494,7 +475,7 @@ const AdminPanel = () => {
         left bar
       </div>
       <div className={`right-bar ${bars.right ? "bar-collapsed" : ""}`}>
-        < Geocoding childToParent={childToParent}/>
+        <Geocoding childToParent={childToParent} ref={functionRefs}/>
       </div>
       <div className={`bottom-bar ${bars.bottom ? "bar-collapsed" : ""}`}>
 	  <table class="itinerary">
@@ -510,7 +491,7 @@ const AdminPanel = () => {
 		  <tr key={index}>
 			<th scope="row">
 				<div class="date_input">
-			        	<input 
+			        <input 
 			  			type="text"
 			  			placeholder={returnDate(legDat["date_obj"])}
 			  			value={legDat["currentDate"]}
@@ -522,7 +503,6 @@ const AdminPanel = () => {
 			  			placeholder={returnTime(legDat["date_obj"])}
 						value={legDat["currentTime"]}
 						onChange={(e) => {handleCurrentTimeChange(e.target.value,index);changeTime(e.target.value,index)}}/>
-
 			        </div>
 			  </th>
 	                <th >{legDat["location1"] + " to " + legDat["location2"]}</th>

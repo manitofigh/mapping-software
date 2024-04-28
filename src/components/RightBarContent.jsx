@@ -1,7 +1,7 @@
 import '../assets/css/style.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 
-function Geocoding({childToParent}) {
+const Geocoding = React.forwardRef(function Geocoding({childToParent},ref) {
   const [addresses, setAddresses] = useState([""]);
  
   const [results, setResults] = useState([]);
@@ -16,6 +16,10 @@ function Geocoding({childToParent}) {
 	console.log(data);
     }
   },data);*/
+
+  useImperativeHandle(ref, () => ({
+    doneInputting,addressSort
+  }));
 
   const handleFileChange = (e) => {
     e.preventDefault();
@@ -32,6 +36,8 @@ function Geocoding({childToParent}) {
       texts.pop();
   
       setAddresses(texts.slice(0, 100)); 
+      //console.log("Updated Addresses")
+      //console.log(addresses)
     };
     if (file) {
       reader.readAsText(file);
@@ -48,7 +54,9 @@ function Geocoding({childToParent}) {
   
 
   const geocodeAddresses = async () => {
+    console.log("Running");
     const geocodedResults = [];
+    console.log(addresses)
 
     for (let i = 0; i < addresses.length; i++) {
       const address = addresses[i];
@@ -126,7 +134,7 @@ function Geocoding({childToParent}) {
   };
 
   const addressSort = async () => {	
-    // console.log("Running Address Sorting");
+    console.log("Running Address Sorting");
     var str = ""
     results.forEach(e => {
       str += e['longitude'];
@@ -145,43 +153,45 @@ function Geocoding({childToParent}) {
         // console.log("Everything worked")
         // console.log("Duration in mins: " + data.trips[0].duration / 60)
         
-	var dat = []
+        var dat = []
         var waypointIndices = returnWaypointsIndexes(data.waypoints)
-        
-	// Logs the Addresses
-	var currentDate = new Date();
+          
+        // Logs the Addresses
+        var currentDate = new Date();
         for(var i = 1; i < results.length; i++){
-	  var leg = {}
-  	  leg["start_time"] = 0;
-	  if(i == 1)
-	  	leg["start_time"] = currentDate.getTime() + convertSecondsToMiliseconds(3600);
-	  else
-	  	leg["start_time"] = dat[dat.length-1]["start_time"] + convertSecondsToMiliseconds(dat[dat.length-1]["duration"]) + convertSecondsToMiliseconds(1);
-	  leg["location1"] = results[waypointIndices[i-1]]['formatted_address']
-	  leg["location2"] = results[waypointIndices[i]]['formatted_address']
-	  leg["duration"] = data.trips[0].legs[i-1].duration;
-	  leg["formatted_time"] = convertsSecondsToTime(leg["duration"]);
-	  leg["date_obj"] = new Date(leg["start_time"])
-	  leg["date"] = leg["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"})
-	  leg["currentDate"] = new String(leg["date"])
-	  leg["time"] = leg["date_obj"].toLocaleString(Intl.DateTimeFormat().locale, {hour: "numeric",minute:"numeric",second:"numeric"})
-	  leg["currentTime"] = new String(leg["time"])
-	  dat.push(leg);
+          var leg = {}
+          leg["start_time"] = 0;
+          
+          if(i == 1)
+            leg["start_time"] = currentDate.getTime() + convertSecondsToMiliseconds(3600);
+          else
+            leg["start_time"] = dat[dat.length-1]["start_time"] + convertSecondsToMiliseconds(dat[dat.length-1]["duration"]) + convertSecondsToMiliseconds(1);
+          
+          leg["location1"] = results[waypointIndices[i-1]]['formatted_address']
+          leg["location2"] = results[waypointIndices[i]]['formatted_address']
+          leg["duration"] = data.trips[0].legs[i-1].duration;
+          leg["formatted_time"] = convertsSecondsToTime(leg["duration"]);
+          leg["date_obj"] = new Date(leg["start_time"])
+          leg["date"] = leg["date_obj"].toLocaleString(Intl.DateTimeFormat().locale,{year:"numeric",month:"numeric",day:"numeric"})
+          leg["currentDate"] = new String(leg["date"])
+          leg["time"] = leg["date_obj"].toLocaleString(Intl.DateTimeFormat().locale, {hour: "numeric",minute:"numeric",second:"numeric"})
+          leg["currentTime"] = new String(leg["time"])
+          dat.push(leg);
 
-          //console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
-          // console.log(data.trips[0].legs[i-1].duration);
-         }
-	 // console.log(dat);
-	 // console.log("Child To Parent");
-   var pinpoints = [];
-   for (var i = 0; i < results.length; i++) {
-     var result = results[i];
-     var coordinate = [result.longitude, result.latitude];
-     var formattedAddress = result.formatted_address;
-     pinpoints.push({ longitude: coordinate[0], latitude: coordinate[1], formattedAddress: formattedAddress });
-   }
-   
-	 childToParent(data,dat,pinpoints);
+            //console.log(results[waypointIndices[i-1]]['formatted_address'] + "\tto\t"  + results[waypointIndices[i]]['formatted_address'] + ": " + convertsSecondsToTime(data.trips[0].legs[i-1].duration));
+            // console.log(data.trips[0].legs[i-1].duration);
+        }
+        // console.log(dat);
+        // console.log("Child To Parent");
+        var pinpoints = [];
+        for (var i = 0; i < results.length; i++) {
+          var result = results[i];
+          var coordinate = [result.longitude, result.latitude];
+          var formattedAddress = result.formatted_address;
+          pinpoints.push({ longitude: coordinate[0], latitude: coordinate[1], formattedAddress: formattedAddress });
+        }
+        
+        childToParent(data,dat,pinpoints);
         //console.log(data)
       } else 
         console.error(data.code + ": " + data.message);
@@ -189,55 +199,56 @@ function Geocoding({childToParent}) {
         console.error(`Error address sorting`);
     }
 
-    function convertSecondsToMiliseconds(seconds){
-	return seconds * 1000;
-    }
+  function convertSecondsToMiliseconds(seconds){
+    return seconds * 1000;
+  }
 
-    function returnWaypointsIndexes(waypoints){
-      var arr = []
-      var len = waypoints.length
-      for(var i = 0; i < len; i++){
-        for(var a = 0; a < len; a++){
-          if(waypoints[a].waypoint_index == i){
-            arr.push(a);
-          }
+  function returnWaypointsIndexes(waypoints){
+    var arr = []
+    var len = waypoints.length
+    for(var i = 0; i < len; i++){
+      for(var a = 0; a < len; a++){
+        if(waypoints[a].waypoint_index == i){
+          arr.push(a);
         }
       }
-      return arr;
+    }
+    return arr;
+  }
+
+  function convertsSecondsToTime(secs){
+    // seconds
+    var s = Math.floor(secs % 60)
+    var minutes = secs / 60
+    var m = Math.floor(minutes%60)
+    var hours = minutes / 60
+    var h = Math.floor(hours % 24)
+    var days = hours / 24
+    var d = Math.floor(days)
+
+    var arr = [d,h,m,s];
+    var str = ""
+    for(var i = 0; i < arr.length; i++){
+      if(i == 0)
+          str += arr[i].toFixed(0).toString();
+      else
+          str += String(arr[i].toFixed(0)).padStart(2,'0');
     
-         }
+      str += ":"
+        }
+              str = str.substring(0,str.length-1);
 
-    function convertsSecondsToTime(secs){
-      // seconds
-      var s = Math.floor(secs % 60)
-      var minutes = secs / 60
-      var m = Math.floor(minutes%60)
-      var hours = minutes / 60
-      var h = Math.floor(hours % 24)
-      var days = hours / 24
-      var d = Math.floor(days)
+    // str = d.toFixed(0).toString() + ":" + h.toFixed(0).toString() + ":" + m.toFixed(0).toString() + ":" + s.toFixed(0).toString()
+    return str;
 
-      var arr = [d,h,m,s];
-      var str = ""
-      for(var i = 0; i < arr.length; i++){
-        if(i == 0)
-           str += arr[i].toFixed(0).toString();
-        else
-           str += String(arr[i].toFixed(0)).padStart(2,'0');
-      
-        str += ":"
-         }
-               str = str.substring(0,str.length-1);
-
-      // str = d.toFixed(0).toString() + ":" + h.toFixed(0).toString() + ":" + m.toFixed(0).toString() + ":" + s.toFixed(0).toString()
-      return str;
-
-    }       
+  }       
 
     // "http://router.project-osrm.org/trip/v1/driving/-73.999786,40.764389;-74.016678,40.703564;-73.985428,40.748817?source=first&roundtrip=false"
     // console.log(results);
   }
 
+  //       <button onClick={doneInputting}>Done Inputting</button>
+  //       <button onClick={addressSort}>Run Address Sorting</button>
   return (
     <div class="right_sidebar">
       {addresses.map((address, index) => (
@@ -253,7 +264,7 @@ function Geocoding({childToParent}) {
         </div>
       ))}
       <button onClick={addAddressInput}>Add Address</button>
-      <button onClick={doneInputting}>Done Inputting</button>
+      
       
       <div
         id="drop_zone"
@@ -266,9 +277,9 @@ function Geocoding({childToParent}) {
         <input type="file" id="actual_button" accept=".csv,.txt" onChange={handleFileChange} hidden />
       </div>
 
-      <button onClick={addressSort}>Run Address Sorting</button>
+      
     </div>
   );
-}
+});
 
 export default Geocoding;
