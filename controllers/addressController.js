@@ -196,6 +196,158 @@ const addressController = {
     }
   },
 
+  async createTrips(req, res) {
+    try {
+      // const { warehouseLocation } = req.body;
+      const warehouseLocation = '40.7168988,-73.59903779999999';
+      const warehouseName = 'Hofstra University';
+      const drivers = await AdminModel.getDrivers();
+  
+      for (const driver of drivers) {
+        const pendingLocations = await AddressModel.getPendingDeliveryLocationsByDriverEmail(driver.email);
+  
+        if (pendingLocations.length > 0) {
+          const locations = [warehouseLocation, ...pendingLocations.map(location => location.lat_lon)];
+  
+          const coordinates = locations.map(location => {
+            let [lat, lon] = location.split(',').map(coord => coord.trim());
+            return `${lon},${lat}`;  // lon comes first for OSRM
+          }).join(';');
+          
+          const osrmUrl = `http://router.project-osrm.org/trip/v1/driving/${coordinates}?source=first&roundtrip=false&geometries=geojson&steps=true&annotations=duration,distance`;          
+          console.log(`OSRM URL for DRIVER: ${driver.email}: ${osrmUrl}`);  // Debugging line to check the URL
+  
+          const osrmResponse = await axios.get(osrmUrl);
+  
+          if (osrmResponse.data.code === 'Ok') {
+            const { trips, waypoints } = osrmResponse.data;
+            const { geometry, legs } = trips[0];
+          
+            const tripGeometry = JSON.stringify(geometry);
+          
+            const highestTripNumber = await AddressModel.getHighestTripNumberByDriverEmail(driver.email);
+            const tripNumber = highestTripNumber ? highestTripNumber + 1 : 1;
+          
+            // Store the full geometry of the trip
+            await AddressModel.createTripGeometry(driver.email, tripNumber, tripGeometry, driver.color);
+          
+            for (let i = 0; i < legs.length; i++) {
+              const leg = legs[i];
+              const steps = leg.steps;
+          
+              if (steps && steps.length > 0) {
+                const startWaypointIndex = steps[0].geometry.coordinates[0];
+                const endWaypointIndex = steps[steps.length - 1].geometry.coordinates[steps[steps.length - 1].geometry.coordinates.length - 1];
+          
+                const startWaypoint = waypoints.find(waypoint => waypoint.location[0] === startWaypointIndex[0] && waypoint.location[1] === startWaypointIndex[1]);
+                const endWaypoint = waypoints.find(waypoint => waypoint.location[0] === endWaypointIndex[0] && waypoint.location[1] === endWaypointIndex[1]);
+          
+                console.log('Start Waypoint:', startWaypoint);
+                console.log('End Waypoint:', endWaypoint);
+          
+                const startAddress = i === 0 ? warehouseName : findClosestPendingLocation(startWaypoint.location, pendingLocations)?.address;
+                const endAddress = findClosestPendingLocation(endWaypoint.location, pendingLocations)?.address;
+          
+                console.log('Start Address:', startAddress);
+                console.log('End Address:', endAddress);
+          
+                if (!startAddress || !endAddress) {
+                  console.warn('Skipping leg due to missing address information');
+                  continue;
+                }
+          
+                const startLatLon = i === 0 ? warehouseLocation : `${startWaypoint.location[1]},${startWaypoint.location[0]}`;
+                const endLatLon = `${endWaypoint.location[1]},${endWaypoint.location[0]}`;
+          
+                const estimatedDurationMinutes = Math.ceil(leg.duration / 60);
+                const distance = leg.distance;
+          
+                await AddressModel.createDeliveryJob(
+                  driver.email,
+                  tripNumber,
+                  i,
+                  startAddress,
+                  endAddress,
+                  startLatLon,
+                  endLatLon,
+                  estimatedDurationMinutes,
+                  distance,
+                  driver.color
+                );
+          
+                await AddressModel.updateDeliveryLocationStatus(endAddress, driver.email, 'assigned');
+              } else {
+                console.warn('Leg does not have steps or steps array is empty:', leg);
+              }
+            }
+          
+            await AddressModel.updateTripGeometryStatus(driver.email, tripNumber, 'pending');
+          } else {
+            console.error('Error creating optimal route:', osrmResponse.data);
+          }
+          
+          // Helper function to find the closest pending location
+          function findClosestPendingLocation(waypointLocation, pendingLocations) {
+            let closestLocation = null;
+            let minDistance = Infinity;
+          
+            for (const location of pendingLocations) {
+              const [lat, lon] = location.lat_lon.split(',');
+              const distance = calculateDistance(waypointLocation[1], waypointLocation[0], parseFloat(lat), parseFloat(lon));
+          
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestLocation = location;
+              }
+            }
+          
+            return closestLocation;
+          }
+          
+          // Helper function to calculate the distance between two coordinates
+          function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in kilometers
+            const dLat = toRadians(lat2 - lat1);
+            const dLon = toRadians(lon2 - lon1);
+            const a =
+              Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return distance;
+          }
+          
+          // Helper function to convert degrees to radians
+          function toRadians(degrees) {
+            return degrees * (Math.PI / 180);
+          }
+        }
+      }
+  
+      const renderOptions = {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        successTitle: 'Success',
+        successBody: 'Trips created successfully.',
+      };
+      res.render('admin/adminDashboard.ejs', renderOptions);
+    } catch (error) {
+      console.error('Error creating trips:', error);
+      const renderOptions = {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        errorTitle: 'Error Creating Trips',
+        errorBody: 'An error occurred while creating trips. Please try again.',
+      };
+      res.render('admin/adminDashboard.ejs', renderOptions);
+    }
+  },
+
 };
 
 export default addressController;

@@ -16,5 +16,6 @@ router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
 router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, addressController.getAddressesForDriver);
 router.post('/submit-address', isAuthenticated, isAdmin, addressController.addAddress);
 router.post('/remove-delivery-location', isAuthenticated, isAdmin, addressController.removeDeliveryLocation);
+router.post('/create-trips', isAuthenticated, isAdmin, addressController.createTrips);
 
 export default router;

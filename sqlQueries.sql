@@ -14,44 +14,56 @@ CREATE TABLE users (
     street TEXT,
     full_address TEXT,
     about TEXT,
-	  color VARCHAR(16),
+	color VARCHAR(16),
     create_time VARCHAR(64),
     delete_time VARCHAR(64)
 );
 
--- Create Drivers table
-CREATE TABLE drivers (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  color VARCHAR(7) NOT NULL
+-- GEOCODED LOCATIONS TABLE
+CREATE TABLE geocoded_locations (
+    id SERIAL PRIMARY KEY,
+    address TEXT,
+    lat_lon VARCHAR(64),
+    real_address TEXT,
+    quality VARCHAR(32)
 );
 
--- Create Addresses table
-CREATE TABLE addresses (
+-- DELIVERY LOCATIONS TABLE
+CREATE TABLE delivery_locations (
   id SERIAL PRIMARY KEY,
-  address VARCHAR(255) NOT NULL,
-  latitude DECIMAL(10, 8) NOT NULL,
-  longitude DECIMAL(11, 8) NOT NULL,
-  driver_id INTEGER REFERENCES Drivers(id),
-  status VARCHAR(20) DEFAULT 'active'
+  address TEXT,
+  lat_lon VARCHAR(64),
+  driver_email TEXT,
+  color VARCHAR(16),
+  status VARCHAR(64),
+  created_at VARCHAR(128)
 );
 
--- Create Routes table
-CREATE TABLE routes (
-  id SERIAL PRIMARY KEY,
-  driver_id INTEGER REFERENCES Drivers(id),
-  coordinates JSON NOT NULL,
-  estimated_times JSON NOT NULL
+-- DELIVERY JOBS TABLE
+CREATE TABLE delivery_jobs (
+    id SERIAL PRIMARY KEY,
+    driver_email VARCHAR(255),
+    trip_number INTEGER,
+    waypoint_index INTEGER,
+    start_address TEXT,
+    end_address TEXT,
+    start_lat_lon VARCHAR(64),
+    end_lat_lon VARCHAR(64),
+    start_time VARCHAR(128),
+    end_time VARCHAR(128),
+    estimated_duration_minutes INTEGER,
+    actual_duration_minutes INTEGER,
+    distance NUMERIC,
+    status VARCHAR(64) DEFAULT 'pending',
+    color VARCHAR(50)
 );
 
--- Create TravelTimes table
-CREATE TABLE travelTimes (
-  id SERIAL PRIMARY KEY,
-  route_id INTEGER REFERENCES Routes(id),
-  start_point VARCHAR(255) NOT NULL,
-  end_point VARCHAR(255) NOT NULL,
-  estimated_time INTEGER NOT NULL,
-  actual_time INTEGER
+-- FULL GEOMETRY FOR EACH TRIP
+CREATE TABLE trip_geometries (
+    id SERIAL PRIMARY KEY,
+    driver_email VARCHAR(255),
+    trip_number INTEGER,
+    status VARCHAR(50) DEFAULT 'pending',
+    geometry TEXT
 );
+

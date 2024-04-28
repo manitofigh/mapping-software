@@ -108,6 +108,13 @@
             <div id="mapContainer" class="h-full"></div>
           </div>
           <div class="h-1/2 rounded-b-2xl overflow-hidden border-t border-gray-500 py-4">
+            <% if (pendingDeliveryLocations.length > 0) { %>
+              <form action="/admin/create-trips" method="POST">
+                <button type="submit" id="create-trips-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Create Trips
+                </button>
+              </form>
+            <% } %>
             <div class="bg-white/10 px-4 py-4 rounded-md shadow">
               <!-- itinerary goes here -->
               <p class="text-white">Sample itinerary content</p>
@@ -250,6 +257,12 @@
   
       document.getElementById('search-address').addEventListener('click', () => {
         document.getElementById('search-address').innerHTML = `
+          <div class="loading-spinner"></div>
+        `;
+      });
+
+      document.getElementById('create-trips-btn').addEventListener('click', () => {
+        document.getElementById('create-trips-btn').innerHTML = `
           <div class="loading-spinner"></div>
         `;
       });

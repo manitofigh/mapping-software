@@ -93,8 +93,14 @@ const AdminModel = {
   },
 
   async getDrivers() {
-    const drivers = await pool.query('SELECT * FROM users WHERE role = $1 AND status = $2', ['driver', 'approved']);
-    return drivers.rows;
+    const query = `
+      SELECT * FROM users 
+      WHERE role = $1 
+      AND status = $2
+    `;
+    const values = ['driver', 'approved'];
+    const result = await pool.query(query, values);
+    return result.rows;
   },
 
   async getDriverById(id) {
