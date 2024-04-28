@@ -144,7 +144,7 @@ th {
     justify-content: center;
 }
 .addAddressBtn{
-    height: 30px;
+    height: fit-content;
     background: transparent;
     color: white;
     border-radius: 50%;

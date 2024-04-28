@@ -274,7 +274,7 @@ const Geocoding = React.forwardRef(function Geocoding({childToParent},ref) {
         </div>
       ))}
       <div className="addAddress">
-        <button className="addAddressBtn" onClick={addAddressInput}>+</button>
+        <button className="addAddressBtn" onClick={addAddressInput}>Add</button>
       </div>
       
 
