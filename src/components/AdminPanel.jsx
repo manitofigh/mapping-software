@@ -40,11 +40,21 @@ const AdminPanel = () => {
     }
   });
 
+  const markers=[];
+  
+
   // Add markers for each pinpoint
-  pinpoints.forEach((pinpoint) => {
-    var marker = L.marker([pinpoint.latitude, pinpoint.longitude])
-      .bindPopup(pinpoint.formattedAddress)
-      .addTo(mapRef.current);
+  pinpoints.forEach((pinpoint,index) => {
+    const numberIcon = L.divIcon({
+      className: "number-icon",
+      iconSize: [25, 41],
+      iconAnchor: [10, 44],
+      popupAnchor: [3, -40],
+      html: `<div class="numbers">${index + 1}</div>`
+    });
+    var marker = L.marker([pinpoint.latitude, pinpoint.longitude], { icon: numberIcon })
+    .bindPopup(pinpoint.formattedAddress)
+    .addTo(mapRef.current)
   });
 	//console.log(gjson_feature);
 	

@@ -66,6 +66,16 @@
 .leaflet-marker-pane  { z-index: 6; }
 .leaflet-popup-pane   { z-index: 7; }
 
+.number-icon
+{
+    background-image: url("../marker-icon.png");
+    text-align:center;
+    color:rgb(203, 191, 15);    
+}
+.numbers{
+	color:rgb(0, 255, 13);    
+	font-weight: bolder;
+}
 .leaflet-vml-shape {
 	width: 1px;
 	height: 1px;
