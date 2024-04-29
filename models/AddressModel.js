@@ -46,6 +46,13 @@ const AddressModel = {
     const result = await pool.query(query, values);
     return result.rows;
   },
+
+  async getAssignedDeliveryLocationsByEmail(driverEmail) {
+    const query = 'SELECT address, lat_lon, color FROM delivery_locations WHERE status = $1 AND driver_email = $2';
+    const values = ['assigned',driverEmail];
+    const result = await pool.query(query, values);
+    return result.rows;
+  },
   
   async updateDeliveryLocationStatus(address, driverEmail, status) {
     const query = 'UPDATE delivery_locations SET status = $1 WHERE address = $2 AND driver_email = $3';

@@ -6,13 +6,15 @@ const driverController = {
     try{
       res.render('driver/driverDashboard.ejs', 
       { user: req.user,
-        geometry: await AddressModel.getRouteGeometriesByEmail(req.user.email)}
-      );
+        geometry: await AddressModel.getRouteGeometriesByEmail(req.user.email),
+        mapPinpoints: await AddressModel.getAssignedDeliveryLocationsByEmail(req.user.email)
+      });
     } catch (err){
       res.render('driver/driverDashboard.ejs', 
       { user: req.user,
-        geometry: []}
-      );
+        geometry: null,
+        mapPinpoints:null
+      });
     }
 
   },
