@@ -200,6 +200,27 @@ const AdminModel = {
     const result = await pool.query(query, values);
     return result.rows[0];
   },
+
+  async updateDriverColor(email, color) {
+    const query1 = `
+      UPDATE users SET color = $1 WHERE email = $2;
+    `;
+    const query2 = `
+      UPDATE delivery_jobs SET color = $1 WHERE driver_email = $2;
+    `;
+    const query3 = `
+      UPDATE delivery_locations SET color = $1 WHERE driver_email = $2;
+    `;
+    const query4 = `
+      UPDATE trip_geometries SET color = $1 WHERE driver_email = $2;
+    `;
+    const values = [color, email];
+    await pool.query(query1, values);
+    await pool.query(query2, values);
+    await pool.query(query3, values);
+    await pool.query(query4, values);
+  },
+
 };
 
 export default AdminModel;

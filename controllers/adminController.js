@@ -174,8 +174,12 @@ const adminController = {
       });
     } catch (error) {
       console.error('Error disabling driver account:', error);
-      res.status(500).json({
-        error: 'An error occurred while disabling the driver account. Please try again later.',
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while disabling the driver account. Please try again later.',
       });
     }
   },
@@ -193,8 +197,42 @@ const adminController = {
       });
     } catch (error) {
       console.error('Error enabling driver account:', error);
-      res.status(500).json({
-        error: 'An error occurred while enabling the driver account. Please try again later.',
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while enabling the driver account. Please try again later.',
+      });
+    }
+  },
+
+  async changeDriverColor(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      const { color } = req.body;
+      const driver = await AdminModel.getDriverById(driverId);
+      
+      if (driver) {
+        await AdminModel.updateDriverColor(driver.email, color);
+        res.render('admin/viewDrivers.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          drivers: await AdminModel.getDrivers(),
+          successTitle: 'Success',
+          successBody: `Driver color changed to ${color} successfully.`,
+        });
+      } else {
+        res.status(404).json({ error: 'Driver not found' });
+      }
+    } catch (error) {
+      console.error('Error changing driver color:', error);
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while changing the driver color. Please try again later.',
       });
     }
   },

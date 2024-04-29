@@ -181,12 +181,20 @@
                         </dd>
                       </div>
                       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-white">Color</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0 flex items-center">
-                          <%= driver.color %>
-                          <div class="w-6 h-6 rounded-md ml-2" style="background-color: <%= driver.color %>"></div>
+                        <dt class="text-sm font-medium text-white flex items-center">
+                          Current Color
+                          <div class="w-6 h-6 rounded-full ml-2" style="background-color: <%= driver.color %>;"></div>
+                        </dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-400 sm:col-span-2 sm:mt-0">
+                          <form action="/admin/drivers/<%= driver.id %>/change-color" method="POST" class="flex items-center">
+                            <label for="color" class="text-white">Change Color: &#160;</label>
+                            <input type="color" name="color" value="<%= driver.color %>" class="w-6 h-6 rounded-md mr-2">
+                            <button type="submit" class="button bg-amber-700 rounded-md shadow border border-transparent hover:border-white px-2 py-1 text-sm font-semibold text-white">
+                              Save
+                            </button>
+                          </form>
                         </dd>
-                      </div>
+                      </div>                      
                     </dl>
                   </div>
                 </div>
