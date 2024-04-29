@@ -1,4 +1,5 @@
 import passport from '../utils/passport.js';
+import bcrypt from 'bcrypt';
 // import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
 import { sendMail } from '../utils/nodemailer.js';
@@ -52,12 +53,19 @@ const authController = {
         return next(err);
       }
       if (!user) {
+        if (user.status === 'disabled') {
+          return res.render('auth/login.ejs', { 
+            status: 'error',
+            errorTitle: 'Error',
+            errorBody: 'Your account has been disabled. Please contact the administrator for further information.'
+          });
+        }
         console.log(`INFO MESSAGE: ${info.message}`);
         return res.render('auth/login.ejs', { 
           status: 'error',
           errorTitle: 'Error',
           errorBody: 'Invalid Email or password'
-         });
+        });
       }
       req.logIn(user, (err) => {
         if (err) {
@@ -161,6 +169,10 @@ const authController = {
                     Make sure you have not already submitted an application with this email address.`
       });
     }
+  },
+
+  async comparePasswords(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
   },
 
   // GET /login

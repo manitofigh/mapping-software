@@ -6,35 +6,67 @@ const saltRounds = 10;
 const DriverModel = {
 
   async findDriverByEmail(email) {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1 AND role = $2', [email, 'driver']);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE email = $1 
+      AND role = $2
+    `;
+    const result = await pool.query(query, [email, 'driver']);
     return result.rows[0];
   },
 
   async findById(id) {
-    const result = await pool.query('SELECT * FROM users WHERE id = $1 AND role = $2', [id, 'driver']);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE id = $1 
+      AND role = $2
+    `;
+    const result = await pool.query(query, [id, 'driver']);
     return result.rows[0];
   },
   
   async create(name, email, password, role, status) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const result = await pool.query(
-      'INSERT INTO users (name, email, password, role, status) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [name, email, hashedPassword, role, status]
-    );
+    const query = `
+      INSERT INTO users (name, email, password, role, status) 
+      VALUES ($1, $2, $3, $4, $5) 
+      RETURNING *
+    `;
+    const result = await pool.query(query, [name, email, hashedPassword, role, status]);
     return result.rows[0];
   },
 
   async delete(email) {
-    await pool.query('DELETE FROM users WHERE email = $1 AND role = $2', [email, 'driver']);
+    const query = `
+      DELETE FROM users 
+      WHERE email = $1 
+      AND role = $2
+    `;
+    await pool.query(query, [email, 'driver']);
   },
 
   async updateDriverPassword(email, password) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    await pool.query('UPDATE users SET password = $1 WHERE email = $2 AND role = $3', [hashedPassword, email, 'driver']);
+    const query = `
+      UPDATE users 
+      SET password = $1 
+      WHERE email = $2 
+      AND role = $3
+    `;
+    await pool.query(query, [hashedPassword, email, 'driver']);
   },
   
   async getOptimizedRoute(driverId) {
-    const route = await pool.query('SELECT * FROM routes WHERE driverId = $1 ORDER BY id DESC LIMIT 1', [driverId]);
+    const query = `
+      SELECT * 
+      FROM routes 
+      WHERE driverId = $1 
+      ORDER BY id DESC 
+      LIMIT 1
+    `;
+    const route = await pool.query(query, [driverId]);
     return route.rows[0];
   },
 };

@@ -4,10 +4,6 @@
   <title>Slick</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/addon/display/fullscreen.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/addon/display/fullscreen.js"></script>
 </head>
 
 <body>
@@ -24,7 +20,7 @@
             <ul role="list" class="-mx-2 space-y-1">
               <li>
                 <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
-                <a href="#" class="bg-amber-700 text-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                <a class="bg-amber-700 text-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                   </svg>
@@ -32,7 +28,7 @@
                 </a>
               </li>
               <li>
-                <a href="#" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                <a href="/admin/drivers" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                   </svg>
@@ -40,7 +36,7 @@
                 </a>
               </li>
               <li>
-                <a href="#" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                <a href="/admin/history" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                   </svg>
@@ -60,7 +56,7 @@
                   <% } %>
                 </a>
               </li>
-              <li>
+              <!-- <li>
                 <a href="#" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
@@ -68,9 +64,9 @@
                   </svg>
                   Reports
                 </a>
-              </li>
+              </li> -->
               <li>
-                <a href="#" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                <a href="/admin/profile" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -84,7 +80,10 @@
               <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 mr-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
               
               <a class="text-sm font-normal leading-6 text-white">
-                <%= user.name %> <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">Admin</span>
+                <%= user.first_name %> <%= user.last_name %>
+                <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                  Admin
+                </span>
               </a>
             </form>
           </li>          
@@ -126,13 +125,13 @@
                 <div class="flex justify-between items-start px-4 py-6">
                   <div>
                     <h3 class="text-base font-semibold leading-7 text-white"><%= trip.driverEmail %></h3>
+                    <div class="flex items-center">
+                      <p class="text-sm text-white">Driver Color:</p>
+                      <div class="w-6 h-6 ml-2" style="background-color: <%= trip.deliveryJobs[0].color %>; border-radius: 50%;"></div>
+                    </div>
                   </div>
                   <div>
                     <h3 class="text-base font-semibold leading-7 text-white">Trip Number: <%= trip.deliveryJobs[0].trip_number %></h3>
-                    <div class="flex items-center">
-                      <p class="text-sm text-white ml-2">Driver Color: &#160;</p>
-                      <div class="w-6 h-4" style="background-color: <%= trip.deliveryJobs[0].color %>; border-radius: 6px;"></div>
-                    </div>
                   </div>
                 </div>
             
@@ -319,29 +318,25 @@
   <link rel="stylesheet" href="/styles/main.css">
   <!-- link to leaflet css and axios -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <!-- link to js file under public folder -->
   <script src="/js/addressBox.js"></script>
   <!-- leaflet map settings for admin -->
   <script>
-    const pendingAndAssignedDeliveryLocations = <%- JSON.stringify(pendingAndAssignedDeliveryLocations) %>;
-    const routeGeometries = <%- JSON.stringify(routeGeometries) %>;
-
-    console.log(routeGeometries);
-
+    const activeTrips = <%- JSON.stringify(activeTrips) %>;
+  
     document.addEventListener('DOMContentLoaded', () => {
       const map = L.map('mapContainer', {
-         minZoom: 3, // Set the minimum zoom level
-         maxZoom: 18, // Set the maximum zoom level
-         zoomControl: true // Add zoom control
+        minZoom: 3, // Set the minimum zoom level
+        maxZoom: 18, // Set the maximum zoom level
+        zoomControl: true // Add zoom control
       }).setView([38.34, -100.21], 3); // center of US, zoom level 3
       // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
   
       var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
-         attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-         minZoom: 3,
-         maxZoom: 18,
-         accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
+        attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        minZoom: 3,
+        maxZoom: 18,
+        accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
       }).addTo(map);
   
       // Set the maximum bounds to limit the map to the United States
@@ -351,40 +346,93 @@
       ];
       map.setMaxBounds(usBounds);
   
-      // Loop through the pending delivery locations and add markers to the map
-      pendingAndAssignedDeliveryLocations.forEach((location) => {
-        const [lat, lng] = location.lat_lon.split(',').map(parseFloat);
+      activeTrips.forEach((trip) => {
+      // Render markers for each delivery job
+      trip.deliveryJobs.forEach((job, index) => {
+        const [lat, lng] = job.start_lat_lon.split(',').map(parseFloat);
         const latLng = [lat, lng];
-        const markerColor = location.color;
-        
-        const marker = L.circleMarker(latLng, {
-          color: markerColor,
-          fillColor: markerColor,
-          fillOpacity: 1,
-          radius: 8
-        }).addTo(map);
+        const markerColor = job.color;
+
+        let marker;
+
+        if (index === 0) {
+          // Starting location (warehouse)
+          marker = L.divIcon({
+            className: 'custom-marker',
+            html: `
+              <div class="pin" style="background-color: ${markerColor};">
+                <div class="marker-icon">&#x1F3E2;</div>
+              </div>
+            `,
+            iconSize: [25, 25],
+            iconAnchor: [12, 24]
+          });
+        } else {
+          // Regular delivery locations
+          marker = L.divIcon({
+            className: 'custom-marker',
+            html: `
+              <div class="pin" style="background-color: ${markerColor};">
+                <div class="marker-number">${job.waypoint_index}</div>
+              </div>
+            `,
+            iconSize: [25, 25],            iconAnchor: [12, 24]
+          });
+        }
+
+        L.marker(latLng, { icon: marker })
+          .addTo(map)
+          .bindPopup(`
+            <b>Address:</b> ${job.start_address}<br>
+            <b>Assigned Driver:</b> ${trip.driverEmail}
+          `);
       });
 
-      // Loop through the route geometries and add polylines to the map
-      routeGeometries.forEach((geometry) => {
-        const geojsonData = JSON.parse(geometry.geometry);
-        const coordinates = geojsonData.coordinates;
-        const latLngs = coordinates.map(coord => [coord[1], coord[0]]);
-        const polylineColor = geometry.color === 'NULL' ? 'blue' : geometry.color;
-      
-        const polyline = L.polyline(latLngs, {
-          color: polylineColor,
-          weight: 2,
-          opacity: 0.7
-        }).addTo(map);
+      // Render marker for the last delivery location
+      const lastJob = trip.deliveryJobs[trip.deliveryJobs.length - 1];
+      const [lat, lng] = lastJob.end_lat_lon.split(',').map(parseFloat);
+      const latLng = [lat, lng];
+      const markerColor = lastJob.color;
+
+      const marker = L.divIcon({
+        className: 'custom-marker',
+        html: `
+          <div class="pin" style="background-color: ${markerColor};">
+            <div class="marker-number">${lastJob.waypoint_index + 1}</div>
+          </div>
+        `,
+        iconSize: [25, 25],
+        iconAnchor: [12, 24]
       });
 
+      L.marker(latLng, { icon: marker })
+        .addTo(map)
+        .bindPopup(`
+          <b>Address:</b> ${lastJob.end_address}<br>
+          <b>Assigned Driver:</b> ${trip.driverEmail}
+      `);
+  
+        // Render polyline for the trip geometry
+        if (trip.tripGeometry) {
+          const geojsonData = JSON.parse(trip.tripGeometry.geometry);
+          const coordinates = geojsonData.coordinates;
+          const latLngs = coordinates.map(coord => [coord[1], coord[0]]);
+          const polylineColor = trip.tripGeometry.color;
+  
+          const polyline = L.polyline(latLngs, {
+            color: polylineColor,
+            weight: 2,
+            opacity: 0.7
+          }).addTo(map);
+        }
+      });
+  
       // const logMapDetails = () => {
       //   const center = map.getCenter(); // Gets the current geographical center of the map
       //   const zoom = map.getZoom(); // Gets the current zoom level
       //   console.log(`Latitude: ${center.lat.toFixed(2)}, Longitude: ${center.lng.toFixed(2)}, Zoom: ${zoom}`);
       // };
-
+  
       // // Set the interval to log details every 5 seconds
       // setInterval(logMapDetails, 5000);
   
@@ -393,7 +441,7 @@
           <div class="loading-spinner"></div>
         `;
       });
-
+  
       document.getElementById('create-trips-btn').addEventListener('click', () => {
         document.getElementById('create-trips-btn').innerHTML = `
           <div class="loading-spinner"></div>

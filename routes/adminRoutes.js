@@ -12,8 +12,15 @@ router.get('/applications', isAuthenticated, isAdmin, adminController.renderAppl
 router.post('/applications/:id/approve', isAuthenticated, isAdmin, adminController.approveApplication);
 router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminController.rejectApplication);
 
+router.get('/profile', isAuthenticated, isAdmin, adminController.renderProfile);
+router.post('/profile/update-email', isAuthenticated, isAdmin, adminController.updateEmail);
+router.post('/profile/update-password', isAuthenticated, isAdmin, adminController.updatePassword);
+
 router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
-router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, addressController.getAddressesForDriver);
+router.post('/drivers/:driverId/disable-account', isAuthenticated, isAdmin, adminController.disableAccount);
+router.post('/drivers/:driverId/enable-account', isAuthenticated, isAdmin, adminController.enableAccount);
+router.post('/drivers/:driverId/change-color', isAuthenticated, isAdmin, adminController.changeDriverColor);
+
 router.post('/submit-address', isAuthenticated, isAdmin, addressController.addAddress);
 router.post('/remove-delivery-location', isAuthenticated, isAdmin, addressController.removeDeliveryLocation);
 router.post('/create-trips', isAuthenticated, isAdmin, addressController.createTrips);

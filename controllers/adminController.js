@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const adminController = {
+
   async renderDashboard(req, res) {
     try {
       const drivers = await AdminModel.getDrivers();
@@ -18,42 +19,206 @@ const adminController = {
         const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
         if (highestPendingTripNumber) {
           const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
         }
       }
   
       res.render('admin/adminDashboard.ejs', {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
+        drivers: drivers,
         activeTrips: activeTrips,
       });
     } catch (err) {
       console.error(err);
-
-      const drivers = await AdminModel.getDrivers();
-      const activeTrips = [];
-      for (const driver of drivers) {
-        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
-        if (highestPendingTripNumber) {
-          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
-        }
-      }
-
       res.render('admin/adminDashboard.ejs', {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
         drivers: drivers,
-        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
-        activeTrips: activeTrips,
+        activeTrips: [],
         errorTitle: 'Error',
         errorBody: 'An error occurred while rendering your dashboard. Please try again.',
+      });
+    }
+  },
+
+  async renderProfile(req, res) {
+    try {
+      res.render('admin/profile.ejs', { 
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ 
+        error: 'An error occurred while rendering the profile' 
+      });
+    }
+  },
+
+  async updateEmail(req, res) {
+    try {
+      const { email } = req.body;
+      await AdminModel.updateEmailByEmail(req.user.email, email);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        successTitle: 'Success',
+        successBody: 'Email updated successfully. You need to refresh your page for the changes to take effect as your previous session is still using the old email.',
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while updating the email',
+      });
+    }
+  },
+
+  async updatePassword(req, res) {
+    try {
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+      const admin = await AdminModel.findUserByEmail(req.user.email);
+      const newPasswordAndConfirmPasswordMatch = newPassword === confirmPassword;
+      const currentPasswordMatches = await authController.comparePasswords(currentPassword, admin.password);
+      // email regex to contain at least one special character, one uppercase, one number, and at least 8 letters long
+      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+      const newPasswordMatchesRegex = passwordRegex.test(newPassword);
+
+      // if new password and confirm password match, current password matches, and new password matches regex
+      if (newPasswordAndConfirmPasswordMatch && currentPasswordMatches && newPasswordMatchesRegex) {
+        await AdminModel.updatePasswordById(admin.id, newPassword);
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          successTitle: 'Success',
+          successBody: 'Password updated successfully',
+        });
+      } else if (!newPasswordAndConfirmPasswordMatch) { // if new password and confirm password do not match
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'New password and confirm password do not match',
+        });
+      } else if (!currentPasswordMatches) { // if current password does not match
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'Current password is incorrect',
+        });
+      } else if (!newPasswordMatchesRegex) { // if new password does not match regex
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'New password must contain at least one special character, one uppercase, one number, and at least 8 letters long',
+        });
+      }
+    } catch (err) { 
+      console.error(err);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while updating the password',
+      });
+    }
+  },
+
+  async getDrivers(req, res) {
+    try {
+      const drivers = await AdminModel.getDrivers();
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: drivers,
+      });
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      res.status(500).json({
+        error: 'An error occurred while fetching drivers. Please try again later.',
+      });
+    }
+  },
+
+  async disableAccount(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      await AdminModel.updateStatus(driverId, 'disabled');
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        successTitle: 'Success',
+        successBody: 'Driver account disabled successfully',
+      });
+    } catch (error) {
+      console.error('Error disabling driver account:', error);
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while disabling the driver account. Please try again later.',
+      });
+    }
+  },
+  
+  async enableAccount(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      await AdminModel.updateStatus(driverId, 'approved');
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        successTitle: 'Success',
+        successBody: 'Driver account enabled successfully',
+      });
+    } catch (error) {
+      console.error('Error enabling driver account:', error);
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while enabling the driver account. Please try again later.',
+      });
+    }
+  },
+
+  async changeDriverColor(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      const { color } = req.body;
+      const driver = await AdminModel.getDriverById(driverId);
+      
+      if (driver) {
+        await AdminModel.updateDriverColor(driver.email, color);
+        res.render('admin/viewDrivers.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          drivers: await AdminModel.getDrivers(),
+          successTitle: 'Success',
+          successBody: `Driver color changed to ${color} successfully.`,
+        });
+      } else {
+        res.status(404).json({ error: 'Driver not found' });
+      }
+    } catch (error) {
+      console.error('Error changing driver color:', error);
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while changing the driver color. Please try again later.',
       });
     }
   },
@@ -200,19 +365,6 @@ const adminController = {
         status: 'error', 
         errorTitle: 'Error',
         errorBody: 'An error occurred while resetting the password' });
-    }
-  },
-
-  async getDrivers(req, res) {
-    try {
-      const drivers = await AdminModel.getDrivers();
-      res.json(drivers);
-    } catch (error) {
-      console.error('Error fetching drivers:', error);
-
-      res.status(500).json({
-        error: 'An error occurred while fetching drivers',
-      });
     }
   },
 };
