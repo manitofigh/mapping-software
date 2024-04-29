@@ -44,3 +44,31 @@
 #container.drag-over #dropMask {
     opacity: 1;
 }
+
+.custom-marker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pin {
+  background-color: white;
+  border-radius: 50% 50% 50% 0;
+  width: 25px;
+  height: 25px;
+  transform: rotate(-45deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.marker-number {
+  transform: rotate(45deg);
+  font-weight: bold;
+  color: black;
+}
+
+.marker-icon {
+  font-size: 18px;
+  transform: rotate(45deg);
+}

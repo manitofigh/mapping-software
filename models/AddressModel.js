@@ -186,8 +186,8 @@ const AddressModel = {
 
   async getTripGeometryByDriverEmailAndTripNumber(driverEmail, tripNumber) {
     const query = `
-      SELECT geometry 
-      FROM trip_geometries
+      SELECT geometry, color 
+      FROM trip_geometries 
       WHERE driver_email = $1 
       AND trip_number = $2
     `;

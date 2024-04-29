@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const adminController = {
+
   async renderDashboard(req, res) {
     try {
       const drivers = await AdminModel.getDrivers();
@@ -18,40 +19,25 @@ const adminController = {
         const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
         if (highestPendingTripNumber) {
           const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
         }
       }
   
       res.render('admin/adminDashboard.ejs', {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
+        drivers: drivers,
         activeTrips: activeTrips,
       });
     } catch (err) {
       console.error(err);
-
-      const drivers = await AdminModel.getDrivers();
-      const activeTrips = [];
-      for (const driver of drivers) {
-        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
-        if (highestPendingTripNumber) {
-          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
-        }
-      }
-
       res.render('admin/adminDashboard.ejs', {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
         drivers: drivers,
-        pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
-        activeTrips: activeTrips,
+        activeTrips: [],
         errorTitle: 'Error',
         errorBody: 'An error occurred while rendering your dashboard. Please try again.',
       });
