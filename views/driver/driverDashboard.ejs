@@ -95,21 +95,26 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const map = L.map('mapContainer').setView([37.0902, -95.7129], 4);
+    const map = L.map('mapContainer', {
+         minZoom: 3, // Set the minimum zoom level
+         maxZoom: 18, // Set the maximum zoom level
+         zoomControl: true // Add zoom control
+      }).setView([38.34, -100.21], 3); // center of US, zoom level 3
+      // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
   
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
-      minZoom: 0,
-      maxZoom: 20,
-      attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      ext: 'png'
-    }).addTo(map);
+      var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+         attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+         minZoom: 3,
+         maxZoom: 18,
+         accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
+      }).addTo(map);
   
-    // Set the maximum bounds to limit the map to the United States
-    const usBounds = [
-      [24.9493, -125.0011], // Southwest coordinates
-      [49.5904, -66.9326]   // Northeast coordinates
-    ];
-    map.setMaxBounds(usBounds);
+      // Set the maximum bounds to limit the map to the United States
+      const usBounds = [
+        [24.9493, -125.0011], // Southwest coordinates
+        [49.5904, -66.9326]   // Northeast coordinates
+      ];
+      map.setMaxBounds(usBounds);
   });
 </script>
 

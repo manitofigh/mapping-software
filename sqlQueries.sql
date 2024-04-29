@@ -64,6 +64,7 @@ CREATE TABLE trip_geometries (
     driver_email VARCHAR(255),
     trip_number INTEGER,
     status VARCHAR(50) DEFAULT 'pending',
+    color VARCHAR(50),
     geometry TEXT
 );
 

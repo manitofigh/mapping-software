@@ -39,6 +39,13 @@ const AddressModel = {
     const result = await pool.query(query, values);
     return result.rows;
   },
+
+  async getPendingAndAssignedDeliveryLocations() {
+    const query = 'SELECT address, driver_email, created_at, lat_lon, color FROM delivery_locations WHERE status = $1 OR status = $2';
+    const values = ['pending', 'assigned'];
+    const result = await pool.query(query, values);
+    return result.rows;
+  },
   
   async updateDeliveryLocationStatus(address, driverEmail, status) {
     const query = 'UPDATE delivery_locations SET status = $1 WHERE address = $2 AND driver_email = $3';
