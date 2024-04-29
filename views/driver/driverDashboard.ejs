@@ -77,7 +77,6 @@
 
       <script src="/js/driverDashboard.js"></script>
       <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </div>
   </main>
   <main class="lg:pl-72">
@@ -87,18 +86,31 @@
           <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
         <% } %>
         <div id="mapContainer" style="height: 400px;"></div>
-  
-        <script src="/js/driverDashboard.js"></script>
-        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
       </div>
       </div>
     </div>
   </main>
-
-  <aside class="fixed inset-y-0 right-0 hidden w-96 overflow-y-auto border-l border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
-    <!-- Secondary column (hidden on smaller screens) -->
-  </aside>
 </div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const map = L.map('mapContainer').setView([37.0902, -95.7129], 4);
+  
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+      minZoom: 0,
+      maxZoom: 20,
+      attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      ext: 'png'
+    }).addTo(map);
+  
+    // Set the maximum bounds to limit the map to the United States
+    const usBounds = [
+      [24.9493, -125.0011], // Southwest coordinates
+      [49.5904, -66.9326]   // Northeast coordinates
+    ];
+    map.setMaxBounds(usBounds);
+  });
+</script>
 
 </body>
