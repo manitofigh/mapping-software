@@ -144,6 +144,60 @@ const adminController = {
       });
     }
   },
+
+  async getDrivers(req, res) {
+    try {
+      const drivers = await AdminModel.getDrivers();
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: drivers,
+      });
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      res.status(500).json({
+        error: 'An error occurred while fetching drivers. Please try again later.',
+      });
+    }
+  },
+
+  async disableAccount(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      await AdminModel.updateStatus(driverId, 'disabled');
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        successTitle: 'Success',
+        successBody: 'Driver account disabled successfully',
+      });
+    } catch (error) {
+      console.error('Error disabling driver account:', error);
+      res.status(500).json({
+        error: 'An error occurred while disabling the driver account. Please try again later.',
+      });
+    }
+  },
+  
+  async enableAccount(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      await AdminModel.updateStatus(driverId, 'approved');
+      res.render('admin/viewDrivers.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: await AdminModel.getDrivers(),
+        successTitle: 'Success',
+        successBody: 'Driver account enabled successfully',
+      });
+    } catch (error) {
+      console.error('Error enabling driver account:', error);
+      res.status(500).json({
+        error: 'An error occurred while enabling the driver account. Please try again later.',
+      });
+    }
+  },
   
   async renderApplications(req, res) {
     try {
@@ -287,19 +341,6 @@ const adminController = {
         status: 'error', 
         errorTitle: 'Error',
         errorBody: 'An error occurred while resetting the password' });
-    }
-  },
-
-  async getDrivers(req, res) {
-    try {
-      const drivers = await AdminModel.getDrivers();
-      res.json(drivers);
-    } catch (error) {
-      console.error('Error fetching drivers:', error);
-
-      res.status(500).json({
-        error: 'An error occurred while fetching drivers',
-      });
     }
   },
 };

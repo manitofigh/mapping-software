@@ -17,7 +17,9 @@ router.post('/profile/update-email', isAuthenticated, isAdmin, adminController.u
 router.post('/profile/update-password', isAuthenticated, isAdmin, adminController.updatePassword);
 
 router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
-router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, addressController.getAddressesForDriver);
+router.post('/drivers/:driverId/disable-account', isAuthenticated, isAdmin, adminController.disableAccount);
+router.post('/drivers/:driverId/enable-account', isAuthenticated, isAdmin, adminController.enableAccount);
+
 router.post('/submit-address', isAuthenticated, isAdmin, addressController.addAddress);
 router.post('/remove-delivery-location', isAuthenticated, isAdmin, addressController.removeDeliveryLocation);
 router.post('/create-trips', isAuthenticated, isAdmin, addressController.createTrips);

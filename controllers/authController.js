@@ -53,12 +53,19 @@ const authController = {
         return next(err);
       }
       if (!user) {
+        if (user.status === 'disabled') {
+          return res.render('auth/login.ejs', { 
+            status: 'error',
+            errorTitle: 'Error',
+            errorBody: 'Your account has been disabled. Please contact the administrator for further information.'
+          });
+        }
         console.log(`INFO MESSAGE: ${info.message}`);
         return res.render('auth/login.ejs', { 
           status: 'error',
           errorTitle: 'Error',
           errorBody: 'Invalid Email or password'
-         });
+        });
       }
       req.logIn(user, (err) => {
         if (err) {

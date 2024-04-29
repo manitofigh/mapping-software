@@ -170,9 +170,9 @@ const AdminModel = {
       SELECT * 
       FROM users 
       WHERE role = $1 
-      AND status = $2
+      AND (status = $2 OR status = $3)
     `;
-    const values = ['driver', 'approved'];
+    const values = ['driver', 'approved', 'disabled'];
     const result = await pool.query(query, values);
     return result.rows;
   },
