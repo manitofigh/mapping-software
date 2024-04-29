@@ -1,4 +1,5 @@
 import passport from '../utils/passport.js';
+import bcrypt from 'bcrypt';
 // import DriverModel from '../models/DriverModel.js';
 import AdminModel from '../models/AdminModel.js';
 import { sendMail } from '../utils/nodemailer.js';
@@ -161,6 +162,10 @@ const authController = {
                     Make sure you have not already submitted an application with this email address.`
       });
     }
+  },
+
+  async comparePasswords(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
   },
 
   // GET /login

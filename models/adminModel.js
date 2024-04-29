@@ -5,96 +5,170 @@ const saltRounds = 10;
 
 const AdminModel = {
   async findUserByEmail(email) {
-    const result = await pool.query(
-      `SELECT * FROM users WHERE email = $1`, 
-       [email]
-    );
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE email = $1
+    `;
+    const values = [email];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
-  findAdminByEmail: async function (email) {
-    const result = await pool.query(
-      `SELECT * FROM users WHERE email = $1 AND role = $2`, 
-      [email, 'admin']
-    );
+  async findAdminByEmail(email) {
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE email = $1 
+      AND role = $2
+    `;
+    const values = [email, 'admin'];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
   async findById(id) {
-    const result = await pool.query(
-      `SELECT * FROM users WHERE id = $1 AND role = $2`, 
-      [id, 'admin']);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE id = $1 
+      AND role = $2
+    `;
+    const values = [id, 'admin'];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
   async createUser(firstName, lastName, email, password, status, role, country, city, state, zip, street, about, color, createTime) {
     const fullAddress = `${street}, ${city}, ${state} ${zip}, ${country}`;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const result = await pool.query(
-      `INSERT INTO users 
-       (first_name, last_name, email, password, status, role, country, city, state, zip, street, full_address, about, color, create_time) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`,
-      [
-        firstName, // 1
-        lastName, // 2
-        email, // 3
-        hashedPassword, // 4
-        status, // 5
-        role, // 6
-        country, // 7
-        city, // 8
-        state, // 9
-        zip, // 10
-        street, // 11
-        fullAddress, // 12
-        about, // 13
-        color, // 14
-        createTime, // 15
-      ]
-    );
+    const query = `
+      INSERT INTO users 
+      (first_name, last_name, email, password, status, role, country, city, state, zip, street, full_address, about, color, create_time) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) 
+      RETURNING *
+    `;
+    const values = [
+      firstName,
+      lastName,
+      email,
+      hashedPassword,
+      status,
+      role,
+      country,
+      city,
+      state,
+      zip,
+      street,
+      fullAddress,
+      about,
+      color,
+      createTime,
+    ];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
-  // user == either admin or driver
   async updateUserPassword(email, password) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    await pool.query(
-      `UPDATE users SET password = $1 WHERE email = $2`, 
-      [hashedPassword, email]
-    );
+    const query = `
+      UPDATE users 
+      SET password = $1 
+      WHERE email = $2
+    `;
+    const values = [hashedPassword, email];
+    await pool.query(query, values);
   },
 
   async delete(email) {
-    await pool.query('DELETE FROM users WHERE email = $1 AND role = $2', [email, 'admin']);
+    const query = `
+      DELETE FROM users 
+      WHERE email = $1 
+      AND role = $2
+    `;
+    const values = [email, 'admin'];
+    await pool.query(query, values);
   },
 
   async findPendingApplications() {
-    const result = await pool.query('SELECT * FROM users WHERE status = $1', ['pending']);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE status = $1
+    `;
+    const values = ['pending'];
+    const result = await pool.query(query, values);
     return result.rows;
   },
 
   async findApplicationByEmail(email) {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE email = $1
+    `;
+    const values = [email];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
-  async findApplicationById (id) {
-    const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+  async findApplicationById(id) {
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE id = $1
+    `;
+    const values = [id];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
   async countPendingApplications() {
-    const result = await pool.query('SELECT COUNT(*) FROM users WHERE status = $1', ['pending']);
+    const query = `
+      SELECT COUNT(*) 
+      FROM users 
+      WHERE status = $1
+    `;
+    const values = ['pending'];
+    const result = await pool.query(query, values);
     return result.rows[0].count;
   },
 
   async updateStatus(id, status) {
-    await pool.query('UPDATE users SET status = $1 WHERE id = $2', [status, id]);
+    const query = `
+      UPDATE users 
+      SET status = $1 
+      WHERE id = $2
+    `;
+    const values = [status, id];
+    await pool.query(query, values);
+  },
+
+  async updateEmailByEmail(email, newEmail) {
+    const query = `
+      UPDATE users 
+      SET email = $1 
+      WHERE email = $2
+    `;
+    const values = [newEmail, email];
+    await pool.query(query, values);
+  },
+
+  async updatePasswordById(id, password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const query = `
+      UPDATE users 
+      SET password = $1 
+      WHERE id = $2
+    `;
+    const values = [hashedPassword, id];
+    await pool.query(query, values);
   },
 
   async getDrivers() {
     const query = `
-      SELECT * FROM users 
+      SELECT * 
+      FROM users 
       WHERE role = $1 
       AND status = $2
     `;
@@ -104,16 +178,28 @@ const AdminModel = {
   },
 
   async getDriverById(id) {
-    const result = await pool.query('SELECT * FROM users WHERE id = $1 AND role = $2', [id, 'driver']);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE id = $1 
+      AND role = $2
+    `;
+    const values = [id, 'driver'];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
 
   async getDriverByEmail(email) {
-    const query = 'SELECT * FROM users WHERE email = $1 AND role = $2';
-    const result = await pool.query(query, [email, 'driver']);
+    const query = `
+      SELECT * 
+      FROM users 
+      WHERE email = $1 
+      AND role = $2
+    `;
+    const values = [email, 'driver'];
+    const result = await pool.query(query, values);
     return result.rows[0];
   },
-
 };
 
 export default AdminModel;

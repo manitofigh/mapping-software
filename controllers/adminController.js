@@ -57,6 +57,93 @@ const adminController = {
       });
     }
   },
+
+  async renderProfile(req, res) {
+    try {
+      res.render('admin/profile.ejs', { 
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ 
+        error: 'An error occurred while rendering the profile' 
+      });
+    }
+  },
+
+  async updateEmail(req, res) {
+    try {
+      const { email } = req.body;
+      await AdminModel.updateEmailByEmail(req.user.email, email);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        successTitle: 'Success',
+        successBody: 'Email updated successfully. You need to refresh your page for the changes to take effect as your previous session is still using the old email.',
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while updating the email',
+      });
+    }
+  },
+
+  async updatePassword(req, res) {
+    try {
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+      const admin = await AdminModel.findUserByEmail(req.user.email);
+      const newPasswordAndConfirmPasswordMatch = newPassword === confirmPassword;
+      const currentPasswordMatches = await authController.comparePasswords(currentPassword, admin.password);
+      // email regex to contain at least one special character, one uppercase, one number, and at least 8 letters long
+      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+      const newPasswordMatchesRegex = passwordRegex.test(newPassword);
+
+      // if new password and confirm password match, current password matches, and new password matches regex
+      if (newPasswordAndConfirmPasswordMatch && currentPasswordMatches && newPasswordMatchesRegex) {
+        await AdminModel.updatePasswordById(admin.id, newPassword);
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          successTitle: 'Success',
+          successBody: 'Password updated successfully',
+        });
+      } else if (!newPasswordAndConfirmPasswordMatch) { // if new password and confirm password do not match
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'New password and confirm password do not match',
+        });
+      } else if (!currentPasswordMatches) { // if current password does not match
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'Current password is incorrect',
+        });
+      } else if (!newPasswordMatchesRegex) { // if new password does not match regex
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'New password must contain at least one special character, one uppercase, one number, and at least 8 letters long',
+        });
+      }
+    } catch (err) { 
+      console.error(err);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while updating the password',
+      });
+    }
+  },
   
   async renderApplications(req, res) {
     try {

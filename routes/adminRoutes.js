@@ -12,6 +12,10 @@ router.get('/applications', isAuthenticated, isAdmin, adminController.renderAppl
 router.post('/applications/:id/approve', isAuthenticated, isAdmin, adminController.approveApplication);
 router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminController.rejectApplication);
 
+router.get('/profile', isAuthenticated, isAdmin, adminController.renderProfile);
+router.post('/profile/update-email', isAuthenticated, isAdmin, adminController.updateEmail);
+router.post('/profile/update-password', isAuthenticated, isAdmin, adminController.updatePassword);
+
 router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
 router.get('/drivers/:driverId/addresses', isAuthenticated, isAdmin, addressController.getAddressesForDriver);
 router.post('/submit-address', isAuthenticated, isAdmin, addressController.addAddress);
