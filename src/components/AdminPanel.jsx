@@ -82,7 +82,9 @@ const AdminPanel = ({changeState}) => {
 
     mapRef.current = new L.map('adminMap', mapOptions);
     const layer = new L.TileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	  }
     );
     mapRef.current.addLayer(layer);
     // mapRef.gJsonLayer = L.geoJSON().addTo(mapRef.current);
