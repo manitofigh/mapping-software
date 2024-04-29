@@ -105,6 +105,13 @@ const AddressModel = {
     const result = await pool.query(query, values);
     return result.rows;
   },
+  async getRouteGeometriesByEmail(driverEmail) {
+    const query = 'SELECT geometry, color FROM trip_geometries WHERE driver_email = $1';
+    const values = [driverEmail];
+    const result = await pool.query(query, values);
+    //console.log(result.rows[0]);
+    return result.rows[0];
+  },
 
   async createDeliveryJob(driverEmail, tripNumber, waypointIndex, startAddress, endAddress, startLatLon, endLatLon, estimatedDurationMinutes, distance, color) {
     const query = `

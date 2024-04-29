@@ -75,7 +75,6 @@
       <% } %>
       <div id="mapContainer" style="height: 400px;"></div>
 
-      <script src="/js/driverDashboard.js"></script>
       <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     </div>
   </main>
@@ -95,6 +94,10 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    const geometry = <%- JSON.stringify(geometry) %>;
+  
+    console.log(geometry);
+
     const map = L.map('mapContainer', {
          minZoom: 3, // Set the minimum zoom level
          maxZoom: 18, // Set the maximum zoom level
@@ -115,6 +118,18 @@
         [49.5904, -66.9326]   // Northeast coordinates
       ];
       map.setMaxBounds(usBounds);
+
+      const geojsonData = JSON.parse(geometry.geometry);
+      const coordinates = geojsonData.coordinates;
+      const latLngs = coordinates.map(coord => [coord[1], coord[0]]);
+      const polylineColor = geometry.color === 'NULL' ? 'blue' : geometry.color;
+      
+      const polyline = L.polyline(latLngs, {
+        color: polylineColor,
+        weight: 2,
+        opacity: 0.7
+      }).addTo(map);
+
   });
 </script>
 

@@ -1,7 +1,35 @@
+import AddressModel from "../models/AddressModel.js";
+
 const driverController = {
-  renderDashboard(req, res) {
-    res.render('driver/driverDashboard.ejs', { user: req.user });
+  async renderDashboard(req, res) {
+    //console.log(req.user.email);
+    try{
+      res.render('driver/driverDashboard.ejs', 
+      { user: req.user,
+        geometry: await AddressModel.getRouteGeometriesByEmail(req.user.email)}
+      );
+    } catch (err){
+      res.render('driver/driverDashboard.ejs', 
+      { user: req.user,
+        geometry: []}
+      );
+    }
+
   },
+
+  /*async getGeometry(req,res) {
+    const driverEmail = req.user.email;
+    try {
+      const geometries = await AddressModel.getRouteGeometriesByEmail(driverEmail);
+
+    } catch (error){
+      console.error('Unable to fetching geometries:', error);
+      res.render('driver/driverDashboard.ejs', {
+        errorTitle: 'Error Fetching Geometries',
+        errorBody: 'An error occurred while attempting to fetch the map\'s graph. Please try again.',
+      });
+    }
+  },*/
 
   async getOptimizedRoute(req, res) {
     const driverId = req.user.id;
@@ -22,7 +50,7 @@ const driverController = {
         errorBody: 'An error occurred while fetching the optimized route. Please try again.',
       });
     }
-  },
+  }
 };
 
 export default driverController;
