@@ -268,7 +268,7 @@
               </div>
             <% } else { %>
                 <h2 class="text-lg font-semibold text-white">
-                  Pending Delivery Locations
+                  Pending Locations
                 </h2>
                 <p class="text-sm text-gray-400 mb-3">
                   Pending locations are assigned to a driver before creating a trip. 
@@ -324,8 +324,8 @@
   <script src="/js/addressBox.js"></script>
   <!-- leaflet map settings for admin -->
   <script>
-    const pendingDeliveryLocations = <%- JSON.stringify(pendingDeliveryLocations) %>;
-    console.log(pendingDeliveryLocations)
+    const pendingAndAssignedDeliveryLocations = <%- JSON.stringify(pendingAndAssignedDeliveryLocations) %>;
+    console.log(pendingAndAssignedDeliveryLocations)
     document.addEventListener('DOMContentLoaded', () => {
       const map = L.map('mapContainer', {
          minZoom: 3, // Set the minimum zoom level
@@ -349,7 +349,7 @@
       map.setMaxBounds(usBounds);
   
       // Loop through the pending delivery locations and add markers to the map
-      pendingDeliveryLocations.forEach((location) => {
+      pendingAndAssignedDeliveryLocations.forEach((location) => {
         const [lat, lng] = location.lat_lon.split(',').map(parseFloat);
         const latLng = [lat, lng];
         const markerColor = location.color;
