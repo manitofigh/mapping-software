@@ -83,7 +83,7 @@
             <form action="/logout" method="POST" class="flex justify-between items-center px-6 py-3">
               <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 mr-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
               
-              <a href="#" class="text-sm font-normal leading-6 text-white">
+              <a class="text-sm font-normal leading-6 text-white">
                 <%= user.name %> <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">Admin</span>
               </a>
             </form>
@@ -107,18 +107,113 @@
           <div class="h-1/2 py-4 rounded-t-2xl overflow-hidden">
             <div id="mapContainer" class="h-full"></div>
           </div>
-          <div class="h-1/2 rounded-b-2xl overflow-hidden border-t border-gray-500 py-4">
+          <div class="h-1/2 rounded-b-2xl border-t border-gray-500 p-4 overflow-y-auto">
             <% if (pendingDeliveryLocations.length > 0) { %>
               <form action="/admin/create-trips" method="POST">
-                <button type="submit" id="create-trips-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                  Create Trips
+                <button type="submit" id="create-trips-btn" class="bg-amber-700 text-white font-normal px-4 py-2 rounded-md border border-transparent hover:border-white">
+                  Calculate trips for all pending locations
                 </button>
               </form>
+            <% } else if (activeTrips.length == 0) { %>
+              <div class="flex justify-center items-center">
+                <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-2xl font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                  No active trips!
+                </span>
+              </div>
             <% } %>
-            <div class="bg-white/10 px-4 py-4 rounded-md shadow">
-              <!-- itinerary goes here -->
-              <p class="text-white">Sample itinerary content</p>
-            </div>
+            <% activeTrips.forEach(function(trip) { %>
+              <div class="overflow-hidden bg-white/5 rounded-lg shadow ring-1 ring-inset ring-white/10 mb-4">
+                <div class="flex justify-between items-start px-4 py-6">
+                  <div>
+                    <h3 class="text-base font-semibold leading-7 text-white"><%= trip.driverEmail %></h3>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-semibold leading-7 text-white">Trip Number: <%= trip.deliveryJobs[0].trip_number %></h3>
+                    <div class="flex items-center">
+                      <p class="text-sm text-white ml-2">Driver Color: &#160;</p>
+                      <div class="w-6 h-4" style="background-color: <%= trip.deliveryJobs[0].color %>; border-radius: 6px;"></div>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="border-t border-gray-700">
+                  <div class="divide-y divide-gray-700">
+                    <% trip.deliveryJobs.forEach(function(job) { %>
+                      <div class="px-4 py-6">
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <span class="text-sm font-medium text-white">Route Number:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= job.waypoint_index + 1 %></span>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">From:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= job.start_address %></span>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">To:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= job.end_address %></span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <span class="text-sm font-medium text-white">Est. Duration:</span>
+                            <% if (job.estimated_duration_minutes >= 60) { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= Math.floor(job.estimated_duration_minutes / 60) %> hours <%= job.estimated_duration_minutes % 60 %> minutes</span>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= job.estimated_duration_minutes %> minutes</span>
+                            <% } %>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">Distance:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= (job.distance / 1000).toFixed(1) %> km</span>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">Status:</span>
+                            <% if (job.status === 'completed') { %>
+                              <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20 ml-2">Completed</span>
+                            <% } else if (job.status === 'pending') { %>
+                              <span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-400 ring-1 ring-inset ring-yellow-500/20 ml-2">Pending</span>
+                            <% } else { %>
+                              <span class="inline-flex items-center rounded-md bg-gray-500/10 px-2 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-gray-500/20 ml-2"><%= job.status %></span>
+                            <% } %>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                          <div>
+                            <span class="text-sm font-medium text-white">Actual Duration:</span>
+                            <% if (job.actual_duration_minutes) { %>
+                              <% if (job.actual_duration_minutes >= 60) { %>
+                                <span class="ml-2 text-sm text-gray-400"><%= Math.floor(job.actual_duration_minutes / 60) %> hours <%= job.actual_duration_minutes % 60 %> minutes</span>
+                              <% } else { %>
+                                <span class="ml-2 text-sm text-gray-400"><%= job.actual_duration_minutes %> minutes</span>
+                              <% } %>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400">N/A</span>
+                            <% } %>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">Start Time:</span>
+                            <% if (job.start_time) { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= job.start_time %></span>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400">N/A</span>
+                            <% } %>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">End Time:</span>
+                            <% if (job.end_time) { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= job.end_time %></span>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400">N/A</span>
+                            <% } %>
+                          </div>
+                        </div>
+                      </div>
+                    <% }); %>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
           </div>
         </div>
         <div class="w-2/5 h-full overflow-y-auto p-4 border-l border-gray-500">
@@ -147,10 +242,12 @@
                   </select>
                 <% } else { %>
                   <select id="driverSelect" name="driverId" class="w-3/4 rounded-md border-0 bg-white/10 px-2 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700">
-                    <option value="">No Drivers available</option>
+                    <option value="">
+                      No Drivers available
+                    </option>
                   </select>
                 <% } %>
-                <button type="submit" id="search-address" class="w-1/4 ml-2 flex justify-center items-center px-2 py-2 bg-amber-700 text-white rounded">
+                <button type="submit" id="search-address" class="w-1/4 ml-2 flex justify-center items-center px-2 py-2 bg-amber-700 text-white rounded border border-transparent hover:border-white">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
                     <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
                   </svg>
@@ -160,40 +257,61 @@
           </form>
           <hr class="border-gray-500 mb-4">
           <div id="addressList" class="text-white">
-            <% pendingDeliveryLocations.forEach(function(location) { %>
-              <div class="bg-white/10 px-4 pb-4 pt-1 rounded-md shadow mb-3 relative">
-                <form method="POST" action="/admin/remove-delivery-location">
-                  <input type="hidden" name="address" value="<%= location.address %>">
-                  <input type="hidden" name="driverEmail" value="<%= location.driver_email %>">
-                  <div class="ml-4 flow-root flex-shrink-0 absolute top-3 right-3">
-                    <button type="submit" class="flex items-center justify-center bg-transparent text-gray-400 hover:text-red-500">
-                      <span class="sr-only">Remove</span>
-                      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                </form>
-                <div class="flex items-center mb-2 text-sm">
-                  <svg class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
-                  </svg>
-                  <span><%= location.address %></span>
-                </div>
-                <div class="flex items-center text-sm">
-                  <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" />
-                  </svg>
-                  <span><%= location.driver_email %></span>
-                </div>
-                <div class="flex items-center text-sm mt-1">
-                  <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                  </svg>
-                  <span>Searched at: <%= location.created_at %></span>
-                </div>
+            <% if (pendingDeliveryLocations.length == 0) { %>
+              <div class="flex flex-col items-center justify- h-full">
+                <h2 class="text-lg font-semibold text-white">
+                  No pending delivery locations!
+                </h2>
+                <h2 class="text-lg font-semibold text-white">
+                  Search addresses to create trips.
+                </h2>
               </div>
-            <% }); %>
+            <% } else { %>
+                <h2 class="text-lg font-semibold text-white">
+                  Pending Delivery Locations
+                </h2>
+                <p class="text-sm text-gray-400 mb-3">
+                  Pending locations are assigned to a driver before creating a trip. 
+                  <br>
+                  Once a trip is created, the location(s) and the driver(s) cannot be edited.
+                </p>
+                </p>
+                </p>
+                <% pendingDeliveryLocations.forEach(function(location) { %>
+                <div class="bg-white/10 px-4 pb-4 pt-1 rounded-md shadow mb-3 relative">
+                  <form method="POST" action="/admin/remove-delivery-location">
+                    <input type="hidden" name="address" value="<%= location.address %>">
+                    <input type="hidden" name="driverEmail" value="<%= location.driver_email %>">
+                    <div class="ml-4 flow-root flex-shrink-0 absolute top-3 right-3">
+                      <button type="submit" class="flex items-center justify-center bg-transparent text-gray-400 hover:text-red-500">
+                        <span class="sr-only">Remove</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </form>
+                  <div class="flex items-center mb-2 text-sm">
+                    <svg class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
+                    </svg>
+                    <span><%= location.address %></span>
+                  </div>
+                  <div class="flex items-center text-sm">
+                    <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" />
+                    </svg>
+                    <span><%= location.driver_email %></span>
+                  </div>
+                  <div class="flex items-center text-sm mt-1">
+                    <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Searched at: <%= location.created_at %></span>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
           </div>
         </div>
       </div>

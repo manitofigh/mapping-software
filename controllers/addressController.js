@@ -37,49 +37,82 @@ const addressController = {
   async addAddress(req, res) {
     // Input sanitization and validation
     if (!req.body.address || !req.body.driverEmail) {
-        const renderOptions = {
-            user: req.user,
-            pendingApplications: await AdminModel.countPendingApplications(),
-            drivers: await AdminModel.getDrivers(),
-            pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-            errorTitle: 'Error',
-            errorBody: 'Please make sure you have selected a driver and entered an address.',
-            previousAddress: req.body.address || '',
-            previousDriverEmail: req.body.driverEmail || ''
-        };
-        res.render('admin/adminDashboard.ejs', renderOptions);
-        return;
+      
+      const drivers = await AdminModel.getDrivers();
+      const activeTrips = [];
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
+      const renderOptions = {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          drivers: drivers,
+          pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+          activeTrips: activeTrips,
+          errorTitle: 'Error',
+          errorBody: 'Please make sure you have selected a driver and entered an address.',
+          previousAddress: req.body.address || '',
+          previousDriverEmail: req.body.driverEmail || ''
+      };
+      res.render('admin/adminDashboard.ejs', renderOptions);
+      return;
     }
 
     const { address, driverEmail } = req.body;
     const addressLines = address.trim().split('\n').filter(line => line.trim() !== '');
 
     if (addressLines.length === 0) {
-        const renderOptions = {
-            user: req.user,
-            pendingApplications: await AdminModel.countPendingApplications(),
-            drivers: await AdminModel.getDrivers(),
-            pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-            errorTitle: 'Error',
-            errorBody: 'Please enter at least one valid address.',
-            previousAddress: '',
-            previousDriverEmail: driverEmail
-        };
-        res.render('admin/adminDashboard.ejs', renderOptions);
-        return;
+
+      const drivers = await AdminModel.getDrivers();
+      const activeTrips = [];
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
+
+      const renderOptions = {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          drivers: drivers,
+          pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+          activeTrips: activeTrips,
+          errorTitle: 'Error',
+          errorBody: 'Please enter at least one valid address.',
+          previousAddress: '',
+          previousDriverEmail: driverEmail
+      };
+      res.render('admin/adminDashboard.ejs', renderOptions);
+      return;
     }
 
     try {
         const driver = await AdminModel.getDriverByEmail(driverEmail);
+        const drivers = await AdminModel.getDrivers();
+        const activeTrips = [];
+        for (const driver of drivers) {
+          const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+          if (highestPendingTripNumber) {
+            const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+            activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          }
+        }
         if (!driver) {
             const renderOptions = {
-                user: req.user,
-                pendingApplications: await AdminModel.countPendingApplications(),
-                drivers: await AdminModel.getDrivers(),
-                errorTitle: 'Error',
-                errorBody: 'Invalid driver selected.',
-                previousAddress: address,
-                previousDriverEmail: driverEmail
+              user: req.user,
+              pendingApplications: await AdminModel.countPendingApplications(),
+              drivers: drivers,
+              activeTrips: activeTrips,
+              errorTitle: 'Error',
+              errorBody: 'Invalid driver selected.',
+              previousAddress: address,
+              previousDriverEmail: driverEmail
             };
             res.render('admin/adminDashboard.ejs', renderOptions);
             return;
@@ -141,8 +174,9 @@ const addressController = {
         const renderOptions = {
             user: req.user,
             pendingApplications: await AdminModel.countPendingApplications(),
-            drivers: await AdminModel.getDrivers(),
+            drivers: drivers,
             pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+            activeTrips: activeTrips,
             errorTitle: invalidAddresses.length > 0 || duplicateAddresses.length > 0 ? 'Invalid address' : undefined,
             errorBody: errorBody ? `${errorBody} ${duplicateAddressesMessage}` : undefined,
             successTitle: filteredValidAddresses.length > 0 ? 'Success' : undefined,
@@ -154,11 +188,23 @@ const addressController = {
         res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {
         console.error('Error adding addresses:', error);
+
+        const drivers = await AdminModel.getDrivers();
+        const activeTrips = [];
+        for (const driver of drivers) {
+          const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+          if (highestPendingTripNumber) {
+            const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+            activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          }
+        }
+        
         const renderOptions = {
             user: req.user,
             pendingApplications: await AdminModel.countPendingApplications(),
-            drivers: await AdminModel.getDrivers(),
+            drivers: drivers,
             pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+            activeTrips: activeTrips,
             errorTitle: 'Error Adding Addresses',
             errorBody: 'An error occurred while adding the addresses. Please try again.',
             previousAddress: address,
@@ -170,25 +216,48 @@ const addressController = {
 
   async removeDeliveryLocation(req, res) {
     const { address, driverEmail } = req.body;
+
+    const drivers = await AdminModel.getDrivers();
+    const activeTrips = [];
+    for (const driver of drivers) {
+      const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+      if (highestPendingTripNumber) {
+        const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+        activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+      }
+    }
   
     try {
       await AddressModel.updateDeliveryLocationStatus(address, driverEmail, 'deleted');
       const renderOptions = {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
+        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        activeTrips: activeTrips,
         successTitle: 'Success',
         successBody: `Removed location "${address}" for "${driverEmail}".`,
       };
       res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {
       console.error('Error removing delivery location:', error);
+
+      const drivers = await AdminModel.getDrivers();
+      const activeTrips = [];
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
+
       const renderOptions = {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
+        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        activeTrips: activeTrips,
         errorTitle: 'Error Removing Delivery Location',
         errorBody: 'An error occurred while removing the delivery location. Please try again.',
       };
@@ -323,23 +392,45 @@ const addressController = {
           }
         }
       }
+
+      const activeTrips = [];
+
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
   
       const renderOptions = {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
         drivers: await AdminModel.getDrivers(),
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        activeTrips,
         successTitle: 'Success',
         successBody: 'Trips created successfully.',
       };
       res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {
+
       console.error('Error creating trips:', error);
+      const drivers = await AdminModel.getDrivers();
+      const activeTrips = [];
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
       const renderOptions = {
         user: req.user,
         pendingApplications: await AdminModel.countPendingApplications(),
-        drivers: await AdminModel.getDrivers(),
+        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        activeTrips: activeTrips,
         errorTitle: 'Error Creating Trips',
         errorBody: 'An error occurred while creating trips. Please try again.',
       };

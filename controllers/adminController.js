@@ -11,20 +11,45 @@ dotenv.config();
 const adminController = {
   async renderDashboard(req, res) {
     try {
-      res.render('admin/adminDashboard.ejs', { 
-        user: req.user, 
-        pendingApplications: await AdminModel.countPendingApplications(), 
-        drivers: await AdminModel.getDrivers(),
+      const drivers = await AdminModel.getDrivers();
+      const activeTrips = [];
+  
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
+  
+      res.render('admin/adminDashboard.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        activeTrips: activeTrips,
       });
     } catch (err) {
       console.error(err);
-      res.render('admin/adminDashboard.ejs', { 
-        user:req.user,
-        pendingApplidations: await AdminModel.countPendingApplications(),
+
+      const drivers = await AdminModel.getDrivers();
+      const activeTrips = [];
+      for (const driver of drivers) {
+        const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
+        if (highestPendingTripNumber) {
+          const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        }
+      }
+
+      res.render('admin/adminDashboard.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
+        activeTrips: activeTrips,
         errorTitle: 'Error',
-        errorBody: 'An error occurred while rendering your dashboard. Please try again.' 
+        errorBody: 'An error occurred while rendering your dashboard. Please try again.',
       });
     }
   },
@@ -180,11 +205,9 @@ const adminController = {
       res.json(drivers);
     } catch (error) {
       console.error('Error fetching drivers:', error);
-      res.render('admin/adminDashboard.ejs', {
-        user: req.user,
-        pendingApplications: await AdminModel.countPendingApplications(),
-        errorTitle: 'Error Fetching Drivers',
-        errorBody: 'An error occurred while fetching the drivers. Please try again.',
+
+      res.status(500).json({
+        error: 'An error occurred while fetching drivers',
       });
     }
   },

@@ -58,6 +58,13 @@ const AddressModel = {
     return result.rows;
   },
 
+  async getDeliveryJobsByDriverEmailAndTripNumber(driverEmail, tripNumber) {
+    const query = 'SELECT * FROM delivery_jobs WHERE driver_email = $1 AND trip_number = $2 ORDER BY waypoint_index';
+    const values = [driverEmail, tripNumber];
+    const result = await pool.query(query, values);
+    return result.rows;
+  },
+
   async getHighestTripNumberByDriverEmail(driverEmail) {
     const query = `
       SELECT MAX(trip_number) AS highest_trip_number
@@ -66,6 +73,13 @@ const AddressModel = {
     `;
   
     const result = await pool.query(query, [driverEmail]);
+    return result.rows[0].highest_trip_number;
+  },
+
+  async getHighestPendingTripNumberByDriverEmail(driverEmail) {
+    const query = 'SELECT MAX(trip_number) AS highest_trip_number FROM trip_geometries WHERE driver_email = $1 AND status = $2';
+    const values = [driverEmail, 'pending'];
+    const result = await pool.query(query, values);
     return result.rows[0].highest_trip_number;
   },
 
