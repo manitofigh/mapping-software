@@ -99,6 +99,13 @@ const AddressModel = {
     await pool.query(query, values);
   },
 
+  async getRouteGeometries() {
+    const query = 'SELECT geometry, color FROM trip_geometries WHERE status = $1';
+    const values = ['pending'];
+    const result = await pool.query(query, values);
+    return result.rows;
+  },
+
   async createDeliveryJob(driverEmail, tripNumber, waypointIndex, startAddress, endAddress, startLatLon, endLatLon, estimatedDurationMinutes, distance, color) {
     const query = `
       INSERT INTO delivery_jobs (

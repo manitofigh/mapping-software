@@ -28,6 +28,7 @@ const adminController = {
         drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
         pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
+        routeGeometries: await AddressModel.getRouteGeometries(),
         activeTrips: activeTrips,
       });
     } catch (err) {
@@ -49,6 +50,7 @@ const adminController = {
         drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
         pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
+        routeGeometries: await AddressModel.getRouteGeometries(),
         activeTrips: activeTrips,
         errorTitle: 'Error',
         errorBody: 'An error occurred while rendering your dashboard. Please try again.',
