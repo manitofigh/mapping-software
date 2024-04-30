@@ -90,7 +90,11 @@
             <form action="/driver/start-trip" method="POST">
               <input type="hidden" name="driverEmail" value="<%= activeTrip.driverEmail %>">
               <input type="hidden" name="tripNumber" value="<%= activeTrip.deliveryJobs[0].trip_number %>">
-              <button type="submit" class="bg-amber-700 text-white font-normal px-4 py-2 rounded-md border border-transparent hover:border-white">
+              <!-- text to notify driver they have an active trip and they can start it-->
+              <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 mb-4 text-lg font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                You are assigned a new trip. start it now!
+              </span>
+              <button type="submit" class="block bg-amber-700 text-white font-normal px-4 py-2 rounded-md border border-transparent hover:border-white">
                 Start Trip <%= activeTrip.deliveryJobs[0].trip_number %>
               </button>
             </form>
@@ -198,55 +202,56 @@
       </div>
     </div>
   </main>
-</div>
 
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<!-- link to css file under public folder -->
-<link rel="stylesheet" href="/styles/main.css">
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const geometry = <%- JSON.stringify(geometry) %>;
-    const mapPinpoints = <%- JSON.stringify(mapPinpoints) %>;
-
-    const map = L.map('driverMapContainer', {
-      minZoom: 3, // Set the minimum zoom level
-      maxZoom: 18, // Set the maximum zoom level
-      zoomControl: true // Add zoom control
-    }).setView([38.34, -100.21], 3); // center of US, zoom level 3
-    // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
-
-    var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
-      attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      minZoom: 3,
-      maxZoom: 18,
-      accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
-    }).addTo(map);
-
-    // Set the maximum bounds to limit the map to the United States
-    const usBounds = [
-      [24.9493, -125.0011], // Southwest coordinates
-      [49.5904, -66.9326]   // Northeast coordinates
-    ];
-    map.setMaxBounds(usBounds);
-
-    if (geometry != null && geometry != []) {
-      const geojsonData = JSON.parse(geometry.geometry);
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+ <!-- link to css file under public folder -->
+ <link rel="stylesheet" href="/styles/main.css">
+ <script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const activeTrip = <%- JSON.stringify(activeTrip) %>;
+ 
+     const map = L.map('driverMapContainer', {
+       minZoom: 3, // Set the minimum zoom level
+       maxZoom: 18, // Set the maximum zoom level
+       zoomControl: true // Add zoom control
+     }).setView([38.34, -100.21], 4); // center of US, zoom level 3
+     // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
+ 
+     var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+       attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+       minZoom: 3,
+       maxZoom: 18,
+       accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
+     }).addTo(map);
+ 
+     // Set the maximum bounds to limit the map to the United States
+     const usBounds = [
+       [24.9493, -125.0011], // Southwest coordinates
+       [49.5904, -66.9326]   // Northeast coordinates
+     ];
+     map.setMaxBounds(usBounds);
+ 
+     if (activeTrip && activeTrip.tripGeometry && activeTrip.tripGeometry.geometry) {
+      const geojsonData = JSON.parse(activeTrip.tripGeometry.geometry);
       const coordinates = geojsonData.coordinates;
       const latLngs = coordinates.map(coord => [coord[1], coord[0]]);
-      const polylineColor = '#52a5ff';
+      const polylineColor = '#0369a1';
 
       const polyline = L.polyline(latLngs, {
         color: polylineColor,
         weight: 2,
         opacity: 0.7
       }).addTo(map);
+
+      // Fit the map bounds to the polyline
+      map.fitBounds(polyline.getBounds());
     }
 
-    if (mapPinpoints != null && mapPinpoints != []) {
-      mapPinpoints.forEach((location, index) => {
-        const [lat, lng] = location.lat_lon.split(',').map(parseFloat);
+    if (activeTrip && activeTrip.deliveryJobs && activeTrip.deliveryJobs.length > 0) {
+      activeTrip.deliveryJobs.forEach((job, index) => {
+        const [lat, lng] = job.start_lat_lon.split(',').map(parseFloat);
         const latLng = [lat, lng];
-        const markerColor = '#52a5ff';
+        const markerColor = '#0369a1';
 
         let marker;
 
@@ -268,7 +273,7 @@
             className: 'custom-marker-driver',
             html: `
               <div class="pin" style="background-color: ${markerColor};">
-                <div class="marker-number-driver">${index}</div>
+                <div class="marker-number-driver">${job.waypoint_index}</div>
               </div>
             `,
             iconSize: [25, 25],
@@ -278,9 +283,34 @@
 
         L.marker(latLng, { icon: marker })
           .addTo(map)
-          .bindPopup(`<b>Address:</b> ${location.address}`);
+          .bindPopup(`<b>Address:</b> ${job.start_address}`);
       });
+
+      // Render marker for the last delivery location
+      const lastJob = activeTrip.deliveryJobs[activeTrip.deliveryJobs.length - 1];
+      const [lat, lng] = lastJob.end_lat_lon.split(',').map(parseFloat);
+      const latLng = [lat, lng];
+      const markerColor = '#0369a1';
+
+      const marker = L.divIcon({
+        className: 'custom-marker-driver',
+        html: `
+          <div class="pin" style="background-color: ${markerColor};">
+            <div class="marker-number-driver">${lastJob.waypoint_index + 1}</div>
+          </div>
+        `,
+        iconSize: [25, 25],
+        iconAnchor: [12, 24]
+      });
+
+      L.marker(latLng, { icon: marker })
+        .addTo(map)
+        .bindPopup(`<b>Address:</b> ${lastJob.end_address}`);
+
+      // Fit the map bounds to the markers
+      const group = new L.featureGroup(map._layers);
+      map.fitBounds(group.getBounds());
     }
   });
-</script>
+ </script>
 </body>

@@ -424,7 +424,7 @@ const addressController = {
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
         activeTrips,
         successTitle: 'Success',
-        successBody: `Trip for ${driver.email} has been created successfully.`,
+        successBody: 'Trip created successfully.',
       };
       res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {

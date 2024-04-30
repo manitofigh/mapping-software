@@ -7,27 +7,33 @@ const driverController = {
   async renderDashboard(req, res) {
     try {
       const driverEmail = req.user.email;
-      const activeTrip = await AddressModel.getActiveTrip(driverEmail);
-      const geometry = await AddressModel.getRouteGeometriesByEmail(driverEmail);
-      const mapPinpoints = await AddressModel.getAssignedDeliveryLocationsByEmail(driverEmail);
-  
-      // console.log('Active Trip:', activeTrip);
-      // console.log('Geometry:', geometry);
-      // console.log('Map Pinpoints:', mapPinpoints);
-  
-      res.render('driver/driverDashboard.ejs', { 
-        user: req.user,
-        geometry: geometry,
-        mapPinpoints: mapPinpoints,
-        activeTrip: activeTrip
-      });
+      const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driverEmail);
+      
+      if (highestPendingTripNumber) {
+        const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driverEmail, highestPendingTripNumber);
+        const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driverEmail, highestPendingTripNumber);
+        
+        res.render('driver/driverDashboard.ejs', { 
+          user: req.user,
+          activeTrip: {
+            driverEmail: driverEmail,
+            deliveryJobs: deliveryJobs,
+            tripGeometry: tripGeometry
+          }
+        });
+      } else {
+        res.render('driver/driverDashboard.ejs', { 
+          user: req.user,
+          activeTrip: null
+        });
+      }
     } catch (err) {
       console.error(err);
       res.render('driver/driverDashboard.ejs', { 
         user: req.user,
-        geometry: null,
-        mapPinpoints: null,
-        activeTrip: null
+        activeTrip: null,
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while rendering your dashboard. Please try again.',
       });
     }
   },
