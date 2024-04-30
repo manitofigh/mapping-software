@@ -81,6 +81,32 @@ const driverController = {
     }
   },
 
+  async renderHistory(req, res) {
+    try {
+      const driverEmail = req.user.email;
+      const completedTripNumbers = await AddressModel.getCompletedTripNumbers(driverEmail);
+  
+      const completedTrips = [];
+      for (const tripNumber of completedTripNumbers) {
+        const deliveryJobs = await AddressModel.getDeliveryJobsByTripNumber(driverEmail, tripNumber);
+        completedTrips.push({ tripNumber, deliveryJobs });
+      }
+  
+      res.render('driver/driverHistory.ejs', {
+        user: req.user,
+        completedTrips: completedTrips,
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('driver/driverHistory.ejs', {
+        user: req.user,
+        completedTrips: [],
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while fetching the trip history. Please try again.',
+      });
+    }
+  },
+
 };
 
 export default driverController;

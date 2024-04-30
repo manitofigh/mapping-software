@@ -7,6 +7,9 @@ import authController from './controllers/authController.js';
 // DriverModel.create('Jane Smith', 'jane@example.com', 'password456', 'driver', 'approved');
 // DriverModel.create('Mike Johnson', 'mike@example.com', 'password789', 'driver', 'inactive');
 
+// update driver password
+// DriverModel.updateDriverPassword('driver@example.com', 'password123');
+
 // Update driver status
 // DriverModel.updateStatus('john@example.com', 'approved');
 // DriverModel.updateStatus('jane@example.com', 'inactive');
@@ -46,21 +49,8 @@ import authController from './controllers/authController.js';
 // Update route status
 // RouteModel.updateStatus(1, 'completed');
 
-// Delete a route
+// Delete a route based on id
 // RouteModel.delete(2);
-
-// Create travel times for different routes
-// TravelTimeModel.create(1, '123 Main St, City', '456 Elm St, Town', 3600, 3800);
-// TravelTimeModel.create(1, '456 Elm St, Town', '123 Main St, City', 7200, 7500);
-// TravelTimeModel.create(2, '789 Oak St, Village', '321 Maple Ave, Borough', 5400, 5200);
-// TravelTimeModel.create(2, '321 Maple Ave, Borough', '789 Oak St, Village', 9000, 9200);
-
-// Update actual travel time
-// TravelTimeModel.updateActualTime(1, 3700);
-// TravelTimeModel.updateActualTime(3, 5300);
-
-// Delete a travel time entry
-// TravelTimeModel.delete(2);
 
 /*
 AdminModel.createUser(

@@ -213,6 +213,37 @@ const adminController = {
     }
   },
 
+  async getDriverHistory(req, res) {
+    try {
+      const driverId = req.params.driverId;
+      const driver = await AdminModel.getDriverById(driverId);
+      const completedTripNumbers = await AddressModel.getCompletedTripNumbers(driver.email);
+  
+      const completedTrips = [];
+      for (const tripNumber of completedTripNumbers) {
+        const deliveryJobs = await AddressModel.getDeliveryJobsByTripNumber(driver.email, tripNumber);
+        completedTrips.push({ tripNumber, deliveryJobs });
+      }
+  
+      res.render('admin/driverHistory.ejs', {
+        user: req.user,
+        driver: driver,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        completedTrips: completedTrips,
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('admin/driverHistory.ejs', {
+        user: req.user,
+        driver: null,
+        completedTrips: [],
+        pendingApplications: await AdminModel.countPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while fetching the driver\'s trip history. Please try again.',
+      });
+    }
+  },
+
   async changeDriverColor(req, res) {
     try {
       const driverId = req.params.driverId;

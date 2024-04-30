@@ -336,8 +336,31 @@ async getAssignedDeliveryLocationsByEmail(driverEmail) {
     `;
     const values = [endTime, driverEmail, tripNumber, waypointIndex];
     await pool.query(query, values);
-  }
+  },
+
+  async getCompletedTripNumbers(driverEmail) {
+    const query = `
+      SELECT DISTINCT trip_number
+      FROM trip_geometries
+      WHERE driver_email = $1 AND status = 'completed'
+      ORDER BY trip_number DESC;
+    `;
+    const values = [driverEmail];
+    const result = await pool.query(query, values);
+    return result.rows.map(row => row.trip_number);
+  },
   
+  async getDeliveryJobsByTripNumber(driverEmail, tripNumber) {
+    const query = `
+      SELECT *
+      FROM delivery_jobs
+      WHERE driver_email = $1 AND trip_number = $2
+      ORDER BY waypoint_index;
+    `;
+    const values = [driverEmail, tripNumber];
+    const result = await pool.query(query, values);
+    return result.rows;
+  },
 
 };
 
