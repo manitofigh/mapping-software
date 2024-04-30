@@ -8,7 +8,7 @@ import authController from './controllers/authController.js';
 // DriverModel.create('Mike Johnson', 'mike@example.com', 'password789', 'driver', 'inactive');
 
 // update driver password
-// DriverModel.updateDriverPassword('driver@example.com', 'password123');
+// DriverModel.updateDriverPassword('jalbin5@pride.hofstra.edu', 'test123');
 
 // Update driver status
 // DriverModel.updateStatus('john@example.com', 'approved');
@@ -41,16 +41,6 @@ import authController from './controllers/authController.js';
 
 // Delete an address
 // AddressModel.delete(2);
-
-// Create routes for different drivers
-// RouteModel.create(1, '[[40.7128, -74.0060], [37.7749, -122.4194]]', '[3600, 7200]');
-// RouteModel.create(2, '[[51.5074, -0.1278], [41.8781, -87.6298]]', '[5400, 9000]');
-
-// Update route status
-// RouteModel.updateStatus(1, 'completed');
-
-// Delete a route based on id
-// RouteModel.delete(2);
 
 /*
 AdminModel.createUser(

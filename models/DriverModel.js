@@ -69,6 +69,17 @@ const DriverModel = {
     const route = await pool.query(query, [driverId]);
     return route.rows[0];
   },
+
+  async updatePasswordById(id, password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const query = `
+      UPDATE users 
+      SET password = $1 
+      WHERE id = $2
+    `;
+    const values = [hashedPassword, id];
+    await pool.query(query, values);
+  },
 };
 
 export default DriverModel;

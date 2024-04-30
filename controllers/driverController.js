@@ -107,6 +107,57 @@ const driverController = {
     }
   },
 
+  async renderProfile(req, res) {
+    res.render('driver/profile.ejs', {
+      user: req.user,
+    });
+  },
+  
+  async updatePassword(req, res) {
+    try {
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+      const driver = await DriverModel.findUserByEmail(req.user.email);
+      const newPasswordAndConfirmPasswordMatch = newPassword === confirmPassword;
+      const currentPasswordMatches = await authController.comparePasswords(currentPassword, driver.password);
+      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+      const newPasswordMatchesRegex = passwordRegex.test(newPassword);
+  
+      if (newPasswordAndConfirmPasswordMatch && currentPasswordMatches && newPasswordMatchesRegex) {
+        await DriverModel.updatePasswordById(driver.id, newPassword);
+        res.render('driver/profile.ejs', {
+          user: req.user,
+          successTitle: 'Success',
+          successBody: 'Password updated successfully',
+        });
+      } else if (!newPasswordAndConfirmPasswordMatch) {
+        res.render('driver/profile.ejs', {
+          user: req.user,
+          errorTitle: 'Error',
+          errorBody: 'New password and confirm password do not match',
+        });
+      } else if (!currentPasswordMatches) {
+        res.render('driver/profile.ejs', {
+          user: req.user,
+          errorTitle: 'Error',
+          errorBody: 'Current password is incorrect',
+        });
+      } else if (!newPasswordMatchesRegex) {
+        res.render('driver/profile.ejs', {
+          user: req.user,
+          errorTitle: 'Error',
+          errorBody: 'New password must contain at least one special character, one uppercase, one number, and at least 8 letters long',
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      res.render('driver/profile.ejs', {
+        user: req.user,
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while updating your password. Please try again.',
+      });
+    }
+  },
+
 };
 
 export default driverController;
