@@ -74,12 +74,17 @@ const AddressModel = {
     return result.rows;
   },
 
-  async getAssignedDeliveryLocationsByEmail(driverEmail) {
-    const query = 'SELECT address, lat_lon, color FROM delivery_locations WHERE status = $1 AND driver_email = $2';
-    const values = ['assigned',driverEmail];
+async getAssignedDeliveryLocationsByEmail(driverEmail) {
+    const query = `
+        SELECT address, lat_lon, color 
+        FROM delivery_locations 
+        WHERE status = $1 
+        AND driver_email = $2
+    `;
+    const values = ['assigned', driverEmail];
     const result = await pool.query(query, values);
     return result.rows;
-  },
+},
   
   async updateDeliveryLocationStatus(address, driverEmail, status) {
     const query = `
@@ -246,6 +251,94 @@ const AddressModel = {
     const result = await pool.query(query, [driverEmail]);
     return result.rows[0];
   },
+
+  async getActiveTrip(driverEmail) {
+    const query = `
+      SELECT 
+        dj.driver_email,
+        dj.trip_number,
+        dj.waypoint_index,
+        dj.start_address,
+        dj.end_address,
+        dj.estimated_duration_minutes,
+        dj.distance,
+        dj.status,
+        dj.start_time,
+        dj.end_time,
+        dj.actual_duration_minutes,
+        dj.color
+      FROM delivery_jobs dj
+      JOIN (
+        SELECT driver_email, MAX(trip_number) AS max_trip_number
+        FROM delivery_jobs
+        WHERE driver_email = $1 AND status != 'completed'
+        GROUP BY driver_email
+      ) latest_trip ON dj.driver_email = latest_trip.driver_email AND dj.trip_number = latest_trip.max_trip_number
+      ORDER BY dj.waypoint_index;
+    `;
+  
+    const values = [driverEmail];
+    const result = await pool.query(query, values);
+  
+    if (result.rows.length === 0) {
+      return null;
+    }
+  
+    return {
+      driverEmail: result.rows[0].driver_email,
+      deliveryJobs: result.rows
+    };
+  },
+  
+  async updateRouteStatus(driverEmail, tripNumber, waypointIndex, status) {
+    const query = `
+      UPDATE delivery_jobs
+      SET status = $1
+      WHERE driver_email = $2
+      AND trip_number = $3
+      AND waypoint_index = $4
+    `;
+    const values = [status, driverEmail, tripNumber, waypointIndex];
+    await pool.query(query, values);
+  },
+  
+  async updateTripStatus(driverEmail, tripNumber, status) {
+    const query = `
+      UPDATE trip_geometries
+      SET status = $1
+      WHERE driver_email = $2
+      AND trip_number = $3
+    `;
+    const values = [status, driverEmail, tripNumber];
+    await pool.query(query, values);
+  },
+
+  
+  async stampStartTime(driverEmail, tripNumber, waypointIndex, startTime) {
+    const query = `
+      UPDATE delivery_jobs
+      SET start_time = $1
+      WHERE driver_email = $2
+      AND trip_number = $3
+      AND waypoint_index = $4
+    `;
+    const values = [startTime, driverEmail, tripNumber, waypointIndex];
+    await pool.query(query, values);
+  },
+  
+  async stampEndTime(driverEmail, tripNumber, waypointIndex, endTime) {
+    const query = `
+      UPDATE delivery_jobs
+      SET end_time = $1
+      WHERE driver_email = $2
+      AND trip_number = $3
+      AND waypoint_index = $4
+    `;
+    const values = [endTime, driverEmail, tripNumber, waypointIndex];
+    await pool.query(query, values);
+  }
+  
+
 };
 
 export default AddressModel;

@@ -131,6 +131,26 @@ const adminController = {
     }
   },
 
+  async cleanDatabase(req, res) {
+    try {
+      await AdminModel.cleanDatabase();
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        successTitle: 'Success',
+        successBody: 'Database cleaned successfully',
+      });
+    } catch (err) {
+      console.error(err);
+      res.render('admin/profile.ejs', {
+        user: req.user,
+        pendingApplications: await AdminModel.countPendingApplications(),
+        errorTitle: 'Error',
+        errorBody: 'An error occurred while cleaning the database',
+      });
+    }
+  },
+
   async getDrivers(req, res) {
     try {
       const drivers = await AdminModel.getDrivers();
@@ -231,9 +251,9 @@ const adminController = {
       });
     } catch (err) {
       console.error(err);
-      res.render('admin/adminDashboard.ejs', { 
+      res.render('admin/applications.ejs', { 
         user: req.user, 
-        pendingApplications: await AdminModel.countPendingApplications(),
+        pendingApplications: [],
         errorTitle: 'Error', 
         errorBody: 'An error occurred while rendering the applications. Please try again.' });
     }

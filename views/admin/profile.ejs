@@ -31,17 +31,17 @@
                     <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                     </svg>
-                    Drivers
+                    Drivers & History
                   </a>
                 </li>
-                <li>
+                <!-- <li>
                   <a href="/admin/history" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                     <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                     </svg>
                     History
                   </a>
-                </li>
+                </li> -->
                 <li>
                   <a href="/admin/applications" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                     <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -114,14 +114,14 @@
                     <!-- <div class="sm:col-span-3">
                       <label for="first-name" class="block text-sm font-medium leading-6 text-white">First name</label>
                       <div class="mt-2">
-                        <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                        <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block w-full rounded-md border-0 bg-white/10 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       </div>
                     </div>
       
                     <div class="sm:col-span-3">
                       <label for="last-name" class="block text-sm font-medium leading-6 text-white">Last name</label>
                       <div class="mt-2">
-                        <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                        <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="block w-full rounded-md border-0 bg-white/10 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       </div>
                     </div> -->
                     
@@ -130,7 +130,7 @@
                         Email address
                     </label>
                       <div class="mt-2">
-                        <input id="email" name="email" type="email" autocomplete="email" value="<%= user.email %>" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                        <input id="email" name="email" type="email" autocomplete="email" value="<%= user.email %>" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       </div>
                     </div> 
                    
@@ -161,7 +161,7 @@
                         Current password
                       </label>
                       <div class="mt-2">
-                        <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                        <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       </div>
                     </div>
       
@@ -170,7 +170,7 @@
                         New password
                       </label>
                       <div class="mt-2">
-                        <input id="new-password" name="newPassword" type="password" autocomplete="new-password" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                        <input id="new-password" name="newPassword" type="password" autocomplete="new-password" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       </div>
                     </div>
       
@@ -179,7 +179,7 @@
                         Confirm password
                       </label>
                       <div class="mt-2">
-                        <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" class="block w-full rounded-md border-0 bg-white/5 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                        <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       </div>
                     </div>
                   </div>
@@ -192,16 +192,22 @@
                 </form>
               </div>
       
-              <!-- <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+              <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
                 <div>
-                  <h2 class="text-base font-semibold leading-7 text-white">Delete your account</h2>
-                  <p class="mt-1 text-sm leading-6 text-gray-400">You can only delete your account when there are no jobs assigned to you. All your authentication and application information will be deleted from our system irreversibly; however, your past trip records would still be accessible by administrators. This action notifies administrators.</p>
+                  <h2 class="text-base font-semibold leading-7 text-red-500">Danger Zone</h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-400">
+                    This button clears all the following but users' credentials and cached locations in the database: 
+                    <br>
+                    Trips, route geometries, unassigned and assigned locations.
+                  </p>
                 </div>
       
-                <form class="flex items-start md:col-span-2">
-                  <button type="submit" class="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm border border-transparent hover:border-white hover:bg-red-800">Delete my account</button>
+                <form class="flex items-start md:col-span-2" action="/admin/profile/clean-database" method="POST">
+                  <button type="submit" class="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm border border-transparent hover:border-white hover:bg-red-800">
+                    Delete the aforementioned data from the database.
+                  </button>
                 </form>
-              </div> -->
+              </div>
             </div>
         </div>
     </main>

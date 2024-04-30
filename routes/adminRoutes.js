@@ -15,6 +15,7 @@ router.post('/applications/:id/reject', isAuthenticated, isAdmin, adminControlle
 router.get('/profile', isAuthenticated, isAdmin, adminController.renderProfile);
 router.post('/profile/update-email', isAuthenticated, isAdmin, adminController.updateEmail);
 router.post('/profile/update-password', isAuthenticated, isAdmin, adminController.updatePassword);
+router.post('/profile/clean-database', isAuthenticated, isAdmin, adminController.cleanDatabase);
 
 router.get('/drivers', isAuthenticated, isAdmin, adminController.getDrivers);
 router.post('/drivers/:driverId/disable-account', isAuthenticated, isAdmin, adminController.disableAccount);

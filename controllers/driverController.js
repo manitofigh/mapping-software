@@ -1,58 +1,80 @@
 import AddressModel from "../models/AddressModel.js";
+import authController from "./authController.js";
+import DriverModel from "../models/DriverModel.js";
 
 const driverController = {
+
   async renderDashboard(req, res) {
-    //console.log(req.user.email);
-    try{
-      res.render('driver/driverDashboard.ejs', 
-      { user: req.user,
-        geometry: await AddressModel.getRouteGeometriesByEmail(req.user.email),
-        mapPinpoints: await AddressModel.getAssignedDeliveryLocationsByEmail(req.user.email)
+    try {
+      const driverEmail = req.user.email;
+      const activeTrip = await AddressModel.getActiveTrip(driverEmail);
+      const geometry = await AddressModel.getRouteGeometriesByEmail(driverEmail);
+      const mapPinpoints = await AddressModel.getAssignedDeliveryLocationsByEmail(driverEmail);
+  
+      // console.log('Active Trip:', activeTrip);
+      // console.log('Geometry:', geometry);
+      // console.log('Map Pinpoints:', mapPinpoints);
+  
+      res.render('driver/driverDashboard.ejs', { 
+        user: req.user,
+        geometry: geometry,
+        mapPinpoints: mapPinpoints,
+        activeTrip: activeTrip
       });
-    } catch (err){
-      res.render('driver/driverDashboard.ejs', 
-      { user: req.user,
+    } catch (err) {
+      console.error(err);
+      res.render('driver/driverDashboard.ejs', { 
+        user: req.user,
         geometry: null,
-        mapPinpoints:null
+        mapPinpoints: null,
+        activeTrip: null
       });
     }
-
   },
 
-  /*async getGeometry(req,res) {
-    const driverEmail = req.user.email;
+  async startTrip(req, res) {
     try {
-      const geometries = await AddressModel.getRouteGeometriesByEmail(driverEmail);
-
-    } catch (error){
-      console.error('Unable to fetching geometries:', error);
-      res.render('driver/driverDashboard.ejs', {
-        errorTitle: 'Error Fetching Geometries',
-        errorBody: 'An error occurred while attempting to fetch the map\'s graph. Please try again.',
-      });
-    }
-  },*/
-
-  async getOptimizedRoute(req, res) {
-    const driverId = req.user.id;
-    try {
-      const route = await DriverModel.getOptimizedRoute(driverId);
-      if (route) {
-        res.json(route);
-      } else {
-        res.render('driver/driverDashboard.ejs', {
-          errorTitle: 'No Optimized Route',
-          errorBody: 'No optimized route found for the driver.',
-        });
+      const { driverEmail, tripNumber } = req.body;
+      const trip = await AddressModel.getActiveTrip(driverEmail);
+      if (trip) {
+        await AddressModel.updateRouteStatus(driverEmail, tripNumber, 0, 'started');
+        await AddressModel.stampStartTime(driverEmail, tripNumber, 0, authController.getFormattedTime());
+  
+        // Update the status of the next route (if available) to "pending"
+        if (trip.deliveryJobs.length > 1) {
+          await AddressModel.updateRouteStatus(driverEmail, tripNumber, 1, 'pending');
+        }
       }
+      res.redirect('/driver/dashboard');
     } catch (error) {
-      console.error('Error fetching optimized route:', error);
-      res.render('driver/driverDashboard.ejs', {
-        errorTitle: 'Error Fetching Route',
-        errorBody: 'An error occurred while fetching the optimized route. Please try again.',
-      });
+      console.error(error);
+      res.redirect('/driver/dashboard');
     }
-  }
+  },
+  
+  async markComplete(req, res) {
+    try {
+      const { driverEmail, tripNumber, waypointIndex } = req.body;
+      const trip = await AddressModel.getActiveTrip(driverEmail);
+      if (trip) {
+        await AddressModel.updateRouteStatus(driverEmail, tripNumber, waypointIndex, 'completed');
+        await AddressModel.stampEndTime(driverEmail, tripNumber, waypointIndex, authController.getFormattedTime());
+  
+        const nextWaypointIndex = parseInt(waypointIndex) + 1;
+        if (nextWaypointIndex < trip.deliveryJobs.length) {
+          await AddressModel.updateRouteStatus(driverEmail, tripNumber, nextWaypointIndex, 'started');
+          await AddressModel.stampStartTime(driverEmail, tripNumber, nextWaypointIndex, authController.getFormattedTime());
+        } else {
+          await AddressModel.updateTripStatus(driverEmail, tripNumber, 'completed');
+        }
+      }
+      res.redirect('/driver/dashboard');
+    } catch (error) {
+      console.error(error);
+      res.redirect('/driver/dashboard');
+    }
+  },
+
 };
 
 export default driverController;

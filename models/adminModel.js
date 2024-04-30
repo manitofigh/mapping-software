@@ -165,6 +165,21 @@ const AdminModel = {
     await pool.query(query, values);
   },
 
+  async cleanDatabase() {
+    const query1 = `
+      DELETE FROM delivery_jobs;
+    `;
+    const query2 = `
+      DELETE FROM delivery_locations;
+    `;
+    const query3 = `
+      DELETE FROM trip_geometries;
+    `;
+    await pool.query(query1);
+    await pool.query(query2);
+    await pool.query(query3);
+  },
+
   async getDrivers() {
     const query = `
       SELECT * 

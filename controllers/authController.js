@@ -133,7 +133,7 @@ const authController = {
         application.firstName,
         application.lastName,
         application.email,
-        'NULL',
+        authController.generatePassword(),
         'pending',
         'driver',
         application.country,
@@ -142,7 +142,7 @@ const authController = {
         application.zip,
         application.street,
         application.about,
-        'NULL',
+        null,
         authController.getFormattedTime()
       );
       await sendMail(

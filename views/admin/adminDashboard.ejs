@@ -32,17 +32,17 @@
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                   </svg>
-                  Drivers
+                  Drivers & History
                 </a>
               </li>
-              <li>
+              <!-- <li>
                 <a href="/admin/history" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                   </svg>
                   History
                 </a>
-              </li>
+              </li> -->
               <li>
                 <a href="/admin/applications" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                   <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -169,27 +169,25 @@
                           <div>
                             <span class="text-sm font-medium text-white">Status:</span>
                             <% if (job.status === 'completed') { %>
-                              <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20 ml-2">Completed</span>
+                              <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20 ml-2">
+                                Completed
+                              </span>
                             <% } else if (job.status === 'pending') { %>
-                              <span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-400 ring-1 ring-inset ring-yellow-500/20 ml-2">Pending</span>
+                              <span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-400 ring-1 ring-inset ring-yellow-500/20 ml-2">
+                                Pending
+                              </span>
+                            <% } else if (job.status === 'started') { %>
+                              <span class="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20 ml-2">
+                                In Progress
+                              </span>
                             <% } else { %>
-                              <span class="inline-flex items-center rounded-md bg-gray-500/10 px-2 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-gray-500/20 ml-2"><%= job.status %></span>
+                              <span class="inline-flex items-center rounded-md bg-gray-500/10 px-2 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-gray-500/20 ml-2">
+                                <%= job.status %>
+                              </span>
                             <% } %>
                           </div>
                         </div>
                         <div class="grid grid-cols-3 gap-4">
-                          <div>
-                            <span class="text-sm font-medium text-white">Actual Duration:</span>
-                            <% if (job.actual_duration_minutes) { %>
-                              <% if (job.actual_duration_minutes >= 60) { %>
-                                <span class="ml-2 text-sm text-gray-400"><%= Math.floor(job.actual_duration_minutes / 60) %> hours <%= job.actual_duration_minutes % 60 %> minutes</span>
-                              <% } else { %>
-                                <span class="ml-2 text-sm text-gray-400"><%= job.actual_duration_minutes %> minutes</span>
-                              <% } %>
-                            <% } else { %>
-                              <span class="ml-2 text-sm text-gray-400">N/A</span>
-                            <% } %>
-                          </div>
                           <div>
                             <span class="text-sm font-medium text-white">Start Time:</span>
                             <% if (job.start_time) { %>
@@ -398,7 +396,7 @@
         className: 'custom-marker',
         html: `
           <div class="pin" style="background-color: ${markerColor};">
-            <div class="marker-number">F-${lastJob.waypoint_index + 1}</div>
+            <div class="marker-number">${lastJob.waypoint_index + 1}</div>
           </div>
         `,
         iconSize: [25, 25],

@@ -12,6 +12,10 @@
     border-radius: 12px;
 }
 
+#driverMapContainer {
+    border-radius: 12px;
+}
+
 .loading-spinner {
     display: inline-block;
     width: 20px;
@@ -51,6 +55,13 @@
   align-items: center;
 }
 
+.custom-marker-driver {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
 .pin {
   background-color: white;
   border-radius: 50% 50% 50% 0;
@@ -67,6 +78,12 @@
   font-weight: bold;
   color: black;
 }
+
+.marker-number-driver {
+    transform: rotate(45deg);
+    font-weight: bold;
+    color: white;
+  }
 
 .marker-icon {
   font-size: 18px;

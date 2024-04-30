@@ -41,11 +41,13 @@ const addressController = {
       
       const drivers = await AdminModel.getDrivers();
       const activeTrips = [];
+
       for (const driver of drivers) {
         const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
         if (highestPendingTripNumber) {
           const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
         }
       }
       const renderOptions = {
@@ -53,8 +55,6 @@ const addressController = {
           pendingApplications: await AdminModel.countPendingApplications(),
           drivers: drivers,
           pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-          pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-          routeGeometries: await AddressModel.getRouteGeometries(),
           activeTrips: activeTrips,
           errorTitle: 'Error',
           errorBody: 'Please make sure you have selected a driver and entered an address.',
@@ -72,11 +72,13 @@ const addressController = {
 
       const drivers = await AdminModel.getDrivers();
       const activeTrips = [];
+
       for (const driver of drivers) {
         const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
         if (highestPendingTripNumber) {
           const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
         }
       }
 
@@ -85,8 +87,6 @@ const addressController = {
           pendingApplications: await AdminModel.countPendingApplications(),
           drivers: drivers,
           pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-          pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-          routeGeometries: await AddressModel.getRouteGeometries(),
           activeTrips: activeTrips,
           errorTitle: 'Error',
           errorBody: 'Please enter at least one valid address.',
@@ -101,11 +101,13 @@ const addressController = {
         const driver = await AdminModel.getDriverByEmail(driverEmail);
         const drivers = await AdminModel.getDrivers();
         const activeTrips = [];
+  
         for (const driver of drivers) {
           const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
           if (highestPendingTripNumber) {
             const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-            activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+            const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+            activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
           }
         }
         if (!driver) {
@@ -113,7 +115,6 @@ const addressController = {
               user: req.user,
               pendingApplications: await AdminModel.countPendingApplications(),
               drivers: drivers,
-              routeGeometries: await AddressModel.getRouteGeometries(),
               activeTrips: activeTrips,
               errorTitle: 'Error',
               errorBody: 'Invalid driver selected.',
@@ -182,8 +183,6 @@ const addressController = {
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: drivers,
             pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-            pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-            routeGeometries: await AddressModel.getRouteGeometries(),
             activeTrips: activeTrips,
             errorTitle: invalidAddresses.length > 0 || duplicateAddresses.length > 0 ? 'Invalid address' : undefined,
             errorBody: errorBody ? `${errorBody} ${duplicateAddressesMessage}` : undefined,
@@ -199,11 +198,13 @@ const addressController = {
 
         const drivers = await AdminModel.getDrivers();
         const activeTrips = [];
+  
         for (const driver of drivers) {
           const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
           if (highestPendingTripNumber) {
             const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-            activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+            const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+            activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
           }
         }
         
@@ -212,8 +213,6 @@ const addressController = {
             pendingApplications: await AdminModel.countPendingApplications(),
             drivers: drivers,
             pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-            pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-            routeGeometries: await AddressModel.getRouteGeometries(),
             activeTrips: activeTrips,
             errorTitle: 'Error Adding Addresses',
             errorBody: 'An error occurred while adding the addresses. Please try again.',
@@ -229,11 +228,13 @@ const addressController = {
 
     const drivers = await AdminModel.getDrivers();
     const activeTrips = [];
+
     for (const driver of drivers) {
       const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
       if (highestPendingTripNumber) {
         const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-        activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+        const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+        activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
       }
     }
   
@@ -244,8 +245,6 @@ const addressController = {
         pendingApplications: await AdminModel.countPendingApplications(),
         drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
         activeTrips: activeTrips,
         successTitle: 'Success',
         successBody: `Removed location "${address}" for "${driverEmail}".`,
@@ -413,7 +412,8 @@ const addressController = {
         const highestPendingTripNumber = await AddressModel.getHighestPendingTripNumberByDriverEmail(driver.email);
         if (highestPendingTripNumber) {
           const deliveryJobs = await AddressModel.getDeliveryJobsByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
-          activeTrips.push({ driverEmail: driver.email, deliveryJobs });
+          const tripGeometry = await AddressModel.getTripGeometryByDriverEmailAndTripNumber(driver.email, highestPendingTripNumber);
+          activeTrips.push({ driverEmail: driver.email, deliveryJobs, tripGeometry });
         }
       }
   
@@ -422,11 +422,9 @@ const addressController = {
         pendingApplications: await AdminModel.countPendingApplications(),
         drivers: await AdminModel.getDrivers(),
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
         activeTrips,
         successTitle: 'Success',
-        successBody: 'Trips created successfully.',
+        successBody: `Trip for ${driver.email} has been created successfully.`,
       };
       res.render('admin/adminDashboard.ejs', renderOptions);
     } catch (error) {
@@ -446,8 +444,6 @@ const addressController = {
         pendingApplications: await AdminModel.countPendingApplications(),
         drivers: drivers,
         pendingDeliveryLocations: await AddressModel.getPendingDeliveryLocations(),
-        pendingAndAssignedDeliveryLocations: await AddressModel.getPendingAndAssignedDeliveryLocations(),
-        routeGeometries: await AddressModel.getRouteGeometries(),
         activeTrips: activeTrips,
         errorTitle: 'Error Creating Trips',
         errorBody: 'An error occurred while creating trips. Please try again.',
