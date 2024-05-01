@@ -2,13 +2,28 @@ import DriverModel from './models/DriverModel.js';
 import AdminModel from './models/AdminModel.js';
 import authController from './controllers/authController.js';
 
-// Create drivers with different statuses
-// DriverModel.create('John Doe', 'john@example.com', 'password123', 'driver', 'pending');
-// DriverModel.create('Jane Smith', 'jane@example.com', 'password456', 'driver', 'approved');
-// DriverModel.create('Mike Johnson', 'mike@example.com', 'password789', 'driver', 'inactive');
+// Create users with different statuses
+/*
+AdminModel.createUser(
+    'FirstName', 
+    'LastName', 
+    'example@email.com', 
+    'password', 
+    'approved'|| 'pending' || 'disabled', 
+    'driver' || 'admin', 
+    'USA', 
+    'City', 
+    'NY', 
+    12345, 
+    'Somewhere in NY', 
+    'I want a car too', 
+    'red', 
+    authController.getFormattedTime()
+)
+*/
 
 // update driver password
-// DriverModel.updateDriverPassword('jalbin5@pride.hofstra.edu', 'test123');
+// DriverModel.updateDriverPassword('example@email.com', 'test123');
 
 // Update driver status
 // DriverModel.updateStatus('john@example.com', 'approved');
@@ -16,12 +31,6 @@ import authController from './controllers/authController.js';
 
 // Delete a driver
 // DriverModel.delete('mike@example.com');
-
-// Delete admin
-
-// Create admins with different statuses
-// AdminModel.create('Admin User 1', 'admin1@example.com', 'adminpass123', 'admin', 'approved');
-// AdminModel.create('Admin User 2', 'admin2@example.com', 'adminpass456', 'admin', 'pending');
 
 // Update admin status
 // AdminModel.updateStatus('admin2@example.com', 'approved');
@@ -39,24 +48,3 @@ import authController from './controllers/authController.js';
 // AddressModel.updateStatus(1, 'inactive');
 // AddressModel.updateStatus(3, 'inactive');
 
-// Delete an address
-// AddressModel.delete(2);
-
-/*
-AdminModel.createUser(
-    'First Name', 
-    'Last Name', 
-    'email@example.com', 
-    'password123', 
-    'status', 
-    'role', 
-    'Country', 
-    'City', 
-    'State', 
-    12345, 
-    'Address', 
-    'Description', 
-    'some_color', 
-    authController.getFormattedTime()
-)
-*/
