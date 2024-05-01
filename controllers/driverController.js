@@ -116,7 +116,7 @@ const driverController = {
   async updatePassword(req, res) {
     try {
       const { currentPassword, newPassword, confirmPassword } = req.body;
-      const driver = await DriverModel.findUserByEmail(req.user.email);
+      const driver = await DriverModel.findDriverByEmail(req.user.email);
       const newPasswordAndConfirmPasswordMatch = newPassword === confirmPassword;
       const currentPasswordMatches = await authController.comparePasswords(currentPassword, driver.password);
       const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
