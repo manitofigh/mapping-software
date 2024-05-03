@@ -1,0 +1,91 @@
+/* Custom CSS */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* for Internet Explorer, Edge */
+    scrollbar-width: none;  /* for Firefox */
+}
+
+#mapContainer {
+    border-radius: 12px;
+}
+
+#driverMapContainer {
+    border-radius: 12px;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+#container {
+    position: relative;
+}
+
+#dropMask {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#container.drag-over #dropMask {
+    opacity: 1;
+}
+
+.custom-marker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-marker-driver {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.pin {
+  background-color: white;
+  border-radius: 50% 50% 50% 0;
+  width: 25px;
+  height: 25px;
+  transform: rotate(-45deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.marker-number {
+  transform: rotate(45deg);
+  font-weight: bold;
+  color: black;
+}
+
+.marker-number-driver {
+    transform: rotate(45deg);
+    font-weight: bold;
+    color: white;
+  }
+
+.marker-icon {
+  font-size: 18px;
+  transform: rotate(45deg);
+}

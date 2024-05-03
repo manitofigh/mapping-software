@@ -1,0 +1,183 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slick</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+  
+<body>
+    <!-- Static sidebar for desktop -->
+    <div class="fixed inset-y-0 z-50 flex w-72 flex-col bg-gray-900 border-r border-gray-500">
+      <!-- Sidebar component, swap this element with another sidebar if you like -->
+      <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6">
+        <div class="flex h-16 shrink-0 items-center">
+          <img class="h-20 w-auto" src="https://svgshare.com/i/15N6.svg" alt="Slick">
+        </div>
+        <nav class="flex flex-1 flex-col">
+          <ul role="list" class="flex flex-1 flex-col gap-y-7">
+            <li>
+              <ul role="list" class="-mx-2 space-y-1">
+                <li>
+                  <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
+                  <a href="/admin/dashboard" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                    <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                    Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a href="/admin/drivers" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                    <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                    </svg>
+                    Drivers & History
+                  </a>
+                </li>
+                <li>
+                  <a href="/admin/applications" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                    <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+                    </svg>
+                    Driver Applications
+                    <% if (pendingApplications == 0) { %>
+                      <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20"> 0 </span>
+                    <% } else { %>
+                      <span class="inline-flex items-center rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20"> <%= pendingApplications %> </span>
+                    <% } %>
+                  </a>
+                </li>
+                <li>
+                  <a href="/admin/profile" class="bg-amber-700 text-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                    <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Profile
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="-mx-6 mt-auto">
+              <form action="/logout" method="POST" class="flex justify-between items-center px-6 py-3">
+                <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 mr-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
+                
+                <a class="text-sm font-normal leading-6 text-white">
+                  <%= user.first_name %> <%= user.last_name %> 
+                  <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                    Admin
+                  </span>
+                </a>
+              </form>
+            </li>          
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <main class="pl-72">
+        <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
+            <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
+          <% } %>
+          <% if (typeof successTitle !== 'undefined' && typeof successBody !== 'undefined') { %>
+            <%- include('../partials/successNotif.ejs', { successTitle, successBody }) %>
+          <% } %>
+        <div class="px-4 sm:px-6 lg:px-4 bg-gray-900 min-h-screen">
+            <!-- Settings forms -->
+            <div class="divide-y divide-gray-700 bg-gray-900">
+              <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+                <div>
+                  <h2 class="text-base font-semibold leading-7 text-white">Personal Information</h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-400">
+                    Update the Email associated with your account.
+                  </p>
+                </div>
+      
+                <form class="md:col-span-2" action="/admin/profile/update-email" method="POST">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
+                    <div class="col-span-full">
+                      <label for="email" class="block text-sm font-medium leading-6 text-white">
+                        Email address
+                    </label>
+                      <div class="mt-2">
+                        <input id="email" name="email" type="email" autocomplete="email" value="<%= user.email %>" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                      </div>
+                    </div> 
+                   
+                  </div>
+      
+                  <div class="mt-8 flex">
+                    <button type="submit" class="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white shadow-sm border border-transparent hover:border-white">
+                        Update Email
+                    </button>
+                  </div>
+                </form>
+              </div>
+      
+              <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+                <div>
+                  <h2 class="text-base font-semibold leading-7 text-white">
+                    Password
+                  </h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-400">
+                    Update the password associated with your account.
+                  </p>
+                </div>
+      
+                <form class="md:col-span-2" action="/admin/profile/update-password" method="POST">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
+                    <div class="col-span-full">
+                      <label for="current-password" class="block text-sm font-medium leading-6 text-white">
+                        Current password
+                      </label>
+                      <div class="mt-2">
+                        <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                      </div>
+                    </div>
+      
+                    <div class="col-span-full">
+                      <label for="new-password" class="block text-sm font-medium leading-6 text-white">
+                        New password
+                      </label>
+                      <div class="mt-2">
+                        <input id="new-password" name="newPassword" type="password" autocomplete="new-password" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                      </div>
+                    </div>
+      
+                    <div class="col-span-full">
+                      <label for="confirm-password" class="block text-sm font-medium leading-6 text-white">
+                        Confirm password
+                      </label>
+                      <div class="mt-2">
+                        <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" class="block w-full rounded-md border-0 bg-white/10 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                      </div>
+                    </div>
+                  </div>
+      
+                  <div class="mt-8 flex">
+                    <button type="submit" class="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white shadow-sm border border-transparent hover:border-white">
+                        Update Password
+                    </button>
+                  </div>
+                </form>
+              </div>
+      
+              <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+                <div>
+                  <h2 class="text-base font-semibold leading-7 text-red-500">Danger Zone</h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-400">
+                    This button clears all the following but users' credentials and cached locations in the database: 
+                    <br>
+                    Trips, route geometries, unassigned and assigned locations.
+                  </p>
+                </div>
+      
+                <form class="flex items-start md:col-span-2" action="/admin/profile/clean-database" method="POST">
+                  <button type="submit" class="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm border border-transparent hover:border-white hover:bg-red-800">
+                    Delete the aforementioned data from the database.
+                  </button>
+                </form>
+              </div>
+            </div>
+        </div>
+    </main>
+</body>

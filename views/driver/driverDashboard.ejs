@@ -1,0 +1,309 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slick</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900">
+  <!-- Static sidebar for desktop -->
+  <div class="fixed inset-y-0 z-50 flex w-72 flex-col bg-gray-900 border-gray-500 border-r">
+    <!-- Sidebar component, swap this element with another sidebar if you like -->
+    <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6">
+      <div class="flex h-16 shrink-0 items-center">
+        <img class="h-20 w-auto" src="https://svgshare.com/i/15N6.svg" alt="Slick">
+      </div>
+      <nav class="flex flex-1 flex-col">
+        <ul role="list" class="flex flex-1 flex-col gap-y-7">
+          <li>
+            <ul role="list" class="-mx-2 space-y-1">
+              <li>
+                <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
+                <a href="/driver/dashboard" class="bg-amber-700 text-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a href="/driver/history" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  </svg>
+                  History
+                </a>
+              </li>
+              <li>
+                <a href="/driver/profile" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Profile
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="-mx-6 mt-auto">
+            <form action="/logout" method="POST" class="flex justify-between items-center px-6 py-3">
+              <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
+              
+              <a class="text-sm font-normal leading-6 text-white">
+                <%= user.first_name %> <%= user.last_name %>
+                <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                  Driver
+                </span>
+              </a>
+            </form>
+          </li>          
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <main class="pl-72">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <!-- Notification messages -->
+      <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
+        <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
+      <% } %>
+      <% if (typeof successTitle !== 'undefined' && typeof successBody !== 'undefined') { %>
+        <%- include('../partials/successNotif.ejs', { successTitle, successBody }) %>
+      <% } %>
+  
+      <!-- Map container -->
+      <div id="driverMapContainer" style="height: 400px; margin-top: 20px;"></div>
+      <hr class="my-8 border-gray-500" style="width: 100%;">
+
+      <!-- Action button -->
+      <div class="mb-4">
+        <% if (activeTrip) { %>
+          <% if (activeTrip.deliveryJobs[0].status === 'pending') { %>
+            <form action="/driver/start-trip" method="POST">
+              <input type="hidden" name="driverEmail" value="<%= activeTrip.driverEmail %>">
+              <input type="hidden" name="tripNumber" value="<%= activeTrip.deliveryJobs[0].trip_number %>">
+              <!-- text to notify driver they have an active trip and they can start it-->
+              <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 mb-4 text-lg font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                You are assigned a new trip. start it now!
+              </span>
+              <button type="submit" class="block bg-amber-700 text-white font-normal px-4 py-2 rounded-md border border-transparent hover:border-white">
+                Start Trip <%= activeTrip.deliveryJobs[0].trip_number %>
+              </button>
+            </form>
+          <% } else { %>
+            <% const currentRoute = activeTrip.deliveryJobs.find(job => job.status === 'started') %>
+            <% if (currentRoute) { %>
+              <form action="/driver/mark-complete" method="POST">
+                <input type="hidden" name="driverEmail" value="<%= activeTrip.driverEmail %>">
+                <input type="hidden" name="tripNumber" value="<%= activeTrip.deliveryJobs[0].trip_number %>">
+                <input type="hidden" name="waypointIndex" value="<%= currentRoute.waypoint_index %>">
+                <button type="submit" class="bg-amber-700 text-white font-normal px-4 py-2 rounded-md border border-transparent hover:border-white">
+                  <% if (currentRoute.waypoint_index === activeTrip.deliveryJobs.length - 1) { %>
+                    Finish Trip <%= activeTrip.deliveryJobs[0].trip_number %>
+                  <% } else { %>
+                    Complete Route <%= currentRoute.waypoint_index + 1 %> to <%= currentRoute.end_address %>
+                  <% } %>
+                </button>
+              </form>
+            <% } %>
+          <% } %>
+        <% } %>
+      </div>
+  
+      <!-- Itinerary section -->
+      <div class="itinerary-section">
+        <% if (activeTrip) { %>
+          <div class="overflow-hidden bg-white/5 rounded-lg shadow ring-1 ring-inset ring-white/10 mb-4">
+            <div class="flex justify-between items-start px-4 py-6">
+              <div>
+                <h3 class="text-base font-semibold leading-7 text-white"><%= activeTrip.driverEmail %></h3>
+                <!-- <div class="flex items-center">
+                  <p class="text-sm text-white">Driver Color:</p>
+                  <div class="w-6 h-6 ml-2" style="background-color: <%= activeTrip.deliveryJobs[0].color %>; border-radius: 50%;"></div>
+                </div> -->
+              </div>
+              <div>
+                <h3 class="text-base font-semibold leading-7 text-white">Trip Number: <%= activeTrip.deliveryJobs[0].trip_number %></h3>
+              </div>
+            </div>
+            <div class="border-t border-gray-500">
+              <div class="divide-y divide-gray-700">
+                <% activeTrip.deliveryJobs.forEach(function(job, index) { %>
+                  <div class="px-4 py-6">
+                    <!-- Route details -->
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <span class="text-sm font-medium text-white">Route Number:</span>
+                        <span class="ml-2 text-sm text-gray-400"><%= job.waypoint_index + 1 %></span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-white">From:</span>
+                        <span class="ml-2 text-sm text-gray-400"><%= job.start_address %></span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-white">To:</span>
+                        <span class="ml-2 text-sm text-gray-400"><%= job.end_address %></span>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <span class="text-sm font-medium text-white">Est. Duration:</span>
+                        <% if (job.estimated_duration_minutes >= 60) { %>
+                          <span class="ml-2 text-sm text-gray-400"><%= Math.floor(job.estimated_duration_minutes / 60) %> hours <%= job.estimated_duration_minutes % 60 %> minutes</span>
+                        <% } else { %>
+                          <span class="ml-2 text-sm text-gray-400"><%= job.estimated_duration_minutes %> minutes</span>
+                        <% } %>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-white">Distance:</span>
+                        <span class="ml-2 text-sm text-gray-400"><%= (job.distance / 1000).toFixed(1) %> km</span>
+                      </div>
+                      <div>
+                        <span class="text-sm font-medium text-white">Status:</span>
+                        <% if (job.status === 'completed') { %>
+                          <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20 ml-2">
+                            Completed
+                          </span>
+                        <% } else if (job.status === 'started') { %>
+                          <span class="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20 ml-2">
+                            In progress
+                          </span>
+                        <% } else if (job.status === 'pending') { %>
+                          <span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-400 ring-1 ring-inset ring-yellow-500/20 ml-2">
+                            <%= job.status %>
+                          </span>
+                        <% } else { %>
+                          <span class="inline-flex items-center rounded-md bg-gray-500/10 px-2 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-gray-500/20 ml-2">
+                            <%= job.status %>
+                          </span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="flex justify-center items-center">
+            <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-2xl font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+              Sit back and relax. No trips are currently assigned to you.
+            </span>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+ <!-- link to css file under public folder -->
+ <link rel="stylesheet" href="/styles/main.css">
+ <script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const activeTrip = <%- JSON.stringify(activeTrip) %>;
+ 
+     const map = L.map('driverMapContainer', {
+       minZoom: 3, // Set the minimum zoom level
+       maxZoom: 18, // Set the maximum zoom level
+       zoomControl: true // Add zoom control
+     }).setView([38.34, -100.21], 4); // center of US, zoom level 3
+     // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
+ 
+     var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+       attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+       minZoom: 3,
+       maxZoom: 18,
+       accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
+     }).addTo(map);
+ 
+     // Set the maximum bounds to limit the map to the United States
+     const usBounds = [
+       [24.9493, -125.0011], // Southwest coordinates
+       [49.5904, -66.9326]   // Northeast coordinates
+     ];
+     map.setMaxBounds(usBounds);
+ 
+     if (activeTrip && activeTrip.tripGeometry && activeTrip.tripGeometry.geometry) {
+      const geojsonData = JSON.parse(activeTrip.tripGeometry.geometry);
+      const coordinates = geojsonData.coordinates;
+      const latLngs = coordinates.map(coord => [coord[1], coord[0]]);
+      const polylineColor = '#0369a1';
+
+      const polyline = L.polyline(latLngs, {
+        color: polylineColor,
+        weight: 2,
+        opacity: 0.7
+      }).addTo(map);
+
+      // Fit the map bounds to the polyline
+      map.fitBounds(polyline.getBounds());
+    }
+
+    if (activeTrip && activeTrip.deliveryJobs && activeTrip.deliveryJobs.length > 0) {
+      activeTrip.deliveryJobs.forEach((job, index) => {
+        const [lat, lng] = job.start_lat_lon.split(',').map(parseFloat);
+        const latLng = [lat, lng];
+        const markerColor = '#0369a1';
+
+        let marker;
+
+        if (index === 0) {
+          // Warehouse location
+          marker = L.divIcon({
+            className: 'custom-marker-driver',
+            html: `
+              <div class="pin" style="background-color: ${markerColor};">
+                <div class="marker-icon">&#x1F3E2;</div>
+              </div>
+            `,
+            iconSize: [25, 25],
+            iconAnchor: [12, 24]
+          });
+        } else {
+          // Regular delivery locations
+          marker = L.divIcon({
+            className: 'custom-marker-driver',
+            html: `
+              <div class="pin" style="background-color: ${markerColor};">
+                <div class="marker-number-driver">${job.waypoint_index}</div>
+              </div>
+            `,
+            iconSize: [25, 25],
+            iconAnchor: [12, 24]
+          });
+        }
+
+        L.marker(latLng, { icon: marker })
+          .addTo(map)
+          .bindPopup(`<b>Address:</b> ${job.start_address}`);
+      });
+
+      // Render marker for the last delivery location
+      const lastJob = activeTrip.deliveryJobs[activeTrip.deliveryJobs.length - 1];
+      const [lat, lng] = lastJob.end_lat_lon.split(',').map(parseFloat);
+      const latLng = [lat, lng];
+      const markerColor = '#0369a1';
+
+      const marker = L.divIcon({
+        className: 'custom-marker-driver',
+        html: `
+          <div class="pin" style="background-color: ${markerColor};">
+            <div class="marker-number-driver">${lastJob.waypoint_index + 1}</div>
+          </div>
+        `,
+        iconSize: [25, 25],
+        iconAnchor: [12, 24]
+      });
+
+      L.marker(latLng, { icon: marker })
+        .addTo(map)
+        .bindPopup(`<b>Address:</b> ${lastJob.end_address}`);
+
+      // Fit the map bounds to the markers
+      const group = new L.featureGroup(map._layers);
+      map.fitBounds(group.getBounds());
+    }
+  });
+ </script>
+</body>

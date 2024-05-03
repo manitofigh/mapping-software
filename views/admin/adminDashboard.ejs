@@ -1,0 +1,450 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slick</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <!-- Static sidebar for desktop -->
+  <div class="fixed inset-y-0 z-50 flex w-72 flex-col bg-gray-900 border-r border-gray-500">
+    <!-- Sidebar component, swap this element with another sidebar if you like -->
+    <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6">
+      <div class="flex h-16 shrink-0 items-center">
+        <img class="h-20 w-auto" src="https://svgshare.com/i/15N6.svg" alt="Slick">
+      </div>
+      <nav class="flex flex-1 flex-col">
+        <ul role="list" class="flex flex-1 flex-col gap-y-7">
+          <li>
+            <ul role="list" class="-mx-2 space-y-1">
+              <li>
+                <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
+                <a class="bg-amber-700 text-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a href="/admin/drivers" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                  </svg>
+                  Drivers & History
+                </a>
+              </li>
+              <!-- <li>
+                <a href="/admin/history" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  </svg>
+                  History
+                </a>
+              </li> -->
+              <li>
+                <a href="/admin/applications" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+                  </svg>
+                  Driver Applications
+                  <% if (pendingApplications == 0) { %>
+                    <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20"> 0 </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20"> <%= pendingApplications %> </span>
+                  <% } %>
+                </a>
+              </li>
+              <!-- <li>
+                <a href="#" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+                  </svg>
+                  Reports
+                </a>
+              </li> -->
+              <li>
+                <a href="/admin/profile" class="text-gray-400 hover:text-white hover:bg-gray-800 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Profile
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="-mx-6 mt-auto">
+            <form action="/logout" method="POST" class="flex justify-between items-center px-6 py-3">
+              <button type="submit" class="rounded-md bg-amber-700 px-2 py-1 mr-1 text-xs font-normal text-white shadow-sm hover:bg-red-500"> <span aria-hidden="true">&larr;</span> Logout</button>
+              
+              <a class="text-sm font-normal leading-6 text-white">
+                <%= user.first_name %> <%= user.last_name %>
+                <span class="ml-1 inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                  Admin
+                </span>
+              </a>
+            </form>
+          </li>          
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <main class="pl-72">
+    <div class="px-4 sm:px-6 lg:px-4 bg-gray-900 min-h-screen">
+      <!-- Main content -->
+      <% if (typeof errorTitle !== 'undefined' && typeof errorBody !== 'undefined') { %>
+        <%- include('../partials/errorNotif.ejs', { errorTitle, errorBody }) %>
+      <% } %>
+      <% if (typeof successTitle !== 'undefined' && typeof successBody !== 'undefined') { %>
+        <%- include('../partials/successNotif.ejs', { successTitle, successBody }) %>
+      <% } %>
+      <div class="flex items-center justify-center h-screen">
+        <div class="w-3/5 h-full mr-4">
+          <div class="h-1/2 py-4 rounded-t-2xl overflow-hidden">
+            <div id="mapContainer" class="h-full"></div>
+          </div>
+          <div class="h-1/2 rounded-b-2xl border-t border-gray-500 p-4 overflow-y-auto">
+            <% if (pendingDeliveryLocations.length > 0) { %>
+              <form action="/admin/create-trips" method="POST">
+                <button type="submit" id="create-trips-btn" class="bg-amber-700 text-white font-normal px-4 py-2 rounded-md border border-transparent hover:border-white">
+                  Calculate trips for all pending locations
+                </button>
+              </form>
+            <% } else if (activeTrips.length == 0) { %>
+              <div class="flex justify-center items-center">
+                <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-2xl font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                  No active trips!
+                </span>
+              </div>
+            <% } %>
+            <% activeTrips.forEach(function(trip) { %>
+              <div class="overflow-hidden bg-white/5 rounded-lg shadow ring-1 ring-inset ring-white/10 mb-4">
+                <div class="flex justify-between items-start px-4 py-6">
+                  <div>
+                    <h3 class="text-base font-semibold leading-7 text-white"><%= trip.driverEmail %></h3>
+                    <div class="flex items-center">
+                      <p class="text-sm text-white">Driver Color:</p>
+                      <div class="w-6 h-6 ml-2" style="background-color: <%= trip.deliveryJobs[0].color %>; border-radius: 50%;"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-semibold leading-7 text-white">Trip Number: <%= trip.deliveryJobs[0].trip_number %></h3>
+                  </div>
+                </div>
+            
+                <div class="border-t border-gray-700">
+                  <div class="divide-y divide-gray-700">
+                    <% trip.deliveryJobs.forEach(function(job) { %>
+                      <div class="px-4 py-6">
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <span class="text-sm font-medium text-white">Route Number:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= job.waypoint_index + 1 %></span>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">From:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= job.start_address %></span>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">To:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= job.end_address %></span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <span class="text-sm font-medium text-white">Est. Duration:</span>
+                            <% if (job.estimated_duration_minutes >= 60) { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= Math.floor(job.estimated_duration_minutes / 60) %> hours <%= job.estimated_duration_minutes % 60 %> minutes</span>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= job.estimated_duration_minutes %> minutes</span>
+                            <% } %>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">Distance:</span>
+                            <span class="ml-2 text-sm text-gray-400"><%= (job.distance / 1000).toFixed(1) %> km</span>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">Status:</span>
+                            <% if (job.status === 'completed') { %>
+                              <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20 ml-2">
+                                Completed
+                              </span>
+                            <% } else if (job.status === 'pending') { %>
+                              <span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-400 ring-1 ring-inset ring-yellow-500/20 ml-2">
+                                Pending
+                              </span>
+                            <% } else if (job.status === 'started') { %>
+                              <span class="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20 ml-2">
+                                In Progress
+                              </span>
+                            <% } else { %>
+                              <span class="inline-flex items-center rounded-md bg-gray-500/10 px-2 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-gray-500/20 ml-2">
+                                <%= job.status %>
+                              </span>
+                            <% } %>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                          <div>
+                            <span class="text-sm font-medium text-white">Start Time:</span>
+                            <% if (job.start_time) { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= job.start_time %></span>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400">N/A</span>
+                            <% } %>
+                          </div>
+                          <div>
+                            <span class="text-sm font-medium text-white">End Time:</span>
+                            <% if (job.end_time) { %>
+                              <span class="ml-2 text-sm text-gray-400"><%= job.end_time %></span>
+                            <% } else { %>
+                              <span class="ml-2 text-sm text-gray-400">N/A</span>
+                            <% } %>
+                          </div>
+                        </div>
+                      </div>
+                    <% }); %>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+        <div class="w-2/5 h-full overflow-y-auto p-4 border-l border-gray-500">
+          <form action="/admin/submit-address" method="POST" class="mb-4">
+            <div class="mb-4">
+              <div id="container" class="flex mb-4 border bg-gray-900 border-gray-600 rounded-md overflow-hidden resize-y h-32 relative">
+                <div id="line-numbers" class="border-r border-gray-600 p-2 text-right text-white overflow-hidden">
+                </div>
+                <textarea id="textarea" name="address" class="bg-white/10 text-white flex-1 border-none outline-none p-2 resize-y" placeholder="Enter US address(es) one per line or drag-and-drop a text/csv file"><%= typeof previousAddress !== 'undefined' ? previousAddress : '' %></textarea>
+                <div id="dropMask" class="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-75 flex items-center justify-center text-white text-xl pointer-events-none opacity-0 transition-opacity duration-200">
+                  <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-md font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                    </svg>
+                    Drop text/csv file
+                  </span>
+                </div>
+              </div>
+              <div class="flex">
+                <% if (typeof drivers !== 'undefined' && drivers.length > 0) { %>
+                  <select id="driverSelect" name="driverEmail" class="w-3/4 rounded-md border-0 bg-white/10 px-2 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700">
+                    <option value="">Select Driver</option>
+                    <% drivers.forEach((driver) => { %>
+                      <option value="<%= driver.email %>" <%= typeof previousDriverEmail !== 'undefined' && previousDriverEmail === driver.email ? 'selected' : '' %>><%= driver.first_name + " " + driver.last_name %> - <%= driver.email %></option>
+                    <% }); %>
+                  </select>
+                <% } else { %>
+                  <select id="driverSelect" name="driverId" class="w-3/4 rounded-md border-0 bg-white/10 px-2 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-700">
+                    <option value="">
+                      No Drivers available
+                    </option>
+                  </select>
+                <% } %>
+                <button type="submit" id="search-address" class="w-1/4 ml-2 flex justify-center items-center px-2 py-2 bg-amber-700 text-white rounded border border-transparent hover:border-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+          <hr class="border-gray-500 mb-4">
+          <div id="addressList" class="text-white">
+            <% if (pendingDeliveryLocations.length == 0) { %>
+              <div class="flex flex-col items-center justify- h-full">
+                <h2 class="text-lg font-semibold text-white">
+                  No pending delivery locations!
+                </h2>
+                <h2 class="text-lg font-semibold text-white">
+                  Search addresses to create trips.
+                </h2>
+              </div>
+            <% } else { %>
+                <h2 class="text-lg font-semibold text-white">
+                  Pending Locations
+                </h2>
+                <p class="text-sm text-gray-400 mb-3">
+                  Pending locations are assigned to a driver before creating a trip. 
+                  <br>
+                  Once a trip is created, the location(s) and the driver(s) cannot be edited.
+                </p>
+                <% pendingDeliveryLocations.forEach(function(location) { %>
+                <div class="bg-white/10 px-4 pb-4 pt-1 rounded-md shadow mb-3 relative">
+                  <form method="POST" action="/admin/remove-delivery-location">
+                    <input type="hidden" name="address" value="<%= location.address %>">
+                    <input type="hidden" name="driverEmail" value="<%= location.driver_email %>">
+                    <div class="ml-4 flow-root flex-shrink-0 absolute top-3 right-3">
+                      <button type="submit" class="flex items-center justify-center bg-transparent text-gray-400 hover:text-red-500">
+                        <span class="sr-only">Remove</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </form>
+                  <div class="flex items-center mb-2 text-sm">
+                    <svg class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
+                    </svg>
+                    <span><%= location.address %></span>
+                  </div>
+                  <div class="flex items-center text-sm">
+                    <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" />
+                    </svg>
+                    <span><%= location.driver_email %></span>
+                  </div>
+                  <div class="flex items-center text-sm mt-1">
+                    <svg class="h-4 w-4 text-gray-400 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Searched at: <%= location.created_at %></span>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- link to css file under public folder -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <!-- link to leaflet css and axios -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <!-- link to js file under public folder -->
+  <script src="/js/addressBox.js"></script>
+  <!-- leaflet map settings for admin -->
+  <script>
+    const activeTrips = <%- JSON.stringify(activeTrips) %>;
+  
+    document.addEventListener('DOMContentLoaded', () => {
+      const map = L.map('mapContainer', {
+        minZoom: 3, // Set the minimum zoom level
+        maxZoom: 18, // Set the maximum zoom level
+        zoomControl: true // Add zoom control
+      }).setView([38.34, -100.21], 4); // center of US, zoom level 3
+      // .setView([40.7169, -73.5990], 16); // Hofstra Locations zoom level 16
+  
+      var Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+        attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        minZoom: 3,
+        maxZoom: 18,
+        accessToken: 'SxKj0amjVMusXHU2Ltmkq9eRTpmpXKLpiQHgxqFtfqjTiU7kBM6rjBvGchSqB2oh'
+      }).addTo(map);
+  
+      // Set the maximum bounds to limit the map to the United States
+      const usBounds = [
+        [24.9493, -125.0011], // Southwest coordinates
+        [49.5904, -66.9326]   // Northeast coordinates
+      ];
+      map.setMaxBounds(usBounds);
+  
+      activeTrips.forEach((trip) => {
+      // Render markers for each delivery job
+      trip.deliveryJobs.forEach((job, index) => {
+        const [lat, lng] = job.start_lat_lon.split(',').map(parseFloat);
+        const latLng = [lat, lng];
+        const markerColor = job.color;
+
+        let marker;
+
+        if (index === 0) {
+          // Starting location (warehouse)
+          marker = L.divIcon({
+            className: 'custom-marker',
+            html: `
+              <div class="pin" style="background-color: ${markerColor};">
+                <div class="marker-icon">&#x1F3E2;</div>
+              </div>
+            `,
+            iconSize: [25, 25],
+            iconAnchor: [12, 24]
+          });
+        } else {
+          // Regular delivery locations
+          marker = L.divIcon({
+            className: 'custom-marker',
+            html: `
+              <div class="pin" style="background-color: ${markerColor};">
+                <div class="marker-number">${job.waypoint_index}</div>
+              </div>
+            `,
+            iconSize: [25, 25],            iconAnchor: [12, 24]
+          });
+        }
+
+        L.marker(latLng, { icon: marker })
+          .addTo(map)
+          .bindPopup(`
+            <b>Address:</b> ${job.start_address}<br>
+            <b>Assigned Driver:</b> ${trip.driverEmail}
+          `);
+      });
+
+      // Render marker for the last delivery location
+      const lastJob = trip.deliveryJobs[trip.deliveryJobs.length - 1];
+      const [lat, lng] = lastJob.end_lat_lon.split(',').map(parseFloat);
+      const latLng = [lat, lng];
+      const markerColor = lastJob.color;
+
+      const marker = L.divIcon({
+        className: 'custom-marker',
+        html: `
+          <div class="pin" style="background-color: ${markerColor};">
+            <div class="marker-number">${lastJob.waypoint_index + 1}</div>
+          </div>
+        `,
+        iconSize: [25, 25],
+        iconAnchor: [12, 24]
+      });
+
+      L.marker(latLng, { icon: marker })
+        .addTo(map)
+        .bindPopup(`
+          <b>Address:</b> ${lastJob.end_address}<br>
+          <b>Assigned Driver:</b> ${trip.driverEmail}
+      `);
+  
+        // Render polyline for the trip geometry
+        if (trip.tripGeometry) {
+          const geojsonData = JSON.parse(trip.tripGeometry.geometry);
+          const coordinates = geojsonData.coordinates;
+          const latLngs = coordinates.map(coord => [coord[1], coord[0]]);
+          const polylineColor = trip.tripGeometry.color;
+  
+          const polyline = L.polyline(latLngs, {
+            color: polylineColor,
+            weight: 2,
+            opacity: 0.7
+          }).addTo(map);
+        }
+      });
+  
+      // const logMapDetails = () => {
+      //   const center = map.getCenter(); // Gets the current geographical center of the map
+      //   const zoom = map.getZoom(); // Gets the current zoom level
+      //   console.log(`Latitude: ${center.lat.toFixed(2)}, Longitude: ${center.lng.toFixed(2)}, Zoom: ${zoom}`);
+      // };
+  
+      // // Set the interval to log details every 5 seconds
+      // setInterval(logMapDetails, 5000);
+  
+      document.getElementById('search-address').addEventListener('click', () => {
+        document.getElementById('search-address').innerHTML = `
+          <div class="loading-spinner"></div>
+        `;
+      });
+  
+      document.getElementById('create-trips-btn').addEventListener('click', () => {
+        document.getElementById('create-trips-btn').innerHTML = `
+          <div class="loading-spinner"></div>
+        `;
+      });
+    });
+  </script>
+</body>
