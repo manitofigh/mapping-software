@@ -3,6 +3,7 @@ import AdminModel from './models/AdminModel.js';
 import authController from './controllers/authController.js';
 
 // Create users with different statuses
+// driver template
 /*
 AdminModel.createUser(
     'FirstName', 
@@ -18,6 +19,26 @@ AdminModel.createUser(
     'Somewhere in NY', 
     'I want a car too', 
     'red', 
+    authController.getFormattedTime()
+)
+*/
+
+// admin template
+/*
+AdminModel.createUser(
+    'Admin', 
+    'Tester', 
+    'admin@test.com', 
+    'Admin@123', 
+    'approved', 
+    'admin', 
+    'USA', 
+    'Hempstead', 
+    'NY', 
+    12345, 
+    'Somewhere in NY', 
+    'I test stuff as an admin', 
+    null, 
     authController.getFormattedTime()
 )
 */
