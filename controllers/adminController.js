@@ -82,15 +82,25 @@ const adminController = {
   async updatePassword(req, res) {
     try {
       const { currentPassword, newPassword, confirmPassword } = req.body;
-      const admin = await AdminModel.findUserByEmail(req.user.email);
+      const adminEmail = req.user.email;
+      const admin = await AdminModel.findUserByEmail(adminEmail);
       const newPasswordAndConfirmPasswordMatch = newPassword === confirmPassword;
       const currentPasswordMatches = await authController.comparePasswords(currentPassword, admin.password);
       // email regex to contain at least one special character, one uppercase, one number, and at least 8 letters long
       const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
       const newPasswordMatchesRegex = passwordRegex.test(newPassword);
+      
+      // Password change for the admin with email admin@test.com is not allowed as it's a test account for all
+      if (adminEmail == 'admin@test.com') {
+	res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'Changing password for this admin account is not allowed through the GUI.',
+        });
 
       // if new password and confirm password match, current password matches, and new password matches regex
-      if (newPasswordAndConfirmPasswordMatch && currentPasswordMatches && newPasswordMatchesRegex) {
+      } else if (newPasswordAndConfirmPasswordMatch && currentPasswordMatches && newPasswordMatchesRegex) {
         await AdminModel.updatePasswordById(admin.id, newPassword);
         res.render('admin/profile.ejs', {
           user: req.user,
