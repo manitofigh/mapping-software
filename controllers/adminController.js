@@ -61,13 +61,24 @@ const adminController = {
   async updateEmail(req, res) {
     try {
       const { email } = req.body;
-      await AdminModel.updateEmailByEmail(req.user.email, email);
-      res.render('admin/profile.ejs', {
-        user: req.user,
-        pendingApplications: await AdminModel.countPendingApplications(),
-        successTitle: 'Success',
-        successBody: 'Email updated successfully. You need to refresh your page for the changes to take effect as your previous session is still using the old email.',
-      });
+      const adminEmail = req.user.email;
+
+      if (adminEmail == 'admin@test.com') {
+	      res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          errorTitle: 'Error',
+          errorBody: 'Changing E-Mail for this general-purpose admin account is prohibited.',
+        });
+      } else {
+        await AdminModel.updateEmailByEmail(adminEmail, email);
+        res.render('admin/profile.ejs', {
+          user: req.user,
+          pendingApplications: await AdminModel.countPendingApplications(),
+          successTitle: 'Success',
+          successBody: 'Email updated successfully. You need to refresh your page for the changes to take effect as your previous session is still using the old email.',
+        });
+      }
     } catch (err) {
       console.error(err);
       res.render('admin/profile.ejs', {
@@ -92,11 +103,11 @@ const adminController = {
       
       // Password change for the admin with email admin@test.com is not allowed as it's a test account for all
       if (adminEmail == 'admin@test.com') {
-	res.render('admin/profile.ejs', {
+	      res.render('admin/profile.ejs', {
           user: req.user,
           pendingApplications: await AdminModel.countPendingApplications(),
           errorTitle: 'Error',
-          errorBody: 'Changing password for this admin account is not allowed through the GUI.',
+          errorBody: 'Changing password for this general-purpose admin account is prohibited.',
         });
 
       // if new password and confirm password match, current password matches, and new password matches regex
