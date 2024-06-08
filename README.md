@@ -18,31 +18,38 @@ There are many other functionalities that Slick provides, such as driver registr
     * HTTPS: `https://github.com/manitofigh/mapping-software.git`
     * GitHub CLI: `gh repo clone manitofigh/mapping-software`
 
-2. Navigate to the project directory.
+2. Navigate to the project directory: </br>
 `cd mapping-software`
 
-3. Install the required dependencies.
+3. Install the required dependencies: </br>
 `npm install`
 
-4. Setup the datbase schema.
+4. Setup the datbase schema: </br>
 We are using PostgreSQL for our database. You can download it here: https://www.postgresql.org/download/
+</br>
 We recommend using pgAdmin to create the database. You can download it here: https://www.pgadmin.org/download/
+</br>
 Of course, you can use any other database management tool you prefer, as long as it supports PostgreSQL.
 
 After the creation of the database (e.g. you can call it "slick"), you can run the sql commands provided in the `sqlQueries.sql` file to create the required tables. You can later use the `manageDb.js` file to create some sample users and data to get started with the application (e.g. creating an admin user to be able to log in).
 
-5. `.env` file setup
-`cp .env.sample .env`
+5. `.env` file setup: </br>
+`cp .env.sample .env` 
+</br>
 Provide the necessary information for your database connection.
-The application uses nodemailer to send out emails for many functionalities (e.g. driver registration requests, application acceptances, application rejections, password resets, etc). The easiest thing is to use a gmail account and create an app password for the application.
+</br>
+The application uses nodemailer to send out emails for many functionalities (e.g. driver registration requests, application acceptances, application rejections, password resets, etc). 
+</br>
+The easiest thing is to use a gmail account and create an app password for the application.
+</br>
 You can follow the instructions here: https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237
 
-6. Start the application.
+6. Start the application: </br>
 `node app.js` or `nodemon app.js` if you have nodemon installed.
 
 ## Authors
-Mani Tofigh 
-Sean Cotter
-Josh Albin
-Kevin Tjon
-Mohtasim Billah
+Mani Tofigh </br>
+Sean Cotter </br>
+Josh Albin </br>
+Kevin Tjon </br>
+Mohtasim Billah </br>
