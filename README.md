@@ -14,9 +14,9 @@ There are many other functionalities that Slick provides, such as driver registr
 
 ## Setup
 ### 1. Clone the repository
-    * SSH: `git@github.com:manitofigh/mapping-software.git`
-    * HTTPS: `https://github.com/manitofigh/mapping-software.git`
-    * GitHub CLI: `gh repo clone manitofigh/mapping-software`
+* SSH: `git@github.com:manitofigh/mapping-software.git`
+* HTTPS: `https://github.com/manitofigh/mapping-software.git`
+* GitHub CLI: `gh repo clone manitofigh/mapping-software`
 
 ### 2. Navigate to the project directory
 ```bash
