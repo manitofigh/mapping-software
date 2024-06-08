@@ -13,38 +13,42 @@ That's what Slick does. It helps administrators input a list of delivery locatio
 There are many other functionalities that Slick provides, such as driver registration, driver application acceptance/rejection, driver and administrator profile management, driver management for administrators, history of deliveries for drivers, etc.
 
 ## Setup
-1. Clone the repository to your local machine using either HTTPS, SSH, or GitHub CLI.
+### 1. Clone the repository
     * SSH: `git@github.com:manitofigh/mapping-software.git`
     * HTTPS: `https://github.com/manitofigh/mapping-software.git`
     * GitHub CLI: `gh repo clone manitofigh/mapping-software`
 
-2. Navigate to the project directory: </br>
-`cd mapping-software`
+### 2. Navigate to the project directory
+```bash
+cd mapping-software
+```
 
-3. Install the required dependencies: </br>
-`npm install`
-
-4. Setup the datbase schema: </br>
+### 3. Install the required dependencies
+```bash
+npm install
+```
+### 4. Setup the datbase schema
 We are using PostgreSQL for our database. You can download it here: https://www.postgresql.org/download/
-</br>
+
 We recommend using pgAdmin to create the database. You can download it here: https://www.pgadmin.org/download/
-</br>
+
 Of course, you can use any other database management tool you prefer, as long as it supports PostgreSQL.
 
 After the creation of the database (e.g. you can call it "slick"), you can run the sql commands provided in the `sqlQueries.sql` file to create the required tables. You can later use the `manageDb.js` file to create some sample users and data to get started with the application (e.g. creating an admin user to be able to log in).
 
-5. `.env` file setup: </br>
-`cp .env.sample .env` 
-</br>
+### 5. `.env` file setup
+```bash
+cp .env.sample .env
+``` 
+
 Provide the necessary information for your database connection.
-</br>
 The application uses nodemailer to send out emails for many functionalities (e.g. driver registration requests, application acceptances, application rejections, password resets, etc). 
-</br>
+
 The easiest thing is to use a gmail account and create an app password for the application.
-</br>
+
 You can follow the instructions here: https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237
 
-6. Start the application: </br>
+### 6. Start the application
 `node app.js` or `nodemon app.js` if you have nodemon installed.
 
 ## Authors
