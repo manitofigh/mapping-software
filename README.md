@@ -80,8 +80,8 @@ You can follow the instructions here: https://knowledge.workspace.google.com/kb/
 `node app.js` or `nodemon app.js` if you have nodemon installed.
 
 ## Authors
-Mani Tofigh </br>
-Sean Cotter </br>
+[Mani Tofigh](https://www.linkedin.com/in/manitofigh) </br>
+[Sean Cotter](https://www.linkedin.com/in/theseancotter/) </br>
 Josh Albin </br>
 Kevin Tjon </br>
-Mohtasim Billah </br>
+[Mohtasim Billah](https://www.linkedin.com/in/mohtasimb62/) </br>
