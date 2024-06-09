@@ -12,6 +12,34 @@ That's what Slick does. It helps administrators input a list of delivery locatio
 
 There are many other functionalities that Slick provides, such as driver registration, driver application acceptance/rejection, driver and administrator profile management, driver management for administrators, history of deliveries for drivers, etc.
 
+## Demo
+Users with access to [Hofstra University's CS VPN](https://csconnect.hofstra.edu/) can access the web app hosted on CS VMs at [this link](http://10.22.12.86:4004/). (For testing credentials please contact the authors)
+
+Either way, here are some images of different sections of the web app:
+### Login Page
+![Login Page](./demoFiles/images/login.png)
+
+### Driver Apply Page
+![Driver Apply Page](./demoFiles/images/apply.png)
+
+### Admin Dashboard
+![Admin Dashboard](./demoFiles/images/adminDashboard.png)
+
+### Admin Driver Management
+![Admin Driver Management](./demoFiles/images/adminDriverManagement.png)
+
+### Admin Profile Management
+![Admin Profile Management](./demoFiles/images/adminProfileManagement.png)
+
+### Driver Dashboard
+![Driver Dashboard](./demoFiles/images/driverDashboard.png)
+
+### Driver History
+![Driver History](./demoFiles/images/driverHistory.png)
+
+### Driver Profile Management
+![Driver Profile Management](./demoFiles/images/driverProfileManagement.png)
+
 ## Setup
 ### 1. Clone the repository
 * SSH: `git@github.com:manitofigh/mapping-software.git`
