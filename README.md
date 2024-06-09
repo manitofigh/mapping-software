@@ -1,7 +1,9 @@
 # Mapping Software | Slick
 
-## Introduction
+## Contributing
+Please read the [CONTRIBUTING.md](./CONTRIBUTING.md) file for details on our process for submitting pull requests to us.
 
+## Introduction
 "Slick" is a web-based software application, aiming to help delivery organizations manage their deliveries, drivers, and driving routes more efficiently. 
 
 Imagine a company like Fedex, UPS, or Amazon. They have a lot of drivers, a lot of packages, and a lot of delivery locations. They need delivery locations to be assigned to drivers, and they need administrators to be able to track and manage the drivers and their deliveries.
@@ -77,7 +79,7 @@ The easiest thing is to use a gmail account and create an app password for the a
 You can follow the instructions here: https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237
 
 ### 6. Start the application
-`node app.js` or `nodemon app.js` if you have nodemon installed.
+`node app.js` or `nodemon app.js` if you have [nodemon](https://www.npmjs.com/package/nodemon) installed.
 
 ## Authors
 [Mani Tofigh](https://www.linkedin.com/in/manitofigh) </br>
